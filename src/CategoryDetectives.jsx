@@ -269,6 +269,15 @@ function FontLoader() {
 function GlobalStyles() {
   return (
     <style>{`
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #0A0A0C;
+      }
+      #root {
+        min-height: 100vh;
+        background: #0A0A0C;
+      }
       .cd-root {
         --void: #0A0A0C;
         --panel: #131317;
