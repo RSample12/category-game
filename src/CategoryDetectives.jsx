@@ -2,9 +2,10 @@ import React, { useReducer, useEffect, useRef, useState } from "react";
 import {
   Search, LayoutGrid, Layers, RefreshCw, ArrowRight, Eye, EyeOff,
   Lock, Lightbulb, Target, Scissors, AlertTriangle, Award,
-  Loader2, CheckCircle2, X, Users, Volume2, VolumeX, History, Trash2, Puzzle, Home
+  Loader2, CheckCircle2, X, Users, Volume2, VolumeX, History, Trash2, Puzzle, Home, Calendar
 } from "lucide-react";
 import { CATEGORY_SETS, ITEM_FACTS, DEAL_LINES } from "./gameData";
+import DailyRun from "./DailyRun.jsx";
 
 
 function shuffle(arr) {
@@ -207,6 +208,9 @@ function reducer(state, action) {
 
     case "GO_CATEGORY":
       return { ...state, screen: "category" };
+
+    case "ENTER_DAILY":
+      return { ...state, screen: "daily" };
 
     case "SELECT_CATEGORY":
       return { ...state, categoryKey: action.key };
@@ -854,6 +858,9 @@ function StatsPanel({ stats, onReset }) {
 
 function IntroScreen({ state, dispatch, stats, onResetStats }) {
   const solo = state.gameMode === "solo";
+  const daily = state.gameMode === "daily";
+  const duel = !solo && !daily;
+
   return (
     <div>
       <div className="cd-kicker"><Search size={14} strokeWidth={2} /> SESSION 01 // NEW CASE</div>
@@ -861,26 +868,34 @@ function IntroScreen({ state, dispatch, stats, onResetStats }) {
       <p className="cd-subtitle">
         A deduction terminal. Agree on a category, get dealt a secret item
         from it at random, and out-question your opponent to name theirs
-        first — or crack a solo puzzle against the clock.
+        first — crack a solo puzzle against the clock — or run today's
+        three-case Daily Dive.
       </p>
 
       <div className="cd-intro-grid">
         <div className="cd-panel">
           <div className="cd-panel-head"><Users size={14} /> GAME MODE</div>
-          <div className="cd-mode-toggle">
+          <div className="cd-mode-toggle" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
             <button
-              className={"cd-mode-btn eliminate" + (!solo ? " is-active" : "")}
-              aria-pressed={!solo}
+              className={"cd-mode-btn eliminate" + (duel ? " is-active" : "")}
+              aria-pressed={duel}
               onClick={() => { Sound.click(); dispatch({ type: "SET_GAME_MODE", value: "duel" }); }}
             >
-              <Users size={16} strokeWidth={2} /> Pass &amp; Play
+              <Users size={15} strokeWidth={2} /> Pass &amp; Play
             </button>
             <button
               className={"cd-mode-btn eliminate" + (solo ? " is-active" : "")}
               aria-pressed={solo}
               onClick={() => { Sound.click(); dispatch({ type: "SET_GAME_MODE", value: "solo" }); }}
             >
-              <Puzzle size={16} strokeWidth={2} /> Puzzle Mode
+              <Puzzle size={15} strokeWidth={2} /> Puzzle
+            </button>
+            <button
+              className={"cd-mode-btn eliminate" + (daily ? " is-active" : "")}
+              aria-pressed={daily}
+              onClick={() => { Sound.click(); dispatch({ type: "SET_GAME_MODE", value: "daily" }); }}
+            >
+              <Calendar size={15} strokeWidth={2} /> Daily
             </button>
           </div>
 
@@ -890,16 +905,34 @@ function IntroScreen({ state, dispatch, stats, onResetStats }) {
               signature fun fact. Wrong guesses tell you if you were close.
             </p>
           )}
+          {daily && (
+            <p className="cd-subtitle" style={{ marginTop: 14, fontSize: 12.5 }}>
+              Three cases, one shot per day. Buy clues or guess early — bank whatever
+              credibility's left when you crack it. Same cases for everyone, every day.
+            </p>
+          )}
 
-          <div className="cd-field">
-            <label>{solo ? "Your Name" : "Player 1"}</label>
-            <input
-              type="text" maxLength={18} placeholder="Player 1"
-              value={state.names.p1}
-              onChange={(e) => dispatch({ type: "SET_NAME", player: "p1", value: e.target.value.trim() || "Player 1" })}
-            />
-          </div>
-          {!solo && (
+          {duel && (
+            <div className="cd-field">
+              <label>Player 1</label>
+              <input
+                type="text" maxLength={18} placeholder="Player 1"
+                value={state.names.p1}
+                onChange={(e) => dispatch({ type: "SET_NAME", player: "p1", value: e.target.value.trim() || "Player 1" })}
+              />
+            </div>
+          )}
+          {solo && (
+            <div className="cd-field">
+              <label>Your Name</label>
+              <input
+                type="text" maxLength={18} placeholder="Player 1"
+                value={state.names.p1}
+                onChange={(e) => dispatch({ type: "SET_NAME", player: "p1", value: e.target.value.trim() || "Player 1" })}
+              />
+            </div>
+          )}
+          {duel && (
             <div className="cd-field">
               <label>Player 2</label>
               <input
@@ -914,7 +947,14 @@ function IntroScreen({ state, dispatch, stats, onResetStats }) {
         <div className="cd-panel">
           <div className="cd-panel-head"><Lightbulb size={14} /> BRIEFING</div>
           <div className="cd-how-list">
-            {(solo
+            {(daily
+              ? [
+                  "Three cases a day, seeded so every player gets the same ones.",
+                  "Each case starts at 100 credibility with one free clue.",
+                  "Buy more clues or guess early — wrong guesses cost more than clues do.",
+                  "Bank whatever credibility's left when you name the right answer."
+                ]
+              : solo
               ? [
                   "Pick from 4 categories — we'll choose a secret item from it.",
                   "Each round reveals a new fun fact about the secret.",
@@ -940,13 +980,22 @@ function IntroScreen({ state, dispatch, stats, onResetStats }) {
       <StatsPanel stats={stats} onReset={onResetStats} />
 
       <div className="cd-stack">
-        <button className="cd-btn cd-btn-primary" onClick={() => { Sound.click(); dispatch({ type: "GO_CATEGORY" }); }}>
-          <LayoutGrid size={18} strokeWidth={2} /> Open Case File
+        <button
+          className="cd-btn cd-btn-primary"
+          onClick={() => {
+            Sound.click();
+            dispatch({ type: daily ? "ENTER_DAILY" : "GO_CATEGORY" });
+          }}
+        >
+          {daily ? <Calendar size={18} strokeWidth={2} /> : <LayoutGrid size={18} strokeWidth={2} />}
+          {daily ? "Open Today's Cases" : "Open Case File"}
         </button>
       </div>
 
       <div className="cd-footer">
-        {solo
+        {daily
+          ? "ONE RUN PER DAY — RESULTS AND SHARE CARD WAIT FOR YOU AFTER CASE 03."
+          : solo
           ? "PLAY SOLO, ANYTIME — A FRESH PUZZLE EVERY ROUND."
           : "BEST PLAYED SEATED ACROSS FROM YOUR OPPONENT — PASS THE DEVICE WHEN PROMPTED."}
       </div>
@@ -1506,6 +1555,14 @@ export default function CategoryDetectives() {
   const nameOf = (p) => state.names[p];
   const boardItem = (id) => state.board.find((b) => b.id === id);
   const resetStats = () => setStats({ ...DEFAULT_STATS, categoryCounts: {} });
+
+  // Daily Run is a fully self-contained app (its own reducer, its own
+  // styling namespace) — mount it directly, bypassing the cd-root shell
+  // and toolbar entirely, so there's no double-padding or CSS collision.
+  // Its own onExit button hands control back to this screen's intro.
+  if (state.screen === "daily") {
+    return <DailyRun onExit={() => { Sound.click(); dispatch({ type: "BACK_TO_START" }); }} />;
+  }
 
   return (
     <>
