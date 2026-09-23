@@ -3,20 +3,35 @@ import {
 } from "lucide-react";
 
 /* =========================================================================
-   GAME DATA — categories, their items, board icons, and the curated real-
-   world facts used as solo-puzzle clues. This is the file to edit to add
-   a new category or expand an existing one; no game-logic changes needed.
+   GAME DATA — categories, their items, board icons, and the curated
+   fun-fact clues + classification used by solo Puzzle Mode. This is the
+   file to edit to add a category or expand an existing one; no
+   game-logic changes needed.
 
-   To add a category:
-     1. Add an entry to CATEGORY_SETS with an Icon (any lucide-react icon)
-        and an `items` array of unique names.
-     2. Add a matching entry to ITEM_FACTS keyed by the same category name,
-        with exactly one array per item containing 2-3 short facts ordered
-        from vague/broad to specific/identifying (the solo puzzle reveals
-        them in that order, one per wrong guess).
+   CATEGORY_SETS holds every category, used by BOTH game modes (Pass &
+   Play offers all of them). ITEM_FACTS only needs entries for whichever
+   categories should be playable in solo Puzzle Mode — the category
+   picker in solo mode is driven directly off Object.keys(ITEM_FACTS), so
+   adding or removing a category from Puzzle Mode is just adding or
+   removing its ITEM_FACTS entry, no other code changes required.
+
+   To add a category to Puzzle Mode:
+     1. Add (or reuse) an entry in CATEGORY_SETS with an Icon (any
+        lucide-react icon) and an `items` array of unique names.
+     2. Add a matching entry to ITEM_FACTS keyed by the same category
+        name. Each item needs:
+          - `group`: a short classification shared by several items in
+            the category (an AKC breed group, a Pokémon type, a broad
+            profession, a country of origin, etc). This is never shown
+            as a clue — it's only used to mark wrong guesses CLOSE
+            (same group as the answer) or FAR (different group).
+          - `clues`: exactly 4 short, real facts about the item, ordered
+            from vague/broad (origin or history) to specific/identifying
+            (a signature, well-known fact). Revealed one per wrong guess.
      3. Every item name in CATEGORY_SETS must have a matching key in
-        ITEM_FACTS under the same category, or that item falls back to
-        name-based clues for every round in solo mode instead.
+        ITEM_FACTS under the same category, or the puzzle will crash
+        trying to build clues for it — Puzzle Mode has no name-based
+        fallback the way earlier versions did.
    ========================================================================= */
 
 export const CATEGORY_SETS = {
@@ -64,224 +79,92 @@ export const CATEGORY_SETS = {
 
 export const ITEM_FACTS = {
   "Dog Breeds": {
-    "Labrador Retriever": ["Classified in the Sporting group of dog breeds.", "Bred to retrieve fishing nets and waterfowl for hunters.", "Originally developed in Newfoundland, Canada, not Labrador."],
-    "Poodle": ["Classified in the Non-Sporting group of dog breeds.", "Known for a curly, low-shedding coat often kept in elaborate trims.", "Believed to have originated in Germany as a water retriever, despite its French association."],
-    "Bulldog": ["Classified in the Non-Sporting group of dog breeds.", "Known for a wrinkled face, stocky build, and pushed-in nose.", "Originally bred in England for the blood sport of bull-baiting."],
-    "Chihuahua": ["Classified in the Toy group of dog breeds.", "One of the smallest dog breeds in the world.", "Named after a state in Mexico."],
-    "Beagle": ["Classified in the Hound group of dog breeds.", "Has one of the most powerful senses of smell of any dog breed.", "Traditionally worked and hunted in packs rather than alone."],
-    "Dachshund": ["Classified in the Hound group of dog breeds.", "Bred with a long body and short legs to hunt burrowing animals underground.", "The name is German for 'badger dog.'"],
-    "Boxer": ["Classified in the Working group of dog breeds.", "Known for a playful, high-energy temperament well into adulthood.", "Developed in Germany, descending from older bull-baiting breeds."],
-    "Siberian Husky": ["Classified in the Working group of dog breeds.", "Known for a thick double coat built for extreme cold.", "Bred by the Chukchi people of northeastern Siberia to pull sleds."],
-    "Rottweiler": ["Classified in the Working group of dog breeds.", "Known for its strength, confidence, and protective instincts.", "Descended from Roman drover dogs used to herd cattle on long marches."],
-    "German Shepherd": ["Classified in the Herding group of dog breeds.", "Known for high intelligence and trainability.", "Developed in Germany in the late 1800s, originally for herding sheep."],
-    "Corgi": ["Classified in the Herding group of dog breeds.", "Known for very short legs relative to its long body.", "Long associated with the British royal family."],
-    "Great Dane": ["Classified in the Working group of dog breeds.", "One of the tallest dog breeds in the world.", "Originally bred to hunt wild boar."],
-    "Shih Tzu": ["Classified in the Toy group of dog breeds.", "Known for a long, flowing double coat.", "Bred in China as a companion for royalty."],
-    "Border Collie": ["Classified in the Herding group of dog breeds.", "Widely regarded as the most intelligent dog breed.", "Known for an intense, focused 'herding eye' stare."],
-    "Doberman": ["Classified in the Working group of dog breeds.", "Known for a sleek, muscular build and alert stance.", "Developed in Germany in the 1890s by a tax collector who wanted a protective companion."],
-    "Golden Retriever": ["Classified in the Sporting group of dog breeds.", "Known for its friendly, patient temperament, especially with children.", "Developed in Scotland in the 1800s for retrieving waterfowl during hunts."],
-    "Pug": ["Classified in the Toy group of dog breeds.", "Known for a distinctively flat, wrinkled face.", "Originated in China, where it was favored by emperors."],
-    "Dalmatian": ["Classified in the Non-Sporting group of dog breeds.", "Known for a white coat covered in distinctive spots.", "Historically used as a carriage dog, running alongside horse-drawn coaches."],
-    "Basset Hound": ["Classified in the Hound group of dog breeds.", "Known for very long ears and short legs.", "Bred in France for scent-hunting small game at a walking pace."],
-    "Australian Shepherd": ["Classified in the Herding group of dog breeds.", "Often has a distinctive mottled coat pattern.", "Despite the name, the breed was actually developed in the United States."]
-  },
-  "Planets & Moons": {
-    "Mercury": ["Classified as a planet.", "Experiences some of the most extreme temperature swings in the solar system.", "The closest planet to the Sun."],
-    "Venus": ["Classified as a planet.", "Rotates in the opposite direction from most other planets.", "The hottest planet in the solar system due to a runaway greenhouse effect."],
-    "Earth": ["Classified as a planet.", "Has exactly one natural satellite.", "The only planet known to support life."],
-    "Mars": ["Classified as a planet.", "Has two small moons.", "Known as the Red Planet due to iron oxide on its surface."],
-    "Jupiter": ["Classified as a planet.", "Has dozens of known moons, more than any planet except one.", "The largest planet in the solar system."],
-    "Saturn": ["Classified as a planet.", "Like Jupiter, it's a gas giant.", "Famous for its extensive, prominent ring system."],
-    "Uranus": ["Classified as a planet.", "Classified as an ice giant rather than a gas giant.", "Rotates almost completely on its side compared to other planets."],
-    "Neptune": ["Classified as a planet.", "Known for its deep blue color.", "Home to the strongest sustained winds recorded in the solar system."],
-    "Pluto": ["Classified as a dwarf planet.", "Located in a region called the Kuiper Belt.", "Reclassified from a full planet in 2006."],
-    "The Moon": ["Classified as a moon.", "Has essentially no atmosphere.", "Earth's only natural satellite."],
-    "Titan": ["Classified as a moon.", "The only moon in the solar system known to have a thick atmosphere.", "The largest moon of Saturn."],
-    "Europa": ["Classified as a moon.", "Has an icy surface believed to cover a hidden liquid ocean.", "One of Jupiter's four largest moons."],
-    "Ganymede": ["Classified as a moon.", "Actually bigger in size than the planet Mercury.", "The largest moon in the entire solar system."],
-    "Io": ["Classified as a moon.", "The most volcanically active body in the entire solar system.", "A moon of Jupiter."],
-    "Callisto": ["Classified as a moon.", "Known for one of the oldest, most heavily cratered surfaces in the solar system.", "One of the four large moons discovered by Galileo."],
-    "Triton": ["Classified as a moon.", "Thought to be a captured object rather than having formed alongside its planet.", "The largest moon of Neptune."],
-    "Phobos": ["Classified as a moon.", "Slowly spiraling inward toward its planet.", "The larger and closer of Mars's two moons."],
-    "Deimos": ["Classified as a moon.", "Named after the Greek personification of dread.", "The smaller and more distant of Mars's two moons."],
-    "Enceladus": ["Classified as a moon.", "Known for geysers of water vapor erupting from its icy surface.", "A moon of Saturn."],
-    "Charon": ["Classified as a moon.", "Named after the ferryman of the dead in Greek mythology.", "The largest moon of Pluto."]
-  },
-  "Board Games": {
-    "Monopoly": ["Classified as an economic trading game.", "The goal is to bankrupt all your opponents.", "Based on an earlier game called The Landlord's Game."],
-    "Clue": ["Classified as a deduction/mystery game.", "Players must determine the culprit, the weapon, and the room.", "Known as Cluedo outside of North America."],
-    "Risk": ["Classified as a strategy game.", "Involves dice rolls to resolve battles between armies.", "Players aim for world domination across a global map."],
-    "Scrabble": ["Classified as a word game.", "Different letters are worth different point values.", "Certain board squares multiply the value of words or letters."],
-    "Chess": ["Classified as an abstract strategy game.", "Each player commands 16 pieces of six different types.", "The goal is to checkmate the opponent's king."],
-    "Checkers": ["Classified as an abstract strategy game.", "Players capture opponent pieces by jumping over them.", "Pieces that reach the far side of the board are 'kinged.'"],
-    "Battleship": ["Classified as a naval guessing game.", "Each player hides a fleet of ships on a grid the opponent can't see.", "Players call out coordinates to try to land a hit on a hidden ship."],
-    "Sorry!": ["Classified as a race/path game.", "Players race colored pawns around a track toward home.", "Based on an ancient cross-and-circle game called Pachisi."],
-    "Candy Land": ["Classified as a race/path game.", "Players move along a path by drawing color-matching cards.", "Designed to be playable by young children who can't yet read."],
-    "Trouble": ["Classified as a race/path game.", "Players race pegs around the board and try to send opponents back to start.", "Features a plastic bubble in the center of the board that pops a die when pressed."],
-    "Connect Four": ["Classified as an abstract strategy game.", "The goal is to connect four of your own discs in a row.", "Players drop colored discs into a vertical grid."],
-    "Jenga": ["Classified as a physical skill game.", "Players take turns removing a block and placing it on top.", "The game ends when a stacked tower of wooden blocks collapses."],
-    "Pictionary": ["Classified as a drawing-based party game.", "Talking or writing letters or numbers while drawing isn't allowed.", "One player draws clues while teammates try to guess the word."],
-    "Yahtzee": ["Classified as a dice-based party game.", "Players aim to form specific scoring combinations, similar to poker hands.", "Played with five dice, rolled up to three times per turn."],
-    "The Game of Life": ["Classified as a race/path game.", "Players make choices about careers, family, and finances along a spinning-wheel-driven path.", "Simulates a person's journey through major life milestones."],
-    "Operation": ["Classified as a physical skill game.", "Touching the metal edge of an opening triggers a buzzer and lights up the patient's nose.", "Players use tweezers to remove small plastic pieces from a patient's body."],
-    "Stratego": ["Classified as a strategy game.", "Higher-ranked pieces generally defeat lower-ranked ones in combat.", "Each side's piece ranks are hidden from the opponent, and the goal is to capture their flag."],
-    "Mouse Trap": ["Classified as a physical skill game.", "The completed contraption is eventually used to try to catch an opponent's mouse piece.", "Players gradually assemble pieces of an elaborate chain-reaction machine."],
-    "Chutes and Ladders": ["Classified as a race/path game.", "Landing on certain squares sends your piece up a ladder or down a chute.", "Based on an ancient Indian game about morality."],
-    "Backgammon": ["Classified as a strategy game.", "Combines dice rolls with strategic decision-making.", "One of the oldest known board games, with roots going back thousands of years."]
-  },
-  "Ice Cream Flavors": {
-    "Vanilla": ["Falls into the classic family of ice cream flavors.", "Often used as a base flavor that pairs with almost any topping.", "Consistently the best-selling ice cream flavor worldwide."],
-    "Chocolate": ["Falls into the classic family of ice cream flavors.", "Comes in many variations based on how dark or milky the chocolate is.", "Usually ranks as the second most popular ice cream flavor after vanilla."],
-    "Strawberry": ["Falls into the fruit-based family of ice cream flavors.", "Known for its naturally pink or reddish color.", "One of the classic 'Neapolitan' trio flavors alongside chocolate and vanilla."],
-    "Mint Chocolate Chip": ["Falls into the classic family of ice cream flavors.", "A popular flavor choice for after-dinner or refreshing treats.", "Naturally a pale off-white color, though often dyed green for visual appeal."],
-    "Cookies and Cream": ["Falls into the candy-and-cookie-inspired family of ice cream flavors.", "Became widely popular in the United States starting in the 1980s.", "A vanilla base mixed with crushed chocolate sandwich cookies."],
-    "Rocky Road": ["Falls into the nut-and-candy mix-in family of ice cream flavors.", "One of the earliest widely popular 'mix-in' style ice cream flavors.", "Reportedly named partly in reference to hard economic times when it was created."],
-    "Pistachio": ["Falls into the nut-based family of ice cream flavors.", "Popular in Italian-style gelato as well as American ice cream.", "Naturally has a pale green color, though it's sometimes enhanced with food coloring."],
-    "Butter Pecan": ["Falls into the nut-based family of ice cream flavors.", "A flavor strongly associated with Southern United States cuisine.", "The pecans are typically toasted in butter before being added."],
-    "Neapolitan": ["Falls into the classic family of ice cream flavors.", "Named after the Italian city of Naples, though it was popularized in the US.", "Actually three separate flavors served together in one block."],
-    "Cookie Dough": ["Falls into the candy-and-cookie-inspired family of ice cream flavors.", "One of the most popular flavors introduced in the late 20th century.", "The dough used is specially made to be safe to eat without baking."],
-    "Coffee": ["Falls into the classic family of ice cream flavors.", "Tends to be a favorite among adult ice cream eaters over children.", "Popular as a base for a dessert where hot espresso is poured over it."],
-    "Salted Caramel": ["Falls into the candy-and-cookie-inspired family of ice cream flavors.", "Became especially trendy in dessert menus starting in the 2010s.", "The salt is added specifically to offset and enhance the sweetness."],
-    "Mango": ["Falls into the fruit-based family of ice cream flavors.", "Especially popular in South Asian and tropical cuisines.", "Often made as a dairy-free sorbet as well as a creamy ice cream."],
-    "Black Cherry": ["Falls into the fruit-based family of ice cream flavors.", "Usually has a deep red or purple color.", "A common flavor pairing alongside vanilla or chocolate swirls."],
-    "Bubblegum": ["Falls into the candy-and-cookie-inspired family of ice cream flavors.", "Popular primarily with children rather than adults.", "Usually brightly colored, often blue or pink."],
-    "Peanut Butter Cup": ["Falls into the nut-and-candy mix-in family of ice cream flavors.", "Popular as both a standalone flavor and a swirl combination.", "Combines two classic dessert flavors: peanut butter and chocolate."],
-    "Birthday Cake": ["Falls into the dessert-inspired family of ice cream flavors.", "Designed to evoke the flavor of a classic birthday celebration.", "Almost always includes colorful sprinkles mixed throughout."],
-    "Coconut": ["Falls into the fruit-based family of ice cream flavors.", "Frequently used as a dairy-free base for vegan ice cream.", "Often paired with other tropical flavors like pineapple or lime."],
-    "Maple Walnut": ["Falls into the nut-based family of ice cream flavors.", "One of the more common flavors specifically featuring maple as the star ingredient.", "Strongly associated with New England and Canadian cuisine."],
-    "Tiramisu": ["Falls into the dessert-inspired family of ice cream flavors.", "Sometimes includes a hint of cocoa or ladyfinger-cookie flavoring.", "Typically includes notes of coffee and mascarpone cheese."]
-  },
-  "Olympic Sports": {
-    "Swimming": ["Classified as an aquatic sport at the Olympics.", "Has been part of the Olympics since the very first modern Games in 1896.", "Includes strokes such as freestyle, backstroke, breaststroke, and butterfly."],
-    "Gymnastics": ["Classified as a judged (not timed) sport at the Olympics.", "Includes multiple apparatus such as balance beam, rings, and vault.", "Athletes are typically among the youngest competitors at the Olympics."],
-    "Track and Field": ["Classified as an athletics sport at the Olympics.", "Includes the 100-meter dash, often considered the highlight event of the Summer Games.", "Actually an umbrella term covering many separate running, jumping, and throwing events."],
-    "Basketball": ["Classified as a team sport at the Olympics.", "Became an Olympic sport in the 1930s.", "Played on a court with a hoop at each end."],
-    "Soccer": ["Classified as a team sport at the Olympics.", "Known as football in most countries outside North America.", "Widely considered the most popular team sport in the world."],
-    "Volleyball": ["Classified as a team sport at the Olympics.", "Has both an indoor and a beach version at the Olympics.", "Teams hit a ball back and forth over a net without letting it touch the ground."],
-    "Boxing": ["Classified as a combat sport at the Olympics.", "One of the oldest combat sports in the Olympic program.", "Matches can be won by knockout or by judges' decision."],
-    "Wrestling": ["Classified as a combat sport at the Olympics.", "One of the events included in the ancient Olympic Games.", "A combat sport based on grappling rather than striking."],
-    "Fencing": ["Classified as a combat sport at the Olympics.", "Has three different weapon disciplines, each with its own rules.", "Competitors wear protective gear, including a mask covering the face."],
-    "Archery": ["Classified as a precision/target sport at the Olympics.", "Scoring is based on which ring of the target the arrow lands in.", "Competitors shoot arrows at a stationary target from a set distance."],
-    "Rowing": ["Classified as an aquatic sport at the Olympics.", "Has been part of the Olympics since 1900.", "Athletes propel a narrow boat using oars, typically racing in a straight line."],
-    "Cycling": ["Classified as a racing sport at the Olympics.", "Track events take place on a banked oval course.", "Includes several different disciplines: road, track, and off-road mountain biking."],
-    "Diving": ["Classified as a judged (not timed) sport at the Olympics.", "Judged on factors like execution, difficulty, and entry into the water.", "Athletes perform acrobatic jumps into water from a platform or springboard."],
-    "Weightlifting": ["Classified as a strength sport at the Olympics.", "Athletes compete in weight classes based on body mass.", "Competitors attempt to lift the heaviest possible barbell in two specific lift types."],
-    "Judo": ["Classified as a combat sport at the Olympics.", "Competitors wear a traditional uniform tied with a colored belt indicating rank.", "A Japanese martial art focused on throws and ground grappling rather than striking."],
-    "Taekwondo": ["Classified as a combat sport at the Olympics.", "Competitors wear protective gear including a chest guard and helmet.", "A Korean martial art known especially for its wide variety of kicking techniques."],
-    "Table Tennis": ["Classified as a racket sport at the Olympics.", "Uses a very lightweight, hollow ball.", "Played on a small table divided by a low net."],
-    "Badminton": ["Classified as a racket sport at the Olympics.", "The shuttlecock can travel faster off the racket than the ball in most other racket sports.", "Played with a shuttlecock instead of a ball."],
-    "Rugby": ["Classified as a team sport at the Olympics.", "The Olympic version is typically a faster, shorter format than the traditional full game.", "Played with an oval-shaped ball rather than a round one."],
-    "Sailing": ["Classified as an aquatic/racing sport at the Olympics.", "Competitors must constantly adjust course and sail position based on wind direction.", "Involves racing wind-powered boats around a marked course."]
-  },
-  "Celebrities": {
-    "Taylor Swift": ["An American singer-songwriter.", "Known for writing much of her own material, often with narrative, storytelling lyrics.", "Began her career primarily in country music before moving into pop."],
-    "Dwayne Johnson": ["An American actor.", "Frequently stars in major action and adventure films.", "A former professional wrestler widely known by a one-word ring nickname."],
-    "Beyoncé": ["An American singer.", "Known for elaborate, highly choreographed live performances.", "Rose to fame as part of a girl group before launching a solo career."],
-    "Tom Hanks": ["An American actor with a career spanning several decades.", "Known for a wide range of both dramatic and comedic roles.", "Often cast in roles portraying real historical figures."],
-    "Oprah Winfrey": ["An American media executive.", "Also known for a highly influential book club recommendation list.", "Her long-running daytime talk show made her one of the most influential figures in American media."],
-    "Leonardo DiCaprio": ["An American actor.", "Also known for environmental activism outside of acting.", "Frequently collaborates with the same small group of directors across his career."],
-    "Rihanna": ["A singer from Barbados.", "Known for blending genres like pop, R&B, and reggae in her music.", "Built a major cosmetics brand in addition to her music career."],
-    "Will Smith": ["An American actor.", "Also has a career as a rapper.", "Got his start on a popular television sitcom before moving into film."],
-    "Jennifer Lawrence": ["An American actress.", "Known for a mix of blockbuster and independent film work.", "Rose to major fame through a leading role in a dystopian young-adult film franchise."],
-    "Keanu Reeves": ["A Canadian actor.", "Widely known for a calm, understated public persona.", "Known for starring in major science fiction and action film franchises."],
-    "Zendaya": ["An American actress and singer.", "Also known for her work as a fashion trendsetter on red carpets.", "Began her career as a Disney Channel star."],
-    "Chris Hemsworth": ["An Australian actor.", "Has a brother who is also a well-known actor.", "Known for playing a Norse-mythology-inspired superhero in a major film franchise."],
-    "Serena Williams": ["A retired American professional tennis player.", "Has a sister who was also a top professional tennis player.", "Widely regarded as one of the greatest players in the sport's history."],
-    "Ryan Reynolds": ["A Canadian actor.", "Also built a business career investing in and promoting consumer brands.", "Known for blending sharp comedic timing with action roles."],
-    "Emma Watson": ["A British actress.", "Also known for advocacy work related to gender equality.", "Rose to fame as a child actor in a major fantasy film franchise."],
-    "Denzel Washington": ["An American actor and director.", "Has also directed several feature films.", "Known for a long career of acclaimed dramatic film performances."],
-    "Ariana Grande": ["An American singer.", "Known for a wide vocal range in her pop music.", "Began her career as a television actress before pivoting to music."],
-    "Robert Downey Jr.": ["An American actor.", "Experienced a major career resurgence in the late 2000s.", "Known for playing a wealthy, wisecracking superhero in a long-running film franchise."],
-    "Lady Gaga": ["An American singer.", "Later earned acclaim for dramatic film acting roles as well.", "Known early in her career for provocative, theatrical pop performances."],
-    "Morgan Freeman": ["An American actor.", "Frequently sought out for narration work in addition to acting roles.", "Known for a distinctive, calming speaking voice."]
+    "Labrador Retriever": { group: "Sporting",     clues: ["Bred in the fishing villages of Newfoundland, Canada, to help haul in nets.", "Famously friendly and easygoing — ranked one of the least aggressive breeds around.", "Comes in three classic coat colors: black, yellow, or chocolate brown.", "Has topped America's most popular dog breed list for decades running."] },
+    "Poodle":             { group: "Non-Sporting",  clues: ["Despite its French reputation, most historians trace it back to Germany as a working water dog.", "Sharp, eager to please, and surprisingly athletic under all that fancy grooming.", "Its dense, curly coat comes in solid colors like white, black, apricot, or gray.", "The elaborate 'poodle clip' haircut actually started as a practical way to protect its joints in cold water."] },
+    "Bulldog":            { group: "Non-Sporting",  clues: ["Descended from dogs bred in England for the brutal old blood sport of bull-baiting.", "Surprisingly gentle and laid-back for a breed with such a tough history.", "Usually seen in shades of white, fawn, brindle, or a mix of the three.", "Its heavily wrinkled face and pushed-in nose are its most recognizable features."] },
+    "Chihuahua":          { group: "Toy",           clues: ["Named after a state in Mexico, where the breed is believed to have originated.", "Small but famously bold — often more confident (and vocal) than dogs many times its size.", "Comes in an unusually wide range of colors and coat lengths, both smooth and long-haired.", "Holds the title of one of the smallest dog breeds in the world."] },
+    "Beagle":             { group: "Hound",         clues: ["Developed in England, where it was bred to hunt rabbits and hares.", "Friendly and easygoing, though its curiosity and nose can make it stubborn on walks.", "Classically tricolor — a mix of black, white, and tan patches.", "Has one of the most powerful noses in the dog world and was traditionally hunted in packs."] },
+    "Dachshund":          { group: "Hound",         clues: ["Bred in Germany to chase badgers and other burrowing animals underground.", "Bold and a bit stubborn, often described as having a 'big dog' attitude in a small body.", "Comes in red, black-and-tan, and a range of dappled or brindle patterns.", "Its name literally translates from German to 'badger dog.'"] },
+    "Boxer":              { group: "Working",       clues: ["Developed in Germany from older bull-baiting breeds.", "Playful and high-energy well into adulthood — often called the 'Peter Pan' of dog breeds.", "Typically fawn or brindle, often with white markings on the chest and face.", "Known for a distinctive square jaw and an alert, muscular stance."] },
+    "Siberian Husky":     { group: "Working",       clues: ["Bred by the Chukchi people of Siberia to pull sleds across long distances.", "Friendly and outgoing rather than aggressive — not known for being a great guard dog.", "Often has striking blue eyes, or sometimes one of each color.", "Its thick double coat is built to handle extreme cold with ease."] },
+    "Rottweiler":         { group: "Working",       clues: ["Descended from Roman drover dogs that herded cattle across long marches.", "Confident and protective, often used as a guard dog — has a reputation for being more assertive than most breeds.", "Always black with distinct rust or mahogany markings.", "Named after a German town where the breed was further developed."] },
+    "German Shepherd":    { group: "Herding",       clues: ["Developed in Germany in the late 1800s, originally to herd sheep.", "Highly intelligent and protective — commonly used in police and military work.", "Usually black and tan, though solid black and sable variations exist.", "One of the most popular breeds for working roles worldwide."] },
+    "Corgi":              { group: "Herding",       clues: ["A herding breed that originated in Wales.", "Energetic and surprisingly bold for its size, with a strong herding instinct.", "Commonly red, sable, or tricolor, usually with white markings.", "Has been a favorite of the British royal family for generations."] },
+    "Great Dane":         { group: "Working",       clues: ["Bred in Germany, despite the name, originally to hunt wild boar.", "Gentle and friendly despite its intimidating size — often called a 'gentle giant.'", "Comes in fawn, brindle, black, blue, or a striking black-and-white harlequin pattern.", "Stands as one of the tallest dog breeds in the world."] },
+    "Shih Tzu":           { group: "Toy",           clues: ["Bred in China as a companion for royalty.", "Affectionate and outgoing — bred purely to be a companion, not a worker.", "Can appear in nearly any color, often with a mix of white and another shade.", "Its name roughly translates to 'lion dog.'"] },
+    "Border Collie":      { group: "Herding",       clues: ["Developed along the border between England and Scotland to herd sheep.", "Intensely focused and driven to work — not aggressive, but needs a job to stay happy.", "Classic black-and-white, though red, blue, and merle patterns also occur.", "Widely regarded as the most intelligent dog breed."] },
+    "Doberman":           { group: "Working",       clues: ["Developed in Germany in the 1890s by a tax collector who wanted a tougher companion for his rounds.", "Alert and protective, with a reputation as one of the more serious guard-dog breeds.", "Typically black or rust with tan markings, sometimes blue or fawn.", "Known for a sleek, muscular build and an ever-alert stance."] },
+    "Golden Retriever":   { group: "Sporting",      clues: ["Developed in 1800s Scotland to retrieve waterfowl during hunts.", "Famously friendly and patient — consistently ranked among the least aggressive breeds.", "Ranges from light cream to deep golden shades.", "One of the most popular family dog breeds in the world."] },
+    "Pug":                { group: "Toy",           clues: ["Originated in China, where it was favored by emperors.", "Easygoing and affectionate, with a comedic, clownish streak.", "Usually fawn or black, always with a distinctive dark mask on the face.", "Known for one of the flattest, most wrinkled faces in the dog world."] },
+    "Dalmatian":          { group: "Non-Sporting",  clues: ["Associated with the Dalmatia region, though its exact origins are debated.", "Energetic and alert, historically valued as a coach dog that could run for miles.", "White coat covered in distinctive black or liver-colored spots.", "Historically used as a carriage dog, running alongside horse-drawn coaches."] },
+    "Basset Hound":       { group: "Hound",         clues: ["Bred in France to scent-hunt small game at a walking pace.", "Calm and easygoing, rarely described as aggressive, though famously stubborn.", "Usually tricolor or two-tone, often black, white, and tan.", "Known for very long ears and short legs."] },
+    "Australian Shepherd": { group: "Herding",      clues: ["Despite the name, actually developed in the United States, closely tied to ranching in the American West.", "High-energy and eager to work, with strong herding instincts.", "Often has a distinctive mottled 'merle' coat pattern.", "Closely associated with rodeo and ranching culture despite the misleading name."] }
   },
   "Pokémon": {
-    "Pikachu": ["An Electric-type Pokémon.", "Evolves from an earlier form and can evolve further with the right stone.", "Widely considered the mascot of the entire franchise."],
-    "Charizard": ["A Fire and Flying-type Pokémon.", "Resembles a dragon, though it's not actually classified as one.", "The final evolution of one of the original starter Pokémon."],
-    "Bulbasaur": ["A Grass and Poison-type Pokémon.", "Has a plant bulb growing on its back that develops as it evolves.", "One of the three original starter Pokémon."],
-    "Squirtle": ["A Water-type Pokémon.", "Evolves twice into progressively larger forms.", "A starter Pokémon with a turtle-like appearance."],
-    "Charmander": ["A Fire-type Pokémon.", "The flame on its tail is said to reflect its health and mood.", "A starter Pokémon with a lizard-like appearance."],
-    "Jigglypuff": ["A round, balloon-like Pokémon.", "Famously draws on the face of anyone who falls asleep during its song.", "Known for a signature move that puts listeners to sleep with its singing."],
-    "Mewtwo": ["A Psychic-type Pokémon.", "Based on the DNA of an extremely rare, mythical Pokémon.", "Created artificially through genetic engineering."],
-    "Mew": ["A Psychic-type Pokémon.", "Said to contain the genetic makeup of many other Pokémon species.", "Considered a mythical, extremely rare Pokémon."],
-    "Eevee": ["A Normal-type Pokémon.", "Which form it evolves into depends on specific conditions like location or friendship level.", "Famous for having an unusually large number of possible evolved forms."],
-    "Snorlax": ["A Normal-type Pokémon.", "Often depicted blocking paths while sleeping, requiring a special method to wake it.", "Known for being enormous and famously lazy."],
-    "Gengar": ["A Ghost and Poison-type Pokémon.", "The final evolution of a three-stage ghostly Pokémon line.", "Based on the concept of a mischievous shadow."],
-    "Gyarados": ["A Water and Flying-type Pokémon.", "Evolves from a Pokémon widely considered one of the weakest in the franchise.", "Known for a fierce, serpentine, dragon-like appearance."],
-    "Dragonite": ["A Dragon and Flying-type Pokémon.", "Despite its large size, it's often depicted as friendly and gentle.", "The final evolution of a three-stage Pokémon line."],
-    "Machamp": ["A Fighting-type Pokémon.", "The final evolution of a line that starts as a small humanoid Pokémon.", "Known for having four muscular arms."],
-    "Alakazam": ["A Psychic-type Pokémon.", "Depicted carrying spoons that are said to help focus its psychic power.", "Known for extremely high intelligence."],
-    "Vaporeon": ["A Water-type Pokémon.", "Has a mermaid-like, aquatic appearance.", "One of the possible evolved forms of a Normal-type Pokémon with many evolution options."],
-    "Blastoise": ["A Water-type Pokémon.", "Known for a pair of cannons that emerge from its shell.", "The final evolution of a classic Water-type starter line."],
-    "Venusaur": ["A Grass and Poison-type Pokémon.", "Known for a large flower blooming on its back.", "The final evolution of a classic Grass-type starter line."],
-    "Psyduck": ["A Water-type Pokémon.", "Its psychic powers are said to activate when its headache becomes severe enough.", "Known for suffering from constant headaches."],
-    "Magikarp": ["A Water-type Pokémon.", "Evolves into a much more powerful serpentine Pokémon.", "Famous for being one of the weakest Pokémon in battle."]
+    "Pikachu":    { group: "Electric", clues: ["Famous for storing electricity in its cheeks and releasing it when startled.", "An Electric-type Pokémon.", "Small, yellow, and mouse-like, with red cheek pouches and a lightning-bolt tail.", "Widely considered the mascot of the entire franchise."] },
+    "Charizard":  { group: "Fire",     clues: ["The final evolution of one of the very first starter Pokémon introduced.", "A Fire and Flying-type Pokémon.", "Resembles a dragon, with wings and a flame burning at the tip of its tail.", "One of the most recognizable Pokémon outside the games themselves, often used in marketing."] },
+    "Bulbasaur":  { group: "Grass",    clues: ["One of the three original starter Pokémon offered at the very beginning of the games.", "A Grass and Poison-type Pokémon.", "Small and frog-like, with a plant bulb growing on its back.", "The bulb on its back is said to grow larger and eventually bloom as it evolves."] },
+    "Squirtle":   { group: "Water",    clues: ["A starter Pokémon known for its calm, easygoing demeanor.", "A Water-type Pokémon.", "Small and turtle-like, with a light blue shell and skin.", "Evolves twice, eventually into a Pokémon with cannons built into its shell."] },
+    "Charmander": { group: "Fire",     clues: ["A starter Pokémon whose tail flame is said to reflect its health and mood.", "A Fire-type Pokémon.", "Small and lizard-like, orange-skinned, with a flame burning at the tip of its tail.", "If its tail flame ever goes out, legend says it won't survive."] },
+    "Jigglypuff": { group: "Normal",   clues: ["Known for a signature move that puts anyone listening to sleep.", "A Normal-type Pokémon.", "Round and balloon-like, usually pink, with big eyes.", "Famously draws on the face of anyone who falls asleep during its song."] },
+    "Mewtwo":     { group: "Psychic", clues: ["Created artificially through genetic engineering rather than occurring in nature.", "A Psychic-type Pokémon.", "Tall, humanoid, and purple, with a long tail.", "Based on the DNA of an extremely rare, mythical Pokémon."] },
+    "Mew":        { group: "Psychic", clues: ["Considered a mythical, extremely rare Pokémon.", "A Psychic-type Pokémon.", "Small, pink, and cat-like, with a long thin tail.", "Said to contain the genetic makeup of many other Pokémon species."] },
+    "Eevee":      { group: "Normal",   clues: ["Famous for having an unusually large number of possible evolved forms.", "A Normal-type Pokémon.", "Small and fox-like, brown-furred, with a fluffy collar.", "Which form it evolves into depends on specific conditions like location or friendship level."] },
+    "Snorlax":    { group: "Normal",   clues: ["Known for being enormous and famously lazy.", "A Normal-type Pokémon.", "Very large, round, and blue-green, usually seen sleeping.", "Often depicted blocking paths while asleep, requiring a special method to wake it."] },
+    "Gengar":     { group: "Ghost",    clues: ["Based on the concept of a mischievous shadow lurking nearby.", "A Ghost and Poison-type Pokémon.", "Purple, grinning, and shadow-like, often shown blending into darkness.", "The final evolution of a three-stage ghostly Pokémon line."] },
+    "Gyarados":   { group: "Water",    clues: ["Evolves from a Pokémon widely considered one of the weakest in the entire franchise.", "A Water and Flying-type Pokémon.", "Long, serpentine, and blue, with a fierce dragon-like face.", "Known for a dramatic, temperamental personality once it evolves."] },
+    "Dragonite":  { group: "Dragon",   clues: ["The final evolution of a three-stage Pokémon line that starts out very small.", "A Dragon and Flying-type Pokémon.", "Large, orange, and dragon-like, with small wings relative to its body.", "Despite its intimidating size, it's often depicted as friendly and gentle."] },
+    "Machamp":    { group: "Fighting", clues: ["The final evolution of a line that starts as a small humanoid Pokémon.", "A Fighting-type Pokémon.", "Muscular and humanoid, notable for having four arms.", "Known for incredible strength, said to be able to move mountains with a single punch."] },
+    "Alakazam":   { group: "Psychic", clues: ["Known for extremely high intelligence, said to remember everything it's ever experienced.", "A Psychic-type Pokémon.", "Thin, humanoid, and yellow, with a bushy mustache.", "Depicted carrying spoons that are said to help focus its psychic power."] },
+    "Vaporeon":   { group: "Water",    clues: ["One of the possible evolved forms of a Normal-type Pokémon with many evolution options.", "A Water-type Pokémon.", "Blue and sleek, with a mermaid-like, aquatic appearance.", "Said to be able to melt invisibly into water."] },
+    "Blastoise":  { group: "Water",    clues: ["The final evolution of a classic Water-type starter line.", "A Water-type Pokémon.", "Large and turtle-like, with a hard shell and thick limbs.", "Known for a pair of cannons that emerge from its shell."] },
+    "Venusaur":   { group: "Grass",    clues: ["The final evolution of a classic Grass-type starter line.", "A Grass and Poison-type Pokémon.", "Large and toad-like, with a big flower blooming on its back.", "The flower on its back is said to take on vivid colors with enough sunlight."] },
+    "Psyduck":    { group: "Water",    clues: ["Known for suffering from constant, severe headaches.", "A Water-type Pokémon.", "Yellow and duck-like, usually shown with a confused expression.", "Its psychic powers are said to activate when its headache becomes unbearable."] },
+    "Magikarp":   { group: "Water",    clues: ["Famous for being one of the weakest Pokémon in battle.", "A Water-type Pokémon.", "Orange and fish-like, with little ability to do more than flop around.", "Evolves into a much more powerful, serpentine Pokémon."] }
   },
-  "Anime": {
-    "Naruto": ["Falls into the shonen action/adventure genre of anime.", "Set in a world where ninja villages compete and cooperate with one another.", "Follows a young ninja who dreams of becoming the leader of his village."],
-    "One Piece": ["Falls into the shonen action/adventure genre of anime.", "One of the longest-running and best-selling manga series ever published.", "Follows a pirate crew searching for a legendary treasure."],
-    "Dragon Ball Z": ["Falls into the shonen action/adventure genre of anime.", "Known for characters achieving dramatic power-up transformations mid-battle.", "Follows warriors who defend Earth from increasingly powerful threats."],
-    "Attack on Titan": ["Falls into the dark fantasy genre of anime.", "Known for a complex, twist-heavy plot that expands well beyond its initial premise.", "Set in a world where humanity lives behind massive walls, threatened by giant humanoid creatures."],
-    "My Hero Academia": ["Falls into the shonen action/adventure genre of anime.", "The protagonist starts the series as one of the rare people without a power.", "Set in a world where the vast majority of people are born with superpowers."],
-    "Death Note": ["Falls into the psychological thriller genre of anime.", "Known for its heavy use of strategic, chess-like plotting rather than physical action.", "Centers on a supernatural notebook that can kill anyone whose name is written in it."],
-    "Fullmetal Alchemist": ["Falls into the adventure/drama genre of anime.", "Combines adventure, dark themes, and a strong emphasis on sibling bonds.", "Follows two brothers seeking a way to restore their bodies after a failed ritual."],
-    "Demon Slayer": ["Falls into the shonen action/adventure genre of anime.", "Known for visually striking, elemental-themed combat techniques.", "Follows a young man who becomes a demon hunter after a tragic family attack."],
-    "Sailor Moon": ["Falls into the magical girl genre of anime.", "Known for popularizing the 'magical girl team' format worldwide.", "Follows a group of teenage girls who transform to battle evil forces."],
-    "Spirited Away": ["Falls into the Studio Ghibli family-film genre of anime.", "Directed by one of the most acclaimed filmmakers in animation history.", "Follows a young girl trapped in a mysterious spirit world centered on a bathhouse."],
-    "One Punch Man": ["Falls into the shonen action/adventure genre of anime.", "Known for blending comedy with over-the-top action.", "Follows a superhero so powerful he can defeat any opponent with a single punch."],
-    "Hunter x Hunter": ["Falls into the shonen action/adventure genre of anime.", "Known for a detailed, strategy-heavy power system.", "Follows a young boy training to become a licensed 'Hunter.'"],
-    "Bleach": ["Falls into the shonen action/adventure genre of anime.", "Known for a large cast of characters each with unique named weapons and abilities.", "Follows a teenager who gains the powers of a soul reaper."],
-    "Cowboy Bebop": ["Falls into the sci-fi noir genre of anime.", "Known for a jazz-heavy soundtrack that heavily influenced its tone.", "Follows a crew of bounty hunters traveling through space."],
-    "Neon Genesis Evangelion": ["Falls into the psychological thriller genre of anime.", "Known for its heavy psychological and philosophical themes.", "Follows teenagers piloting giant biomechanical robots against mysterious beings."],
-    "Jujutsu Kaisen": ["Falls into the shonen action/adventure genre of anime.", "Became one of the most popular new series of its decade shortly after release.", "Follows a student who becomes host to a powerful curse."],
-    "Tokyo Ghoul": ["Falls into the dark fantasy genre of anime.", "Known for its darker, more horror-influenced tone compared to typical action series.", "Follows a young man who becomes part-ghoul after a near-fatal encounter."],
-    "Fairy Tail": ["Falls into the adventure/drama genre of anime.", "Known for its found-family theme among the guild's rowdy members.", "Follows wizards belonging to a magical guild."],
-    "Sword Art Online": ["Falls into the adventure/drama genre of anime.", "One of the most well-known series to center on virtual reality as its core premise.", "Follows players trapped inside a virtual reality game where dying means dying in real life."],
-    "My Neighbor Totoro": ["Falls into the Studio Ghibli family-film genre of anime.", "One of the most recognizable and beloved family-friendly animated films ever made.", "Follows two young sisters who befriend a gentle forest spirit."]
-  },
-  "Famous Soccer Players": {
-    "Lionel Messi": ["An Argentine forward.", "Known especially for close ball control and dribbling at speed.", "Widely regarded as one of the greatest players in the sport's history."],
-    "Cristiano Ronaldo": ["A Portuguese forward.", "Famous for his powerful heading ability and aerial jumping.", "Known for exceptional athleticism and goal-scoring ability."],
-    "Pelé": ["A Brazilian forward from the mid-20th century.", "Won multiple World Cups with the Brazilian national team.", "Widely considered one of the greatest players in the sport's history."],
-    "Diego Maradona": ["An Argentine attacking player.", "Involved in one of the most famous and controversial goals in World Cup history.", "Known for extraordinary dribbling ability in tight spaces."],
-    "Neymar": ["A Brazilian forward.", "Became one of the most expensive transfers in the sport's history at one point.", "Known for flashy, creative dribbling and flair on the ball."],
-    "Kylian Mbappé": ["A French forward.", "Became a World Cup-winning star while still in his teens.", "Known especially for exceptional sprinting speed."],
-    "Zinedine Zidane": ["A French midfielder during his playing career.", "Later became a highly successful club manager after retiring as a player.", "Known for elegant technique and vision on the ball."],
-    "Ronaldinho": ["A Brazilian attacking player.", "Widely recognized for his constant smile while playing.", "Known for flamboyant flair and creative trick plays."],
-    "David Beckham": ["An English midfielder.", "Became one of the sport's most recognizable global celebrities off the field.", "Known especially for precise long passing and free kicks."],
-    "Thierry Henry": ["A French forward.", "Spent a long, highly prolific spell playing in England.", "Known for blazing pace combined with clinical finishing."],
-    "Kevin De Bruyne": ["A Belgian midfielder.", "One of the sport's most prolific creators of scoring chances for teammates.", "Known for exceptional vision and passing range."],
-    "Erling Haaland": ["A Norwegian forward.", "Built a reputation as a prolific goal-scorer from a very young age.", "Known for an unusual combination of large size and sprinting speed."],
-    "Mohamed Salah": ["An Egyptian forward.", "Became one of the most celebrated athletes in Egyptian sporting history.", "Known for pace and clinical finishing, often cutting in from the wing."],
-    "Luka Modrić": ["A Croatian midfielder.", "Captained his national team to a World Cup final.", "Known for passing range and control in the middle of the field."],
-    "Robert Lewandowski": ["A Polish forward.", "Spent much of his career as one of Europe's top annual goal scorers.", "Known for elite finishing and positioning inside the penalty area."],
-    "Andrés Iniesta": ["A Spanish midfielder.", "Scored a decisive goal in a World Cup final for his national team.", "Known for tight close control in crowded spaces."],
-    "Xavi": ["A Spanish midfielder during his playing career.", "Later returned to manage the club where he spent most of his playing career.", "Known for controlling the tempo and rhythm of a match through passing."],
-    "Ronaldo Nazário": ["A Brazilian forward whose peak was in the late 1990s and 2000s.", "Overcame serious knee injuries partway through his career.", "Known for explosive speed and dribbling ability."],
-    "Zlatan Ibrahimović": ["A Swedish forward.", "Also well known for a bold, outspoken public personality.", "Known for combining large physical size with unusually refined technical skill."],
-    "Wayne Rooney": ["An English forward.", "Became his national team's all-time leading goal scorer for a period.", "Known for a powerful, direct playing style."]
+  "Celebrities": {
+    "Taylor Swift":       { group: "Musician", clues: ["Began her career primarily in country music before crossing over into pop.", "Works primarily as a musician.", "Known for writing much of her own material, often with narrative, storytelling lyrics.", "An American singer-songwriter whose massive stadium tours have become cultural events."] },
+    "Dwayne Johnson":     { group: "Actor",    clues: ["Got his start as a professional wrestler before transitioning to film.", "Works primarily as an actor.", "Frequently stars in major action and adventure blockbusters.", "Widely known by a one-word wrestling nickname."] },
+    "Beyoncé":            { group: "Musician", clues: ["Rose to fame as part of a girl group before launching a solo career.", "Works primarily as a musician.", "Known for elaborate, highly choreographed live performances.", "An American singer whose solo career eclipsed her already-successful group days."] },
+    "Tom Hanks":          { group: "Actor",    clues: ["Has had a film career spanning several decades.", "Works primarily as an actor.", "Known for a wide range of both dramatic and comedic roles.", "Often cast in roles portraying real historical figures."] },
+    "Oprah Winfrey":      { group: "Media",    clues: ["Built her career as a talk show host before becoming a media executive.", "Works primarily in media and broadcasting.", "Known for a highly influential book club recommendation list.", "Her long-running daytime talk show made her one of the most influential figures in American media."] },
+    "Leonardo DiCaprio":  { group: "Actor",    clues: ["Known for leading roles in major dramatic films.", "Works primarily as an actor.", "Also known for environmental activism outside of acting.", "Frequently collaborates with the same small group of directors across his career."] },
+    "Rihanna":            { group: "Musician", clues: ["A singer from Barbados.", "Works primarily as a musician.", "Known for blending genres like pop, R&B, and reggae in her music.", "Built a major cosmetics brand in addition to her music career."] },
+    "Will Smith":         { group: "Actor",    clues: ["Got his start on a popular television sitcom before moving into film.", "Works primarily as an actor.", "Also has a career as a rapper.", "Known for starring in many major action and comedy blockbusters."] },
+    "Jennifer Lawrence":  { group: "Actor",    clues: ["Rose to major fame through a leading role in a dystopian young-adult film franchise.", "Works primarily as an actress.", "Known for a mix of blockbuster and independent film work.", "One of the youngest actresses to headline a major action franchise."] },
+    "Keanu Reeves":       { group: "Actor",    clues: ["Known for starring in major science fiction and action film franchises.", "Works primarily as an actor.", "Widely known for a calm, understated public persona.", "A Canadian actor with an unusually devoted global fanbase."] },
+    "Zendaya":            { group: "Actor",    clues: ["Began her career as a Disney Channel star.", "Works primarily as an actress.", "Also known for her work as a fashion trendsetter on red carpets.", "An American actress and singer who transitioned from teen TV into major film roles."] },
+    "Chris Hemsworth":    { group: "Actor",    clues: ["Known for playing a Norse-mythology-inspired superhero in a major film franchise.", "Works primarily as an actor.", "Has a brother who is also a well-known actor.", "An Australian actor known for his imposing physical presence on screen."] },
+    "Serena Williams":    { group: "Athlete",  clues: ["A retired professional tennis player.", "Works primarily as an athlete.", "Has a sister who was also a top professional tennis player.", "Widely regarded as one of the greatest players in tennis history."] },
+    "Ryan Reynolds":      { group: "Actor",    clues: ["Known for blending sharp comedic timing with action roles.", "Works primarily as an actor.", "Also built a business career investing in and promoting consumer brands.", "A Canadian actor known for breaking the fourth wall in a foul-mouthed superhero role."] },
+    "Emma Watson":        { group: "Actor",    clues: ["Rose to fame as a child actor in a major fantasy film franchise.", "Works primarily as an actress.", "Also known for advocacy work related to gender equality.", "A British actress who grew up on screen playing the same character for a decade."] },
+    "Denzel Washington":  { group: "Actor",    clues: ["Known for a long career of acclaimed dramatic film performances.", "Works primarily as an actor.", "Has also directed several feature films.", "An American actor widely regarded as one of the greatest of his generation."] },
+    "Ariana Grande":      { group: "Musician", clues: ["Began her career as a television actress before pivoting to music.", "Works primarily as a musician.", "Known for a wide vocal range in her pop music.", "An American singer whose voice is often compared to legendary pop vocalists."] },
+    "Robert Downey Jr.":  { group: "Actor",    clues: ["Experienced a major career resurgence in the late 2000s.", "Works primarily as an actor.", "Known for playing a wealthy, wisecracking superhero in a long-running film franchise.", "An American actor whose comeback became one of Hollywood's most talked-about stories."] },
+    "Lady Gaga":          { group: "Musician", clues: ["Known early in her career for provocative, theatrical pop performances.", "Works primarily as a musician.", "Later earned acclaim for dramatic film acting roles as well.", "An American singer known for constant reinvention across her career."] },
+    "Morgan Freeman":     { group: "Actor",    clues: ["Known for a distinctive, calming speaking voice.", "Works primarily as an actor.", "Frequently sought out for narration work in addition to acting roles.", "An American actor whose voice alone has become instantly recognizable."] }
   },
   "Car Brands": {
-    "Toyota": ["A Japanese automaker.", "Widely known for a strong reputation for reliability.", "Regularly ranks among the largest car manufacturers in the world by sales."],
-    "Ford": ["An American automaker.", "Founded in the early 20th century by its namesake.", "Pioneered the widespread use of the moving assembly line in car manufacturing."],
-    "Honda": ["A Japanese automaker.", "Known for producing its own engines used across a wide range of products.", "Also one of the largest motorcycle manufacturers in the world."],
-    "Chevrolet": ["An American automotive brand.", "One of the best-selling car brands in the United States.", "Owned by a larger parent company and known for a long history of trucks and muscle cars."],
-    "BMW": ["A German automaker.", "The brand's name is an abbreviation referencing motor and engine works.", "Known for luxury and performance-oriented vehicles."],
-    "Mercedes-Benz": ["A German automaker.", "Known for luxury vehicles and a three-pointed star logo.", "Traces its roots back to some of the very earliest automobile inventions."],
-    "Audi": ["A German automaker.", "Known for a signature all-wheel-drive system used across many models.", "Its logo features four interlocking rings representing four merged companies."],
-    "Volkswagen": ["A German automaker.", "Produced one of the best-selling individual car models in automotive history.", "Its name translates to 'people's car.'"],
-    "Nissan": ["A Japanese automaker.", "Known for producing both mainstream vehicles and a dedicated sports car line.", "Formed a long-running international alliance with a major French automaker."],
-    "Tesla": ["An American automaker.", "Named after a famous inventor and electrical engineer.", "Focuses exclusively on electric vehicles."],
-    "Porsche": ["A German automaker.", "Famous for a long-running model line with the engine mounted at the rear.", "Known for high-performance sports cars."],
-    "Ferrari": ["An Italian automaker.", "Has a long, storied history in motorsport racing.", "Known for high-performance luxury sports cars."],
-    "Lamborghini": ["An Italian automaker.", "Founded by a businessman who originally made tractors.", "Known for dramatic-looking, high-performance supercars."],
-    "Subaru": ["A Japanese automaker.", "Uses a distinctive horizontally opposed engine layout in most vehicles.", "Known for including all-wheel drive as standard on most of its models."],
-    "Mazda": ["A Japanese automaker.", "Produces one of the best-selling two-seat sports cars in history.", "Historically known for using a distinctive rotary engine in some models."],
-    "Hyundai": ["A South Korean automaker.", "Owns another major South Korean car brand as part of the same corporate group.", "One of the largest car manufacturers in the world by production volume."],
-    "Kia": ["A South Korean automaker.", "Has become known in recent years for bold, distinctive exterior design.", "Part of the same corporate group as another major South Korean car brand."],
-    "Jeep": ["An American automotive brand.", "Traces its roots back to a vehicle developed for military use.", "Known for off-road capable SUVs."],
-    "Volvo": ["A Swedish automaker.", "Credited with inventing and popularizing a key seatbelt design used industry-wide.", "Known for a strong brand emphasis on vehicle safety."],
-    "Chrysler": ["An American automaker.", "Now part of a larger multinational automotive group.", "Historically one of the 'Big Three' major US car manufacturers."]
+    "Toyota":       { group: "Japanese",    clues: ["Widely known for a strong reputation for reliability.", "A Japanese automaker.", "Produces a wide range of vehicles from compact cars to hybrids.", "Regularly ranks among the largest car manufacturers in the world by sales."] },
+    "Ford":         { group: "American",    clues: ["Pioneered the widespread use of the moving assembly line in car manufacturing.", "An American automaker.", "Known for a long history of trucks alongside its passenger cars.", "Founded in the early 20th century by its namesake."] },
+    "Honda":        { group: "Japanese",    clues: ["Known for producing its own engines used across a wide range of products.", "A Japanese automaker.", "Also one of the largest motorcycle manufacturers in the world.", "Known for engineering-focused, fuel-efficient vehicles."] },
+    "Chevrolet":    { group: "American",    clues: ["One of the best-selling car brands in the United States.", "An American automaker.", "Known for a long history of trucks and muscle cars.", "Owned by a larger American parent company alongside several other brands."] },
+    "BMW":          { group: "German",      clues: ["The brand's name is an abbreviation referencing motor and engine works.", "A German automaker.", "Known for luxury and performance-oriented vehicles.", "Its logo is often mistaken for a spinning airplane propeller, though that's a popular myth."] },
+    "Mercedes-Benz": { group: "German",     clues: ["Traces its roots back to some of the very earliest automobile inventions.", "A German automaker.", "Known for luxury vehicles across sedans, SUVs, and sports cars.", "Recognizable by a three-pointed star logo."] },
+    "Audi":         { group: "German",      clues: ["Its logo features four interlocking rings representing four merged companies.", "A German automaker.", "Known for a signature all-wheel-drive system used across many models.", "Known for sleek, minimalist interior design."] },
+    "Volkswagen":   { group: "German",      clues: ["Its name translates to 'people's car.'", "A German automaker.", "Produced one of the best-selling individual car models in automotive history.", "Owns several other well-known car brands as part of a larger corporate group."] },
+    "Nissan":       { group: "Japanese",    clues: ["Formed a long-running international alliance with a major French automaker.", "A Japanese automaker.", "Known for producing both mainstream vehicles and a dedicated sports car line.", "One of Japan's largest automakers by production volume."] },
+    "Tesla":        { group: "American",    clues: ["Named after a famous inventor and electrical engineer.", "An American automaker.", "Focuses exclusively on electric vehicles.", "Known for over-the-air software updates that add features after purchase."] },
+    "Porsche":      { group: "German",      clues: ["Famous for a long-running model line with the engine mounted at the rear.", "A German automaker.", "Known for high-performance sports cars.", "Also has a history of building tractors and other vehicles beyond sports cars."] },
+    "Ferrari":      { group: "Italian",     clues: ["Has a long, storied history in motorsport racing.", "An Italian automaker.", "Known for high-performance luxury sports cars.", "Recognizable by its prancing horse logo."] },
+    "Lamborghini":  { group: "Italian",     clues: ["Founded by a businessman who originally made tractors.", "An Italian automaker.", "Known for dramatic-looking, high-performance supercars.", "Known for giving many of its models names inspired by bulls and bullfighting."] },
+    "Subaru":       { group: "Japanese",    clues: ["Uses a distinctive horizontally opposed engine layout in most vehicles.", "A Japanese automaker.", "Known for including all-wheel drive as standard on most of its models.", "Popular among drivers in snowy or rugged terrain."] },
+    "Mazda":        { group: "Japanese",    clues: ["Historically known for using a distinctive rotary engine in some models.", "A Japanese automaker.", "Produces one of the best-selling two-seat sports cars in history.", "Known for a design philosophy centered on the feeling of motion."] },
+    "Hyundai":      { group: "South Korean", clues: ["One of the largest car manufacturers in the world by production volume.", "A South Korean automaker.", "Produces a wide range of vehicles including sedans, SUVs, and EVs.", "Owns another major South Korean car brand as part of the same corporate group."] },
+    "Kia":          { group: "South Korean", clues: ["Part of the same corporate group as another major South Korean car brand.", "A South Korean automaker.", "Has become known in recent years for bold, distinctive exterior design.", "Went from a budget-focused image to winning major design awards in a relatively short time."] },
+    "Jeep":         { group: "American",    clues: ["Traces its roots back to a vehicle developed for military use.", "An American automaker.", "Known for off-road capable SUVs.", "Its most iconic model has kept a recognizably similar shape for decades."] },
+    "Volvo":        { group: "Swedish",     clues: ["Credited with inventing and popularizing a key seatbelt design used industry-wide.", "A Swedish automaker.", "Known for a strong brand emphasis on vehicle safety.", "Known for boxy, durable styling in its classic models."] },
+    "Chrysler":     { group: "American",    clues: ["Historically one of the 'Big Three' major US car manufacturers.", "An American automaker.", "Now part of a larger multinational automotive group.", "Known for pioneering the minivan as a mainstream vehicle category."] }
   }
 };
 

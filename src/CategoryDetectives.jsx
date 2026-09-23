@@ -33,92 +33,31 @@ function hasFreshEliminations(state, turn) {
 }
 
 /* =========================================================================
-   SOLO PUZZLE — Wordle-style single-player mode. One secret item, a
-   fresh clue revealed each round, difficulty controls how many guesses
-   you get and how vague the clues stay.
+   SOLO PUZZLE — Wordle-style single-player mode. One secret item, one
+   real fun-fact clue revealed each round (origin/history, then trait,
+   then appearance, then the most identifying fact). Every wrong guess is
+   compared to the answer's category classification (an AKC group, a
+   Pokémon type, a broad profession, a country of origin) and marked
+   CLOSE or FAR — that classification is never shown as a clue itself,
+   just used for the smart-guess feedback.
    ========================================================================= */
 
+const SOLO_CATEGORIES = Object.keys(ITEM_FACTS);
+const MAX_ROUNDS = 4;
 
-function clueWeak(name) {
-  const letters = name.replace(/[^A-Za-z]/g, "");
-  const words = name.trim().split(/\s+/);
-  const first = name[0].toUpperCase();
-  return pickRandom([
-    `The name has ${words.length > 1 ? "more than one word" : "only one word"}.`,
-    `The name starts with a letter from ${first <= "M" ? "A–M" : "N–Z"}.`,
-    `Excluding spaces, the name is ${letters.length > 9 ? "longer than 9 letters" : "9 letters or fewer"}.`
-  ]);
-}
-function clueMedium(name) {
-  const letters = name.replace(/[^A-Za-z]/g, "");
-  const words = name.trim().split(/\s+/);
-  const first = name[0].toUpperCase();
-  const quartile = first <= "F" ? "A–F" : first <= "M" ? "G–M" : first <= "S" ? "N–S" : "T–Z";
-  const rest = Array.from(new Set(letters.toLowerCase().split(""))).filter((c) => c !== letters[0].toLowerCase());
-  const sample = rest.length ? pickRandom(rest) : letters[0].toLowerCase();
-  return pickRandom([
-    `The name starts with a letter from ${quartile}.`,
-    `The name contains the letter "${sample.toUpperCase()}".`,
-    `The name has exactly ${words.length} word${words.length === 1 ? "" : "s"}.`
-  ]);
-}
-function clueStrong(name) {
-  const letters = name.replace(/[^A-Za-z]/g, "");
-  return pickRandom([
-    `The name starts with "${name.slice(0, 2)}".`,
-    `Excluding spaces, the name has exactly ${letters.length} letters.`
-  ]);
-}
-function clueVeryStrong(name) {
-  return `The name starts with "${name.slice(0, 3)}".`;
+function factsFor(categoryKey, name) {
+  return (ITEM_FACTS[categoryKey] && ITEM_FACTS[categoryKey][name]) || { group: null, clues: [] };
 }
 
-const DIFFICULTY_CONFIG = {
-  easy:   { label: "Easy",   rounds: 6, tiers: ["weak", "weak", "medium", "medium", "strong", "verystrong"] },
-  medium: { label: "Medium", rounds: 5, tiers: ["weak", "weak", "medium", "medium", "strong"] },
-  hard:   { label: "Hard",   rounds: 4, tiers: ["weak", "weak", "weak", "medium"] }
-};
-
-function tierClue(tier, name) {
-  if (tier === "weak") return clueWeak(name);
-  if (tier === "medium") return clueMedium(name);
-  if (tier === "strong") return clueStrong(name);
-  return clueVeryStrong(name);
-}
-
-function buildClueSequence(name, categoryKey, difficulty) {
-  const cfg = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.medium;
-  const facts = (ITEM_FACTS[categoryKey] && ITEM_FACTS[categoryKey][name]) || [];
-  const sequence = [];
-
-  // Real facts about the thing itself come first, ordered vague → specific.
-  const factsToUse = Math.min(facts.length, cfg.rounds);
-  for (let i = 0; i < factsToUse; i++) sequence.push(facts[i]);
-
-  // Only fall back to name-based structural clues for any rounds left over,
-  // continuing the tier escalation from where the facts left off.
-  const used = new Set(sequence);
-  cfg.tiers.slice(sequence.length).forEach((tier) => {
-    let clue = tierClue(tier, name);
-    let attempts = 0;
-    while (used.has(clue) && attempts < 5) { clue = tierClue(tier, name); attempts++; }
-    used.add(clue);
-    sequence.push(clue);
-  });
-
-  return sequence.slice(0, cfg.rounds);
-}
-
-function buildSoloPuzzle(categoryKey, difficulty) {
+function buildSoloPuzzle(categoryKey) {
   const items = CATEGORY_SETS[categoryKey].items.map((name, idx) => ({ id: idx, name }));
   const board = [...items].sort((a, b) => a.name.localeCompare(b.name));
   const secretItem = pickRandom(items);
-  const cfg = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.medium;
   return {
     board,
     soloSecretId: secretItem.id,
-    soloClues: buildClueSequence(secretItem.name, categoryKey, difficulty),
-    soloMaxRounds: cfg.rounds
+    soloClues: factsFor(categoryKey, secretItem.name).clues,
+    soloMaxRounds: MAX_ROUNDS
   };
 }
 
@@ -196,7 +135,6 @@ function loadStats() {
 const initialState = {
   screen: "intro",
   gameMode: "duel",       // "duel" | "solo"
-  difficulty: "medium",   // solo only
   names: { p1: "Player 1", p2: "Player 2" },
   categoryKey: null,
   board: [],
@@ -267,9 +205,6 @@ function reducer(state, action) {
     case "SET_GAME_MODE":
       return { ...state, gameMode: action.value };
 
-    case "SET_DIFFICULTY":
-      return { ...state, difficulty: action.value };
-
     case "GO_CATEGORY":
       return { ...state, screen: "category" };
 
@@ -278,7 +213,7 @@ function reducer(state, action) {
 
     case "DEAL": {
       if (state.gameMode === "solo") {
-        const { board, soloSecretId, soloClues, soloMaxRounds } = buildSoloPuzzle(state.categoryKey, state.difficulty);
+        const { board, soloSecretId, soloClues, soloMaxRounds } = buildSoloPuzzle(state.categoryKey);
         return {
           ...state, board, soloSecretId, soloClues, soloMaxRounds,
           soloRound: 0, soloWrongGuesses: {}, soloModalGuess: null,
@@ -368,8 +303,14 @@ function reducer(state, action) {
       if (id === state.soloSecretId) {
         return { ...state, soloModalGuess: null, winner: "player", winReason: "solo_win", screen: "win" };
       }
+      const guessedItem = state.board.find((b) => b.id === id);
+      const secretItem = state.board.find((b) => b.id === state.soloSecretId);
+      const guessedGroup = factsFor(state.categoryKey, guessedItem.name).group;
+      const secretGroup = factsFor(state.categoryKey, secretItem.name).group;
+      const isClose = guessedGroup !== null && guessedGroup === secretGroup;
+
       const nextRound = state.soloRound + 1;
-      const soloWrongGuesses = { ...state.soloWrongGuesses, [id]: true };
+      const soloWrongGuesses = { ...state.soloWrongGuesses, [id]: { isClose } };
       if (nextRound >= state.soloMaxRounds) {
         return { ...state, soloModalGuess: null, soloWrongGuesses, soloRound: nextRound, winner: null, winReason: "solo_lose", screen: "win" };
       }
@@ -377,7 +318,7 @@ function reducer(state, action) {
     }
 
     case "SOLO_REMATCH": {
-      const { board, soloSecretId, soloClues, soloMaxRounds } = buildSoloPuzzle(state.categoryKey, state.difficulty);
+      const { board, soloSecretId, soloClues, soloMaxRounds } = buildSoloPuzzle(state.categoryKey);
       return {
         ...state, board, soloSecretId, soloClues, soloMaxRounds,
         soloRound: 0, soloWrongGuesses: {}, soloModalGuess: null,
@@ -621,7 +562,7 @@ function GlobalStyles() {
       .cd-hold-btn.is-revealing .cd-hold-reveal { display: inline-flex; }
       .cd-hold-btn.is-revealing .cd-hold-label { display: none; }
 
-      /* ---------- mode toggle (also reused for mode/difficulty selectors) ---------- */
+      /* ---------- mode toggle (also reused for the game-mode selector) ---------- */
       .cd-mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
       .cd-mode-toggle:first-child { margin-top: 0; }
       .cd-mode-btn {
@@ -678,6 +619,9 @@ function GlobalStyles() {
       .cd-card.is-eliminated.is-fresh { border-color: var(--red); }
       .cd-card.is-eliminated.is-fresh .cd-card-name { color: var(--red); }
       .cd-card.is-eliminated.is-locked { cursor: default; opacity: 0.5; }
+      .cd-card.is-eliminated.is-close-wrong { border-color: var(--amber); opacity: 0.85; background: rgba(255,176,32,0.06); }
+      .cd-card.is-eliminated.is-close-wrong .cd-card-name { color: var(--amber); }
+      .cd-card.is-eliminated.is-far-wrong { opacity: 0.4; }
 
       /* ---------- helper ---------- */
       .cd-helper { margin-top: 16px; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); overflow: hidden; }
@@ -941,24 +885,10 @@ function IntroScreen({ state, dispatch, stats, onResetStats }) {
           </div>
 
           {solo && (
-            <div className="cd-field">
-              <label>Difficulty</label>
-              <div className="cd-mode-toggle" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
-                {["easy", "medium", "hard"].map((d) => (
-                  <button
-                    key={d}
-                    className={"cd-mode-btn eliminate" + (state.difficulty === d ? " is-active" : "")}
-                    aria-pressed={state.difficulty === d}
-                    onClick={() => { Sound.click(); dispatch({ type: "SET_DIFFICULTY", value: d }); }}
-                  >
-                    {DIFFICULTY_CONFIG[d].label}
-                  </button>
-                ))}
-              </div>
-              <p className="cd-subtitle" style={{ marginTop: 10, fontSize: 12.5 }}>
-                {DIFFICULTY_CONFIG[state.difficulty].rounds} guesses, clues stay {state.difficulty === "hard" ? "vague the whole way" : state.difficulty === "easy" ? "generous and specific" : "moderate"}.
-              </p>
-            </div>
+            <p className="cd-subtitle" style={{ marginTop: 14, fontSize: 12.5 }}>
+              {MAX_ROUNDS} guesses. Every clue is a real fact — origin, temperament, appearance, then a
+              signature fun fact. Wrong guesses tell you if you were close.
+            </p>
           )}
 
           <div className="cd-field">
@@ -986,10 +916,10 @@ function IntroScreen({ state, dispatch, stats, onResetStats }) {
           <div className="cd-how-list">
             {(solo
               ? [
-                  "Pick a category — we'll choose a secret item from it.",
-                  "Each round reveals a new clue about the secret.",
-                  "Guess an item from the board — wrong guesses are ruled out.",
-                  "Solve it before your guesses for this difficulty run out."
+                  "Pick from 4 categories — we'll choose a secret item from it.",
+                  "Each round reveals a new fun fact about the secret.",
+                  "Guess an item from the board — wrong guesses show if you were close.",
+                  `Solve it within ${MAX_ROUNDS} guesses.`
                 ]
               : [
                   "Together, agree on one shared category from the list.",
@@ -1027,6 +957,7 @@ function IntroScreen({ state, dispatch, stats, onResetStats }) {
 function CategoryScreen({ state, dispatch }) {
   const selected = state.categoryKey;
   const solo = state.gameMode === "solo";
+  const categoryKeys = solo ? SOLO_CATEGORIES : Object.keys(CATEGORY_SETS);
   return (
     <div>
       <div className="cd-kicker"><LayoutGrid size={14} strokeWidth={2} /> STEP 01</div>
@@ -1058,7 +989,7 @@ function CategoryScreen({ state, dispatch }) {
       </div>
 
       <div className="cd-board" style={{ marginTop: 16 }}>
-        {Object.keys(CATEGORY_SETS).map((key) => {
+        {categoryKeys.map((key) => {
           const { Icon, items } = CATEGORY_SETS[key];
           const isSel = key === selected;
           return (
@@ -1349,16 +1280,18 @@ function SoloPlayScreen({ state, dispatch, boardItem }) {
 
       <div className="cd-status-row">
         <span className="cd-chip">{roundsLeft} GUESS{roundsLeft === 1 ? "" : "ES"} LEFT</span>
-        <span className="cd-chip">{DIFFICULTY_CONFIG[state.difficulty].label.toUpperCase()} DIFFICULTY</span>
+        <span className="cd-chip">{Object.keys(state.soloWrongGuesses).length} RULED OUT</span>
       </div>
 
       <div className="cd-board" style={{ marginTop: 16 }}>
         {state.board.map((item) => {
-          const isWrong = !!state.soloWrongGuesses[item.id];
+          const wrongInfo = state.soloWrongGuesses[item.id];
+          const isWrong = !!wrongInfo;
+          const cardCls = "cd-card" + (isWrong ? " is-eliminated is-locked " + (wrongInfo.isClose ? "is-close-wrong" : "is-far-wrong") : "");
           return (
             <button
               key={item.id}
-              className={"cd-card" + (isWrong ? " is-eliminated is-locked" : "")}
+              className={cardCls}
               disabled={isWrong}
               onClick={() => {
                 if (isWrong) return;
@@ -1367,9 +1300,11 @@ function SoloPlayScreen({ state, dispatch, boardItem }) {
               }}
             >
               <div className="cd-card-top">
-                {isWrong ? <X size={16} strokeWidth={1.75} /> : <span className="cd-card-tag">{String(item.id + 1).padStart(2, "0")}</span>}
+                {isWrong
+                  ? <span className="cd-card-tag" style={isWrong && wrongInfo.isClose ? { color: "var(--amber)", borderColor: "var(--amber)" } : undefined}>{wrongInfo.isClose ? "CLOSE" : "FAR"}</span>
+                  : <span className="cd-card-tag">{String(item.id + 1).padStart(2, "0")}</span>}
               </div>
-              <div className="cd-card-name">{isWrong ? "Wrong Guess" : item.name}</div>
+              <div className="cd-card-name">{item.name}</div>
             </button>
           );
         })}
@@ -1420,8 +1355,8 @@ function SoloWinScreen({ state, dispatch, boardItem, stats }) {
         <h1 className="cd-win-title">{isWin ? "Case Solved" : "Case Closed"}</h1>
         <p className="cd-win-sub">
           {isWin
-            ? `Solved it in ${guessesUsed} of ${state.soloMaxRounds} guess${state.soloMaxRounds === 1 ? "" : "es"} on ${DIFFICULTY_CONFIG[state.difficulty].label} difficulty.`
-            : `Out of guesses on ${DIFFICULTY_CONFIG[state.difficulty].label} difficulty. Better luck on the next case.`}
+            ? `Solved it in ${guessesUsed} of ${state.soloMaxRounds} guess${state.soloMaxRounds === 1 ? "" : "es"}.`
+            : "Out of guesses. Better luck on the next case."}
         </p>
       </div>
 
