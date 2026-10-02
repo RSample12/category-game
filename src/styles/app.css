@@ -22,7 +22,7 @@
   color-scheme:dark;
 }
 html,body{height:100%}
-body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.45;padding-inline:16px;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.45;padding-inline:16px;-webkit-tap-highlight-color:transparent}
 *{box-sizing:border-box}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--pc,var(--p1));outline-offset:2px;border-radius:6px}
