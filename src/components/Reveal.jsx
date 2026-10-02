@@ -43,10 +43,6 @@ export default function Reveal({ s, send }) {
           <span>Nº {pad(idx + 1)}</span>
         </span>
       </div>
-      <p className="lede">
-        Memorize it. Your opponent will ask you yes/no questions about it. You can peek again
-        before each of your turns.
-      </p>
       <div className="stack">
         <button className="btn btn-primary" onClick={next}>
           <EyeOff className="ico" aria-hidden="true" /> Hide it{p === 0 ? ' and pass' : ''}
