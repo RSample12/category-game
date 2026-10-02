@@ -10,15 +10,15 @@
     "test": "node --test \"src/**/*.test.js\""
   },
   "dependencies": {
-    "react": "latest",
-    "react-dom": "latest",
-    "lucide-react": "latest",
-    "@fontsource/big-shoulders-display": "latest",
-    "@fontsource-variable/instrument-sans": "latest",
-    "@fontsource/ibm-plex-mono": "latest"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "lucide-react": "^0.383.0",
+    "@fontsource/big-shoulders-display": "^5.0.0",
+    "@fontsource-variable/instrument-sans": "^5.0.0",
+    "@fontsource/ibm-plex-mono": "^5.0.0"
   },
   "devDependencies": {
-    "vite": "latest",
-    "@vitejs/plugin-react": "latest"
+    "vite": "^5.4.0",
+    "@vitejs/plugin-react": "^4.3.1"
   }
 }
