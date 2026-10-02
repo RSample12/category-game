@@ -169,6 +169,12 @@ export function reducer(state, action) {
       return state.screen === 'dealing' ? { ...state, screen: 'reveal' } : state;
     case 'NEW_CATEGORY':
       return { ...state, screen: 'setup', sheet: null };
+    case 'GO_HOME': {
+      // Abandon the current game. Names, scores, category and who starts next are kept.
+      if (state.screen === 'setup') return state;
+      const { names, scores, categoryId, starter } = state;
+      return createInitialState({ names, scores, categoryId, starter });
+    }
 
     case 'REVEAL_NEXT': {
       if (state.screen !== 'reveal') return state;

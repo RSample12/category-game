@@ -43,3 +43,10 @@
 .sound-toggle .ico{width:20px;height:20px}
 .masthead{padding-right:calc(44px + var(--s2))}
 .turnrow{padding-right:calc(44px + var(--s2))}
+
+/* home button: top-left on every in-game screen, mirrors the sound toggle */
+.home-btn{position:fixed;z-index:7;top:calc(env(safe-area-inset-top,0px) + var(--s2));left:var(--s2);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--ink-2);color:var(--text);border:1px solid var(--line);box-shadow:var(--sh-1);cursor:pointer;transition:background .2s var(--ease),border-color .2s var(--ease)}
+.home-btn:hover{background:var(--ink-3);border-color:var(--p1)}
+.home-btn .ico{width:20px;height:20px}
+.turnrow{padding-left:calc(44px + var(--s2))}
+.stage{padding-top:calc(var(--s7) + var(--s3))}

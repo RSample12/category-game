@@ -12,6 +12,7 @@ import { buzz } from './lib/haptics.js';
 import { play, unlock } from './lib/sound.js';
 import { soundFor } from './lib/soundEvents.js';
 import SoundToggle from './components/SoundToggle.jsx';
+import HomeButton from './components/HomeButton.jsx';
 import { nameOf } from './components/shared.jsx';
 import Setup from './components/Setup.jsx';
 import Dealing from './components/Dealing.jsx';
@@ -125,6 +126,7 @@ export default function App() {
         {announcement(state)}
       </p>
       <SoundToggle />
+      {state.screen !== 'setup' && <HomeButton send={send} />}
       {view}
     </div>
   );

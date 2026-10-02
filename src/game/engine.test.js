@@ -170,3 +170,29 @@ test('restore: bad or foreign data falls back to a fresh game', () => {
   const corrupt = { ...startedGame(), secrets: ['dogs-ghost', 'dogs-nobody'] };
   assert.equal(restoreState(serialize(corrupt)).screen, 'setup');
 });
+
+test('GO_HOME mid-game: back to setup, game wiped, names/scores/category kept', () => {
+  let s = createInitialState({ names: ['Ann', 'Bo'], scores: [2, 1], categoryId: 'pokemon', starter: 1 });
+  s = run(s, { type: 'DEAL', secrets: [ITEMS[0], ITEMS[1]], caseNo: '26-1234' }, { type: 'DEAL_DONE' });
+  s = run(s, ...Array(4).fill({ type: 'REVEAL_NEXT' }), { type: 'START_TURN' });
+  s = run(s, ...tap(ITEMS[3]));
+  assert.equal(s.screen, 'turn');
+  s = run(s, { type: 'GO_HOME' });
+  assert.equal(s.screen, 'setup');
+  assert.deepEqual(s.secrets, [null, null]);
+  assert.deepEqual(s.boards[0], { locked: [], pending: [], wrong: [] });
+  assert.deepEqual(s.names, ['Ann', 'Bo']);
+  assert.deepEqual(s.scores, [2, 1]);
+  assert.equal(s.categoryId, 'pokemon');
+  assert.equal(s.starter, 1);
+  assert.equal(s.sheet, null);
+});
+
+test('GO_HOME on setup is a no-op, and works from every game screen', () => {
+  const home = createInitialState();
+  assert.equal(reducer(home, { type: 'GO_HOME' }), home);
+  const dealing = reducer(home, { type: 'DEAL', secrets: [ITEMS[0], ITEMS[1]], caseNo: 'x' });
+  for (const st of [dealing, reducer(dealing, { type: 'DEAL_DONE' }), startedGame()]) {
+    assert.equal(reducer(st, { type: 'GO_HOME' }).screen, 'setup');
+  }
+});
