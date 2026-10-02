@@ -1,0 +1,45 @@
+/* ===== Additions for the React build ===== */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* icons sit with the label, inheriting its color */
+.ico{flex:none;width:1.15em;height:1.15em;stroke-width:2.25}
+.btn .ico{width:18px;height:18px}
+.seg button{display:flex;align-items:center;justify-content:center;gap:var(--s2)}
+.seg button .ico{width:16px;height:16px}
+.btn-primary::before{content:none}
+
+/* turn-start deal: tags fan in once when the board mounts, never on later taps */
+.board .tag{animation:dealIn .38s var(--ease) backwards;animation-delay:calc(var(--i,0) * 24ms)}
+@keyframes dealIn{from{opacity:0;transform:translateY(14px) rotate(-2deg) scale(.96)}}
+
+/* stamp lands with weight */
+.tag.just .st span{animation:thunk .3s cubic-bezier(.2,1.6,.4,1)}
+
+/* case closed: the verdict is a rubber stamp that slams, then the screen shakes */
+.slam{display:inline-block;font-family:var(--display);font-weight:900;text-transform:uppercase;letter-spacing:.04em;font-size:clamp(30px,9vw,46px);line-height:1;color:var(--pc,var(--p1));border:4px solid currentColor;border-radius:var(--r-xs);padding:6px 16px;transform:rotate(-6deg);animation:slam .5s cubic-bezier(.2,1.4,.4,1) backwards;box-shadow:inset 0 0 0 2px rgba(var(--tint),.0),0 0 0 1px rgba(var(--tint),.4)}
+.slam.loss{color:var(--stamp)}
+@keyframes slam{0%{opacity:0;transform:rotate(-14deg) scale(2.6)}60%{opacity:1}100%{transform:rotate(-6deg) scale(1)}}
+.stage.shake{animation:shake .28s .42s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes shake{20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,2px)}80%{transform:translate(2px,-1px)}}
+
+/* peek button: icon + held state */
+.peek{gap:var(--s2)}
+.peek .reveal{font-weight:700}
+.peek.show{border-color:var(--pc,var(--p1));color:var(--pc,var(--p1))}
+
+/* sheet buttons get a clearer pressed state */
+.sheet .row .btn{min-height:52px}
+
+/* long names never break the scoreboard */
+.score .nm{min-width:0}
+@media (prefers-reduced-motion:reduce){
+  .board .tag,.slam,.stage.shake{animation:none}
+}
+
+/* sound toggle: fixed top-right on every screen, clear of the sticky turn bar's text */
+.sound-toggle{position:fixed;z-index:7;top:calc(env(safe-area-inset-top,0px) + var(--s2));right:var(--s2);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--ink-2);color:var(--text);border:1px solid var(--line);box-shadow:var(--sh-1);cursor:pointer;transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)}
+.sound-toggle:hover{background:var(--ink-3);border-color:var(--p1)}
+.sound-toggle[aria-pressed="false"]{color:var(--muted)}
+.sound-toggle .ico{width:20px;height:20px}
+.masthead{padding-right:calc(44px + var(--s2))}
+.turnrow{padding-right:calc(44px + var(--s2))}

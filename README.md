@@ -1,124 +1,75 @@
-# Category Detectives (React)
+# Category Detectives
 
-A pass-and-play mashup of Guess Who and Categories, built with React and
-[lucide-react](https://lucide.dev/) icons. This is a small [Vite](https://vitejs.dev/)
-project — Vite handles the build step that turns the JSX/ES-module source
-into plain JS + CSS a browser can run, which is required here because
-`lucide-react` is a real npm package, not something a plain static HTML
-file can load.
+Pass-and-play deduction game for two players on one phone: a mashup of Guess Who and Categories.
+React + Vite, no backend.
 
-## Project structure
-
-```
-category-detectives/
-├── index.html              ← Vite entry point (meta tags, favicon, mounts #root)
-├── package.json
-├── vite.config.js
-├── .gitignore
-├── public/
-│   └── favicon.svg
-└── src/
-    ├── main.jsx             ← mounts <CategoryDetectives /> into the page
-    └── CategoryDetectives.jsx  ← the whole game (state, logic, styling, UI)
-```
-
-Everything about the game — rules, categories, styling, layout — lives in
-`src/CategoryDetectives.jsx`. There's no other app code to worry about.
-
-## Run it locally
-
-You'll need [Node.js](https://nodejs.org) 18 or later installed.
+## Run it
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:5173
+npm test           # game-rule tests (Node's built-in runner, no extra packages)
+npm run build      # production build in dist/
+npm run preview    # serve dist/ locally
 ```
 
-This starts a local dev server (usually `http://localhost:5173`) with hot
-reload — edit `CategoryDetectives.jsx` and the page updates instantly.
+`package.json` lists dependencies as `latest`. After your first `npm install`, commit the generated
+`package-lock.json`, or replace `latest` with the versions it resolved.
 
-## Build for production
+## How it is organised
 
-```bash
-npm run build
+```
+src/
+  data/categories.js     category lists (the only place content lives)
+  game/engine.js         pure game state + reducer: every rule, no React, no randomness inside
+  game/engine.test.js    game-rule tests (sound mapping tests live in lib/)
+  components/            one component per screen (Setup, Reveal, Handoff, Turn, Over) + shared bits
+  styles/app.css         the night-desk theme: tokens, layout, components
+  styles/extras.css      React-build additions (icons, deal-in, case-closed stamp)
+  lib/haptics.js         vibration cues, only after the first tap
+  lib/sound.js           synthesized sound effects + mute
+  lib/soundEvents.js     pure "which sound for this change" mapping (tested)
+  App.jsx                reducer wiring, persistence, focus + screen-reader announcements
 ```
 
-This outputs a `dist/` folder containing the fully built, static
-site — optimized JS/CSS bundles, no Node or build tools needed to serve it.
-You can sanity-check the production build locally with:
+## Sound
 
-```bash
-npm run preview
+Effects are synthesized with Web Audio (no audio files). Each sound is a small list of voices in
+`src/lib/sound.js`; `src/lib/soundEvents.js` maps game changes to sounds and is unit-tested.
+Stamp thump on a rule-out, soft tick on undo, shuffle on deal, card turn on reveals, chime on
+handoff, buzzer on a wrong accusation, gavel and jingle on a win. A speaker button (top right)
+mutes everything and remembers the choice. Audio starts after the first tap, as browsers require.
+
+## Adding categories
+
+Add one `define(...)` call in `src/data/categories.js`:
+
+```js
+define('birds', 'Birds', 'Wings and whistles.', ['Robin', 'Owl', 'Penguin' /* ... */]),
 ```
 
-## Deploy it
+Item ids are slugs of the name (`birds-robin`), so reordering or growing a list is safe.
+When you want larger pools with random sampling at deal time, do it inside `dealSecrets()` and
+the board setup in `src/game/engine.js`; the UI only reads `getCategory(id).items`.
 
-`dist/` is a static site once built, so any static host works. The two
-easiest paths:
+## Rules (as implemented)
 
-### Option A — Vercel (recommended for Vite projects)
-1. Push this folder to a GitHub repo.
-2. [vercel.com](https://vercel.com) → New Project → import the repo.
-3. Vercel auto-detects Vite — no config needed. It runs `npm run build` and
-   serves `dist/` automatically, with free HTTPS.
-4. Project → Settings → Domains → add your `.io` domain and follow the DNS
-   instructions shown there.
+- Both players are dealt a different secret item from the chosen category.
+- Each turn is either eliminating items or guessing, never both.
+- Eliminations made this turn can be tapped again to undo; ending the turn locks them.
+- Guess mode is unavailable while this turn's eliminations are pending.
+- When one item remains it opens a confirm prompt. Confirming is the guess.
+- Correct guess wins. Wrong guess eliminates that item and passes the turn. Wrong on your last
+  item means the opponent wins by default.
+- Score carries across rematches. Rematch re-deals in the same category and alternates who starts.
 
-### Option B — Netlify
-1. Push to GitHub, or drag the `dist/` folder (after running `npm run build`)
-   onto Netlify's deploy area for a one-off deploy.
-2. For ongoing deploys, connect the GitHub repo instead: Netlify will run
-   `npm run build` and publish `dist/` on every push.
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-3. **Site settings → Domain management → Add custom domain**, enter your
-   `.io` domain, and follow the DNS instructions (Netlify auto-provisions
-   HTTPS).
+## Resume after refresh
 
-### Option C — Cloudflare Pages
-1. Cloudflare dashboard → Workers & Pages → Create → Pages → connect the repo.
-2. Build command: `npm run build`, output directory: `dist`.
-3. If you registered the `.io` domain through Cloudflare, attaching it is a
-   couple of clicks with no external DNS step.
+State is saved to `localStorage`. A reload during a game restores it, but never onto a screen that
+could show a secret: a reload mid-turn lands on that player's handoff screen, and a reload during a
+secret reveal returns to the hidden step.
 
-### Option D — GitHub Pages
-GitHub Pages serves plain static files with no build step of its own, so
-you build locally/in CI first, then publish `dist/`:
-1. `npm run build`
-2. Push the contents of `dist/` to a `gh-pages` branch (the
-   [`gh-pages`](https://www.npmjs.com/package/gh-pages) npm package
-   automates this: `npm i -D gh-pages`, add a `"deploy": "gh-pages -d dist"`
-   script, then `npm run deploy`).
-3. Repo → Settings → Pages → set source to the `gh-pages` branch.
-4. Because the site isn't served from the domain root path in some GitHub
-   Pages setups, you may need to set `base: '/your-repo-name/'` in
-   `vite.config.js` — Vercel/Netlify/Cloudflare Pages don't have this
-   wrinkle, which is why they're the simpler options above.
+## Deploying (Vercel)
 
-## Buying and connecting the `.io` domain
-
-Same as any static site: register through Namecheap, Porkbun, Cloudflare
-Registrar, or similar (check the **renewal** price, not just the first-year
-one — `.io` renewals run noticeably higher than `.com`). Then add the
-custom domain in whichever host you picked above and follow its DNS
-instructions — usually one CNAME record, sometimes an A record or a
-nameserver change.
-
-## Before going live
-
-- [ ] `npm run build && npm run preview` and click through the whole game
-- [ ] Test on an actual phone over real cellular/WiFi
-- [ ] Confirm the Google Fonts (Big Shoulders Display, Public Sans,
-      JetBrains Mono) load correctly — they're fetched from
-      `fonts.googleapis.com` at runtime via `CategoryDetectives.jsx`
-- [ ] Share a link and check the Open Graph preview (the tags are already
-      in `index.html`)
-
-## Making future edits
-
-Everything is in `src/CategoryDetectives.jsx` — game rules, the 11
-categories and their items, and all styling (an injected `<style>` block
-using CSS variables, no separate CSS file to hunt through). Edit it, and
-`npm run dev` will hot-reload; for production, `npm run build` and
-redeploy (or just push — Vercel/Netlify/Cloudflare Pages redeploy
-automatically on every push to the connected repo).
+Framework preset "Vite", build command `npm run build`, output directory `dist`.
+`base: './'` in `vite.config.js` keeps the build portable.
