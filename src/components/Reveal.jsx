@@ -50,7 +50,9 @@ export default function Reveal({ s, send }) {
       </h1>
       {card}
       <p className="lede reveal-note">
-        {showing ? '' : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their secret suspect.`}
+        {showing
+          ? 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before each of your turns.'
+          : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their secret suspect.`}
       </p>
       <div className="stack">
         <button className="btn btn-primary" onClick={next}>
