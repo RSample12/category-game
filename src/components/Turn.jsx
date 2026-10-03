@@ -88,7 +88,8 @@ export default function Turn({ s, send }) {
         <div className="turnrow">
           <h2>{nameOf(s, p)}</h2>
           <span className="meter">
-            <b>{left}</b> / {cat.items.length} left · T{s.turn}
+            <b>{left}</b>
+            <span className="tot"> / {cat.items.length}</span> left · T{s.turn}
           </span>
         </div>
         <div className="seg" role="group" aria-label="Action">
