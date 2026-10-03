@@ -76,6 +76,8 @@ export default function Turn({ s, send }) {
   let tip;
   if (guessing) {
     tip = <>Tap the suspect you think <b>{opp}</b> is holding.</>;
+  } else if (pend && left === 1) {
+    tip = <>One suspect left. End your turn, then you can accuse it next turn.</>;
   } else if (pend) {
     tip = <>Tap a stamped suspect again to undo. Locks when you end your turn. <b>Accuse unlocks next turn.</b></>;
   } else {

@@ -77,6 +77,12 @@ test('correct accusation → win; running out of suspects → lose', () => {
   const sheet = reducer(g, { type: 'TAP_ITEM', id: IDS[1] });
   assert.equal(soundFor(sheet, reducer(sheet, { type: 'SHEET_CONFIRM' })), 'win');
 
-  const last = run(t, ...IDS.filter((id) => id !== IDS[5]).map((id) => ({ type: 'TAP_ITEM', id })));
+  // Ruling out down to one item, then playing it as the accusation on the next turn.
+  const last = run(
+    t,
+    ...IDS.filter((id) => id !== IDS[5]).map((id) => ({ type: 'TAP_ITEM', id })),
+    { type: 'END_TURN' }, { type: 'START_TURN' }, { type: 'END_TURN' }, { type: 'START_TURN' },
+  );
+  assert.equal(last.sheet.type, 'last');
   assert.equal(soundFor(last, reducer(last, { type: 'SHEET_CONFIRM' })), 'lose');
 });

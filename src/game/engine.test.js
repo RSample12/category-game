@@ -91,34 +91,49 @@ test('cancelling a guess changes nothing', () => {
   assert.deepEqual(s.boards, before.boards);
 });
 
-test('eliminating down to one item opens a confirm prompt for that item', () => {
+// P0 rules out everything but `keep`, ends the turn, P1 passes, and P0 starts their next turn.
+const toNextTurnWithOneLeft = (keep) => {
+  const all = ITEMS.filter((id) => id !== keep);
+  return run(
+    startedGame(),
+    ...tap(...all),
+    { type: 'END_TURN' },
+    { type: 'START_TURN' },
+    { type: 'END_TURN' },
+    { type: 'START_TURN' },
+  );
+};
+
+test('eliminating down to one item does NOT accuse it on the same turn', () => {
   const all = ITEMS.filter((id) => id !== ITEMS[5]);
-  let s = run(startedGame(), ...tap(...all.slice(0, -1)));
+  const s = run(startedGame(), ...tap(...all));
   assert.equal(s.sheet, null);
-  s = run(s, ...tap(all.at(-1)));
-  assert.deepEqual(s.sheet, { type: 'last', itemId: ITEMS[5], undo: all.at(-1) });
-  // Taps are ignored while the prompt is open.
-  assert.equal(run(s, ...tap(ITEMS[2])), s);
+  assert.equal(s.screen, 'turn');
+  assert.equal(s.winner, null);
+  assert.equal(remainingIds(s, 0).length, 1);
+  // Guessing stays locked until the turn ends.
+  assert.equal(run(s, { type: 'SET_MODE', mode: 'guess' }).mode, 'elim');
 });
 
-test('cancelling the last-item prompt undoes the final elimination', () => {
-  const all = ITEMS.filter((id) => id !== ITEMS[5]);
-  let s = run(startedGame(), ...tap(...all), { type: 'SHEET_CANCEL' });
-  assert.equal(s.sheet, null);
-  assert.equal(remainingIds(s, 0).length, 2);
-  assert.ok(!s.boards[0].pending.includes(all.at(-1)));
+test('the player cannot rule out their very last item', () => {
+  const s = run(startedGame(), ...tap(...ITEMS));
+  assert.equal(remainingIds(s, 0).length, 1);
 });
 
-test('last item that IS the opponent secret: confirm wins', () => {
-  const all = ITEMS.filter((id) => id !== ITEMS[1]); // P1 secret is ITEMS[1]
-  const s = run(startedGame(), ...tap(...all), { type: 'SHEET_CONFIRM' });
+test('after ending the turn, the opponent plays, then the last-item prompt opens', () => {
+  const s = toNextTurnWithOneLeft(ITEMS[5]);
+  assert.equal(s.current, 0);
+  assert.deepEqual(s.sheet, { type: 'last', itemId: ITEMS[5], undo: null });
+});
+
+test('last item that IS the opponent secret: confirm wins on the next turn', () => {
+  const s = run(toNextTurnWithOneLeft(ITEMS[1]), { type: 'SHEET_CONFIRM' }); // P1 secret is ITEMS[1]
   assert.equal(s.winner, 0);
   assert.equal(s.reason, 'solved');
 });
 
 test('wrong guess on your LAST item: opponent wins by default', () => {
-  const all = ITEMS.filter((id) => id !== ITEMS[5]); // not P1 secret
-  const s = run(startedGame(), ...tap(...all), { type: 'SHEET_CONFIRM' });
+  const s = run(toNextTurnWithOneLeft(ITEMS[5]), { type: 'SHEET_CONFIRM' }); // not P1 secret
   assert.equal(s.screen, 'over');
   assert.equal(s.winner, 1);
   assert.equal(s.reason, 'exhausted');

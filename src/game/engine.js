@@ -8,7 +8,9 @@
  *  - Eliminations made this turn ("pending") can be tapped again to undo.
  *    Ending the turn locks them for good.
  *  - Guess mode is unavailable while pending eliminations exist.
- *  - When only one item remains, a confirm prompt is opened for it.
+ *  - Ruling out down to one item does NOT accuse it. The player ends the turn, and the
+ *    confirm prompt for that last item opens at the start of their next turn, so the
+ *    opponent always gets a turn in between.
  *  - Correct guess wins. Wrong guess eliminates that item and passes the turn;
  *    if it was the last remaining item the opponent wins by default.
  */
@@ -229,12 +231,8 @@ export function reducer(state, action) {
         { ...b, pending: [...b.pending, id] },
         { justId: id },
       );
-      const rem = remainingIds(next, p);
-      if (rem.length === 0) return state; // never allow an empty board
-      if (rem.length === 1) {
-        return { ...next, sheet: { type: 'last', itemId: rem[0], undo: id } };
-      }
-      return next;
+      if (remainingIds(next, p).length === 0) return state; // never allow an empty board
+      return next; // one item left is fine: accusing it has to wait for the next turn
     }
 
     case 'SHEET_CANCEL': {

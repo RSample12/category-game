@@ -90,7 +90,7 @@ export default function Setup({ s, send, onDeal }) {
             <li><strong>Ask</strong> your opponent one yes/no question out loud about their secret.</li>
             <li><strong>Rule out</strong> suspects on your board, or <strong>accuse</strong> one. Never both in one turn.</li>
             <li>Rule-outs can be undone until you end your turn. After that they're locked.</li>
-            <li>Rule out all but one and that last suspect becomes your accusation.</li>
+            <li>Rule out all but one, end your turn, and accuse that last suspect on your next turn.</li>
             <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you lose.</li>
           </ol>
         </details>
