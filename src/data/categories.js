@@ -104,6 +104,13 @@ export const CATEGORIES = [
     'Nigeria', 'India', 'China', 'Japan',
     'South Korea', 'Australia', 'Russia', 'Turkey',
   ]),
+  define('landmarks', 'World Landmarks', 'Famous sights from around the globe.', [
+    'Eiffel Tower', 'Statue of Liberty', 'Great Wall of China', 'Taj Mahal',
+    'Colosseum', 'Pyramids of Giza', 'Big Ben', 'Sydney Opera House',
+    'Machu Picchu', 'Christ the Redeemer', 'Golden Gate Bridge', 'Stonehenge',
+    'Leaning Tower of Pisa', 'Mount Rushmore', 'Burj Khalifa', 'Angkor Wat',
+    'Petra', 'Niagara Falls', 'Acropolis', 'Brandenburg Gate',
+  ]),
 ];
 
 export const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
