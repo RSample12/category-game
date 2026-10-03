@@ -1,4 +1,4 @@
-# Category Detectives
+# Crack the Case
 
 Pass-and-play deduction game for two players on one phone: a mashup of Guess Who and Categories.
 React + Vite, no backend.

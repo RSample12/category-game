@@ -37,7 +37,7 @@ function init() {
 /** What a screen reader should hear when the screen changes. */
 function announcement(s) {
   switch (s.screen) {
-    case 'setup': return 'Category Detectives. Pick a category and deal.';
+    case 'setup': return 'Crack the Case. Pick a category and deal.';
     case 'dealing': return 'Dealing suspects.';
     case 'reveal':
       return s.revealStep % 2 === 0
