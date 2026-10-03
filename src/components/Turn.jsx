@@ -65,6 +65,27 @@ function Sheet({ s, send }) {
 }
 
 export default function Turn({ s, send }) {
+  const barRef = useRef(null);
+  // Keep keyboard focus out from under the sticky turn bar: publish its height so
+  // cards scroll into view below it (WCAG 2.4.11).
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el) return undefined;
+    const root = document.documentElement;
+    const set = () => {
+      root.style.scrollPaddingTop = `${el.offsetHeight + 12}px`;
+      root.style.scrollPaddingBottom = '104px'; // sticky End turn button
+    };
+    set();
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(set);
+    ro?.observe(el);
+    return () => {
+      ro?.disconnect();
+      root.style.scrollPaddingTop = '';
+      root.style.scrollPaddingBottom = '';
+    };
+  }, []);
+
   const p = s.current;
   const b = s.boards[p];
   const cat = getCategory(s.categoryId);
@@ -84,8 +105,9 @@ export default function Turn({ s, send }) {
 
   return (
     <div className={`p${p} ${guessing ? 'mode-guess' : ''}`}>
-      <div className="turnbar">
+      <div className="turnbar" ref={barRef}>
         <div className="turnrow">
+          <h1 className="sr-only">Category Detectives, turn {s.turn}</h1>
           <h2>{nameOf(s, p)}</h2>
           <span className="meter">
             <b>{left}</b>

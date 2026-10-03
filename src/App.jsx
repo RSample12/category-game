@@ -127,7 +127,7 @@ export default function App() {
       </p>
       <SoundToggle />
       {state.screen !== 'setup' && <HomeButton send={send} />}
-      {view}
+      <main id="main">{view}</main>
     </div>
   );
 }

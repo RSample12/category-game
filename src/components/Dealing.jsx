@@ -9,7 +9,7 @@ export default function Dealing({ caseNo, categoryName }) {
       <span className="eyebrow">
         Case Nº {caseNo} · {categoryName}
       </span>
-      <h2 style={{ fontSize: 40 }}>Shuffling the case files…</h2>
+      <h1 style={{ fontSize: 40 }}>Shuffling the case files…</h1>
     </div>
   );
 }

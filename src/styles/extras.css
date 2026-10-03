@@ -80,3 +80,21 @@
 .turnrow{padding-left:0;padding-right:0}
 .masthead{padding-top:var(--chrome)}
 @media (max-width:400px){.meter .tot{display:none}}
+
+/* ---- accessibility, tier 1 ---- */
+/* main landmark wraps each screen and keeps the old flex column layout */
+#app>main{flex:1;display:flex;flex-direction:column;min-height:0}
+
+/* focus must never land under the sticky turn bar or the sticky End turn button */
+/* (scroll padding is set on <html> by Turn.jsx, because it also applies to cards that are already on screen) */
+
+/* ruled-out cards: the stamp is a compact tag in the top band (where the number sits),
+   so it never covers the name; the name is struck through and keeps its contrast */
+.tag .st{place-items:start end;padding:4px 6px 0 0}
+.tag .st span{font-size:10px;letter-spacing:.05em;padding:0 4px;border-width:2px;transform:rotate(-4deg);background:rgba(235,228,211,.92)}
+.tag.pending .no,.tag.locked .no{display:none}
+.tag.pending .nm{opacity:.78}
+.tag.pending .nm,.tag.locked .nm{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--stamp-ink)}
+
+/* text fields: a real focus ring, not just a border tint */
+.field input:focus-visible{outline:3px solid var(--pc,var(--p1));outline-offset:2px;border-color:var(--pc,var(--p1))}
