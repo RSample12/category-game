@@ -36,10 +36,10 @@ test('deal flow: setup → dealing → reveal → handoff → turn, P0 starts', 
 test('eliminate, then tap again to undo (same turn)', () => {
   let s = run(startedGame(), ...tap(ITEMS[3]));
   assert.deepEqual(s.boards[0].pending, [ITEMS[3]]);
-  assert.equal(remainingIds(s, 0).length, 15);
+  assert.equal(remainingIds(s, 0).length, ITEMS.length - 1);
   s = run(s, ...tap(ITEMS[3]));
   assert.deepEqual(s.boards[0].pending, []);
-  assert.equal(remainingIds(s, 0).length, 16);
+  assert.equal(remainingIds(s, 0).length, ITEMS.length);
 });
 
 test('ending the turn locks eliminations permanently', () => {
