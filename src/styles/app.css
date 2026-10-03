@@ -229,7 +229,7 @@ h1,h2,h3{text-wrap:balance}
 .cats{gap:var(--s3)}
 .cat{padding:var(--s4);gap:var(--s4);border-radius:var(--r-md);box-shadow:var(--sh-1);transition:border-color .2s var(--ease),background .2s var(--ease),transform .2s var(--ease),box-shadow .2s var(--ease)}
 .cat:hover{transform:translateY(-1px);box-shadow:var(--sh-2)}
-.cat[aria-checked="true"]{box-shadow:0 0 0 1px var(--p1),0 12px 28px -12px rgba(227,176,75,.35)}
+.cat[aria-checked="true"]{box-shadow:0 0 0 1px var(--p1),var(--sh-1)}
 .cat .tab{border-radius:var(--r-xs);box-shadow:var(--sh-1)}
 .rules,.score,.report{border-radius:var(--r-md)}
 .rules{padding:var(--s1) var(--s4)}
@@ -241,8 +241,8 @@ h1,h2,h3{text-wrap:balance}
 .actionbar{padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom,0px))}
 /* buttons: tinted glow in the active player's color, one easing */
 .btn{border-radius:var(--r);transition:transform .2s var(--ease),background .2s var(--ease),box-shadow .2s var(--ease),filter .2s var(--ease),opacity .2s var(--ease)}
-.btn-primary{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 16px -8px var(--pc,var(--p1))}
-.btn-primary:hover{filter:none;transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 12px 24px -8px var(--pc,var(--p1))}
+.btn-primary{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 1px 2px rgba(var(--tint),.5)}   /* flat: top highlight and a tight contact shadow, no colored glow */
+.btn-primary:hover{filter:brightness(1.07);transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 4px rgba(var(--tint),.5)}
 .btn:active{transform:translateY(1px) scale(.99)}
 /* turn header and board */
 .turnbar{box-shadow:0 14px 16px -16px rgba(var(--tint),.95)}
