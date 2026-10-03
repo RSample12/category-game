@@ -45,6 +45,36 @@ export const CATEGORIES = [
     'Cherry', 'Kiwi', 'Peach', 'Blueberry',
     'Coconut', 'Avocado', 'Pomegranate', 'Orange',
   ]),
+  define('soccer', 'Soccer Players', 'Stars of the club and country game.', [
+    'Lionel Messi', 'Cristiano Ronaldo', 'Kylian Mbappé', 'Erling Haaland',
+    'Neymar Jr', 'Kevin De Bruyne', 'Mohamed Salah', 'Luka Modrić',
+    'Robert Lewandowski', 'Vinícius Jr', 'Jude Bellingham', 'Harry Kane',
+    'Lamine Yamal', 'Son Heung-min', 'Virgil van Dijk', 'Zlatan Ibrahimović',
+  ]),
+  define('games', 'Video Game Franchises', 'Consoles, PCs and phones.', [
+    'Super Mario', 'The Legend of Zelda', 'Sonic the Hedgehog', 'Halo',
+    'Call of Duty', 'Grand Theft Auto', 'Minecraft', 'Fortnite',
+    'Fallout', 'The Sims', 'Street Fighter', 'Mortal Kombat',
+    'Animal Crossing', 'God of War', 'Overwatch', "Assassin's Creed",
+  ]),
+  define('anime', 'Anime', 'Series every fan has an opinion on.', [
+    'Naruto', 'One Piece', 'Dragon Ball Z', 'Attack on Titan',
+    'Death Note', 'My Hero Academia', 'Demon Slayer', 'Bleach',
+    'Fullmetal Alchemist', 'Jujutsu Kaisen', 'Hunter x Hunter', 'Sailor Moon',
+    'Cowboy Bebop', 'One Punch Man', 'Tokyo Ghoul', 'Spy x Family',
+  ]),
+  define('cars', 'Car Brands', 'Badges from Detroit to Stuttgart to Tokyo.', [
+    'Toyota', 'Honda', 'Ford', 'Chevrolet',
+    'Tesla', 'BMW', 'Mercedes-Benz', 'Audi',
+    'Porsche', 'Ferrari', 'Lamborghini', 'Volkswagen',
+    'Subaru', 'Jeep', 'Hyundai', 'Nissan',
+  ]),
+  define('restaurants', 'Chain Restaurants', 'Drive-thru, dine-in and coffee runs.', [
+    "McDonald's", 'Burger King', "Wendy's", 'Taco Bell',
+    'Chick-fil-A', 'Subway', 'Chipotle', 'Starbucks',
+    "Domino's", 'Pizza Hut', 'KFC', 'Popeyes',
+    'Panda Express', "Dunkin'", 'Olive Garden', "Applebee's",
+  ]),
 ];
 
 export const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
