@@ -2,19 +2,19 @@
    Ported unchanged from the standalone build, then extended in extras.css. */
 /* Layout: single-column case file on a night-desk ground — sticky turn header, evidence-tag grid, thumb-zone action bar. Deliberately single-theme (dark). */
 :root{
-  --ink:#10151d;        /* desk at night */
-  --ink-2:#18202c;      /* panels */
-  --ink-3:#222b3a;      /* raised controls */
-  --line:#2e394b;
-  --text:#e9edf3;
-  --muted:#8e9aae;
-  --paper:#ebe4d3;      /* evidence tag stock */
-  --paper-2:#d9d0bb;
-  --paper-ink:#1c2029;
-  --p1:#f4c23f;         /* detective one: signal yellow */
-  --p2:#62d6c2;         /* detective two: mint */
-  --stamp:#e04a3e;      /* ruled-out stamp */
-  --win:#8fd16a;
+  --ink:#0f1f1a;        /* desk: green baize at night */
+  --ink-2:#17302a;      /* panels */
+  --ink-3:#1f3d35;      /* raised controls */
+  --line:#2f5248;
+  --text:#eef2e8;
+  --muted:#a9bdb1;
+  --paper:#efe6cf;      /* evidence tag stock */
+  --paper-2:#dbd0b3;
+  --paper-ink:#1b2420;
+  --p1:#e3b04b;         /* detective one: brass */
+  --p2:#f08a6b;         /* detective two: coral */
+  --stamp:#e8604f;      /* ruled-out stamp */
+  --win:#8bd17c;
   --display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --body:"Instrument Sans Variable","Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
@@ -42,7 +42,7 @@ h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;let
 .btn-primary{background:var(--pc,var(--p1));color:var(--paper-ink)}
 .btn-primary:hover{filter:brightness(1.06)}
 .btn-ghost{background:var(--ink-3);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
-.btn-ghost:hover{background:#2a3446}
+.btn-ghost:hover{background:#2a4a41}
 .btn-danger{background:var(--stamp);color:#fff}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
 .btn-block{width:100%}
@@ -61,12 +61,12 @@ h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;let
 .field{display:grid;gap:6px;min-width:0}
 .field label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--pc)}
 .field input{width:100%;min-width:0;background:var(--ink-2);border:1px solid var(--line);border-left:4px solid var(--pc);border-radius:6px;color:var(--text);padding:12px;font:600 17px var(--body)}
-.field input::placeholder{color:#5f6a7d}
+.field input::placeholder{color:#6f8a7e}
 .field input:focus{outline:none;border-color:var(--pc)}
 .cats{display:grid;gap:10px}
 .cat{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;text-align:left;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;transition:border-color .15s,background .15s}
-.cat:hover{border-color:#46536a}
-.cat[aria-checked="true"]{border-color:var(--p1);background:#1d2533}
+.cat:hover{border-color:#4b7566}
+.cat[aria-checked="true"]{border-color:var(--p1);background:#1c3a32}
 .cat .tab{width:44px;height:52px;background:var(--paper);color:var(--paper-ink);border-radius:4px 4px 4px 4px;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:26px;position:relative}
 .cat .tab::before{content:"";position:absolute;top:6px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--ink-2)}
 .cat .tab b{margin-top:8px}
@@ -162,7 +162,7 @@ h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;let
 .actionbar .in{max-width:760px;margin-inline:auto;display:grid;gap:8px}
 
 /* sheet */
-.scrim{position:fixed;inset:0;z-index:20;background:rgba(6,9,14,.72);display:grid;align-items:end;justify-items:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));animation:fade .18s ease}
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(3,12,9,.74);display:grid;align-items:end;justify-items:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));animation:fade .18s ease}
 .sheet{width:100%;max-width:440px;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:22px 18px 18px;display:grid;gap:16px;text-align:center;animation:rise .22s cubic-bezier(.2,.9,.3,1)}
 .sheet h3{font-size:38px}
 .sheet h3 em{font-style:normal;color:var(--stamp)}
@@ -201,16 +201,16 @@ h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;let
   --r-xs:4px;--r:8px;--r-md:12px;--r-lg:16px;
   --t-xs:12px;--t-sm:14px;--t-md:16px;--t-lg:21px;--t-xl:28px;
   --ease:cubic-bezier(.4,0,.2,1);
-  --tint:6,9,16;
+  --tint:3,12,9;
   --sh-1:0 1px 0 rgba(var(--tint),.55),0 2px 6px rgba(var(--tint),.35);
   --sh-2:0 2px 4px rgba(var(--tint),.35),0 12px 24px -6px rgba(var(--tint),.65);
   --sh-3:0 4px 8px rgba(var(--tint),.4),0 28px 48px -12px rgba(var(--tint),.8);
   --stamp-ink:#b4281d;
-  --muted:#98a4b8;
+  --muted:#a9bdb1;
 }
 /* ground: a desk lamp pooled at the top, faint leather grain */
 body{
-  background-image:radial-gradient(70% 42% at 50% -6%,rgba(244,194,63,.11),transparent 72%),repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
+  background-image:radial-gradient(70% 42% at 50% -6%,rgba(227,176,75,.10),transparent 72%),repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
   background-repeat:no-repeat,repeat;
   font-feature-settings:"kern","liga";text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;
 }
@@ -219,7 +219,7 @@ h1,h2,h3{text-wrap:balance}
 .masthead h1,.stage h1{letter-spacing:-.01em}
 .lede{text-wrap:pretty;font-size:var(--t-md);line-height:1.55}
 .cat p,.tip,.report,.rules ol{font-size:var(--t-sm)}
-.field input::placeholder{color:#76829a}
+.field input::placeholder{color:#86a092}
 /* hero: the kicker becomes a stuck-on file label, echoing the evidence tags */
 .masthead{padding-block:var(--s6) var(--s2);gap:var(--s3)}
 .masthead .eyebrow{justify-self:start;max-width:100%;font-size:11px;letter-spacing:.08em;background:var(--paper);color:var(--paper-ink);padding:var(--s2) var(--s3) var(--s2) 28px;border-radius:var(--r-xs);position:relative;transform:rotate(-1.5deg);box-shadow:var(--sh-1)}
@@ -229,7 +229,7 @@ h1,h2,h3{text-wrap:balance}
 .cats{gap:var(--s3)}
 .cat{padding:var(--s4);gap:var(--s4);border-radius:var(--r-md);box-shadow:var(--sh-1);transition:border-color .2s var(--ease),background .2s var(--ease),transform .2s var(--ease),box-shadow .2s var(--ease)}
 .cat:hover{transform:translateY(-1px);box-shadow:var(--sh-2)}
-.cat[aria-checked="true"]{box-shadow:0 0 0 1px var(--p1),0 12px 28px -12px rgba(244,194,63,.35)}
+.cat[aria-checked="true"]{box-shadow:0 0 0 1px var(--p1),0 12px 28px -12px rgba(227,176,75,.35)}
 .cat .tab{border-radius:var(--r-xs);box-shadow:var(--sh-1)}
 .rules,.score,.report{border-radius:var(--r-md)}
 .rules{padding:var(--s1) var(--s4)}

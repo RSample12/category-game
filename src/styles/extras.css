@@ -66,3 +66,8 @@
 .reveal-stage .stack{margin-top:auto}
 @keyframes cardSwap{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){.reveal-stage .bigtag,.reveal-stage .cover{animation:none}}
+
+/* the turn bar must never be wider than the screen: let the name shrink with an ellipsis */
+.turnbar{grid-template-columns:minmax(0,1fr)}
+.turnrow h2{flex:1 1 0;min-width:0}
+.meter{flex:none}
