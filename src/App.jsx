@@ -10,6 +10,7 @@ import {
 import { getCategory } from './data/categories.js';
 import { buzz } from './lib/haptics.js';
 import { play, unlock } from './lib/sound.js';
+import { trackEvent } from './lib/analytics.js';
 import { soundFor } from './lib/soundEvents.js';
 import SoundToggle from './components/SoundToggle.jsx';
 import HomeButton from './components/HomeButton.jsx';
@@ -62,9 +63,17 @@ export default function App() {
   }, []);
 
   const deal = useCallback(
-    (type) => send({ type, ...dealSecrets(state.categoryId) }),
+    (type) => {
+      trackEvent(type === 'REMATCH' ? 'rematch' : 'game_started', { category: state.categoryId });
+      send({ type, ...dealSecrets(state.categoryId) });
+    },
     [send, state.categoryId],
   );
+
+  // Anonymous count of finished games (no names, no personal data).
+  useEffect(() => {
+    if (state.screen === 'over') trackEvent('game_finished', { category: state.categoryId });
+  }, [state.screen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist so an accidental refresh can resume the game (secrets stay hidden on restore).
   useEffect(() => {

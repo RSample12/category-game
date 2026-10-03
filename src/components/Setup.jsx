@@ -93,6 +93,11 @@ export default function Setup({ s, send, onDeal }) {
             <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you lose.</li>
           </ol>
         </details>
+        <p className="site-links">
+          <a href="/about">About</a>
+          <span aria-hidden="true"> · </span>
+          <a href="/privacy">Privacy</a>
+        </p>
       </section>
 
       <div className="cta">

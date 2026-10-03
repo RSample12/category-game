@@ -9,6 +9,9 @@ import '@fontsource/ibm-plex-mono/600';
 import './styles/app.css';
 import './styles/extras.css';
 import App from './App.jsx';
+import { startAnalytics } from './lib/analytics.js';
+
+startAnalytics();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
