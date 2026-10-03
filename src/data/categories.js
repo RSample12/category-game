@@ -97,6 +97,13 @@ export const CATEGORIES = [
     'Fred Flintstone', 'Popeye', 'Donald Duck', 'Goofy',
     'Eric Cartman', 'Rick Sanchez', 'Bluey', 'Tweety',
   ]),
+  define('countries', 'Countries', 'Nations from every corner of the map.', [
+    'United States', 'Canada', 'Mexico', 'Brazil',
+    'Argentina', 'United Kingdom', 'France', 'Germany',
+    'Italy', 'Spain', 'Egypt', 'South Africa',
+    'Nigeria', 'India', 'China', 'Japan',
+    'South Korea', 'Australia', 'Russia', 'Turkey',
+  ]),
 ];
 
 export const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
