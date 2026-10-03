@@ -37,7 +37,7 @@ function init() {
 function announcement(s) {
   switch (s.screen) {
     case 'setup': return 'Category Detectives. Pick a category and deal.';
-    case 'dealing': return 'Dealing secret suspects.';
+    case 'dealing': return 'Dealing suspects.';
     case 'reveal':
       return s.revealStep % 2 === 0
         ? `Hand the device to ${nameOf(s, s.revealStep < 2 ? 0 : 1)}.`

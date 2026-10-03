@@ -23,8 +23,8 @@ export default function Reveal({ s, send }) {
     const cat = getCategory(s.categoryId);
     const idx = cat.items.findIndex((i) => i.id === item.id);
     card = (
-      <div className="bigtag" key="face" role="img" aria-label={`Your secret suspect is ${item.name}`}>
-        <span className="k">Your secret suspect</span>
+      <div className="bigtag" key="face" role="img" aria-label={`Your suspect is ${item.name}`}>
+        <span className="k">Your suspect</span>
         <span className="n">{item.name}</span>
         <span className="f">
           <span>{cat.name}</span>
@@ -52,7 +52,7 @@ export default function Reveal({ s, send }) {
       <p className="lede reveal-note">
         {showing
           ? 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before each of your turns.'
-          : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their secret suspect.`}
+          : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their suspect.`}
       </p>
       <div className="stack">
         <button className="btn btn-primary" onClick={next}>
