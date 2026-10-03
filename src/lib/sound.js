@@ -30,12 +30,16 @@ export const SOUNDS = {
   // the accuse confirmation opening
   sheet: [tone(300, 0, 0.12, 0.14, { to: 380 })],
   // turning a card over for a private reveal
-  flip: [noise('highpass', 2500, 0, 0.14, 0.14)],
+  flip: [
+    noise('bandpass', 1300, 0, 0.17, 0.09, { q: 0.6, attack: 0.03 }),
+    tone(240, 0, 0.12, 0.05, { to: 170, attack: 0.02 }),
+  ],
   // picking a category
   select: [tone(880, 0, 0.05, 0.09)],
   // shuffling the deck before the deal
-  shuffle: Array.from({ length: 7 }, (_, i) =>
-    noise('bandpass', 2800 + (i % 3) * 500, i * 0.11, 0.09, 0.13, { q: 0.8 }),
+  // (soft riffle: low band, slow attack, quieter, no hissy highs)
+  shuffle: Array.from({ length: 6 }, (_, i) =>
+    noise('bandpass', 1000 + (i % 3) * 250, i * 0.12, 0.11, 0.075, { q: 0.6, attack: 0.03 }),
   ),
   // phone changes hands: two rising notes
   handoff: [tone(523.25, 0, 0.18, 0.16), tone(783.99, 0.1, 0.26, 0.16)],
@@ -100,7 +104,7 @@ function renderVoice(v, t0) {
   const t = t0 + v.at;
   const env = ctx.createGain();
   env.gain.setValueAtTime(0.0001, t);
-  env.gain.exponentialRampToValueAtTime(v.gain, t + 0.008);
+  env.gain.exponentialRampToValueAtTime(v.gain, t + (v.attack ?? 0.008));
   env.gain.exponentialRampToValueAtTime(0.0001, t + v.dur);
 
   let src;
