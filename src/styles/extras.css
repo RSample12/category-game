@@ -80,3 +80,8 @@
 .turnrow{padding-left:0;padding-right:0}
 .masthead{padding-top:var(--chrome)}
 @media (max-width:400px){.meter .tot{display:none}}
+
+/* footer links on the setup screen */
+.site-links{margin:var(--s4) 0 0;text-align:center;font-size:var(--t-sm);color:var(--muted)}
+.site-links a{color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:10px 6px;display:inline-block}
+.site-links a:hover{color:var(--text)}
