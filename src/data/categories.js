@@ -83,6 +83,13 @@ export const CATEGORIES = [
     'Panda Express', "Dunkin'", 'Olive Garden', "Applebee's",
     "Arby's", 'Five Guys', 'Panera Bread', "Chili's",
   ]),
+  define('actors', 'Actors', 'Leading names from the big screen.', [
+    'Tom Hanks', 'Leonardo DiCaprio', 'Brad Pitt', 'Denzel Washington',
+    'Robert De Niro', 'Morgan Freeman', 'Will Smith', 'Johnny Depp',
+    'Tom Cruise', 'Dwayne Johnson', 'Ryan Reynolds', 'Keanu Reeves',
+    'Margot Robbie', 'Scarlett Johansson', 'Zendaya', 'Jennifer Lawrence',
+    'Meryl Streep', 'Emma Stone', 'Chris Hemsworth', 'Robert Downey Jr.',
+  ]),
 ];
 
 export const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
