@@ -63,11 +63,11 @@ export const CATEGORIES = [
     'Fullmetal Alchemist', 'Jujutsu Kaisen', 'Hunter x Hunter', 'Sailor Moon',
     'Cowboy Bebop', 'One Punch Man', 'Tokyo Ghoul', 'Spy x Family',
   ]),
-  define('cars', 'Cars', 'Muscle, hybrids and supercars.', [
-    'Toyota Camry', 'Honda Civic', 'Ford Mustang', 'Chevy Corvette',
-    'Tesla Model 3', 'Jeep Wrangler', 'Ford F-150', 'Porsche 911',
-    'Dodge Charger', 'Toyota Prius', 'VW Beetle', 'Subaru Outback',
-    'Mazda Miata', 'Honda Odyssey', 'Mercedes G-Wagon', 'Lamborghini Huracán',
+  define('cars', 'Car Brands', 'Badges from Detroit to Stuttgart to Tokyo.', [
+    'Toyota', 'Honda', 'Ford', 'Chevrolet',
+    'Tesla', 'BMW', 'Mercedes-Benz', 'Audi',
+    'Porsche', 'Ferrari', 'Lamborghini', 'Volkswagen',
+    'Subaru', 'Jeep', 'Hyundai', 'Nissan',
   ]),
   define('restaurants', 'Chain Restaurants', 'Drive-thru, dine-in and coffee runs.', [
     "McDonald's", 'Burger King', "Wendy's", 'Taco Bell',
