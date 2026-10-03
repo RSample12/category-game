@@ -39,7 +39,7 @@ function ConfirmHome({ onStay, onLeave }) {
       <div className="sheet" role="alertdialog" aria-modal="true" aria-labelledby="home-title" aria-describedby="home-desc" ref={ref}>
         <h3 id="home-title">Leave this game?</h3>
         <p id="home-desc">
-          This game ends and its secret suspects are lost. Scores from earlier rounds are kept.
+          This game ends and the dealt suspects are lost. Scores from earlier rounds are kept.
         </p>
         <div className="row">
           <button className="btn btn-ghost" ref={stayRef} onClick={onStay}>

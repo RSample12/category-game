@@ -13,7 +13,7 @@ export default function Setup({ s, send, onDeal }) {
           <span>Detectives</span>
         </h1>
         <p className="lede">
-          Each of you is dealt a secret suspect from the same lineup. Ask yes/no questions,
+          Each of you is dealt a suspect from the same lineup. Ask yes/no questions,
           rule suspects out, and accuse first.
         </p>
       </header>
@@ -97,7 +97,7 @@ export default function Setup({ s, send, onDeal }) {
 
       <div className="cta">
         <button className="btn btn-primary btn-block" onClick={onDeal}>
-          <Search className="ico" aria-hidden="true" /> Deal secret suspects
+          <Search className="ico" aria-hidden="true" /> Deal suspects
         </button>
       </div>
     </>
