@@ -111,6 +111,13 @@ export const CATEGORIES = [
     'Leaning Tower of Pisa', 'Mount Rushmore', 'Burj Khalifa', 'Angkor Wat',
     'Petra', 'Niagara Falls', 'Acropolis', 'Brandenburg Gate',
   ]),
+  define('austin-bars', 'Austin Bars', 'Where Austin goes out, from Sixth Street to the East Side.', [
+    'Midnight Cowboy', 'Casino El Camino', 'The Driskill Bar', "Whisler's",
+    'The White Horse', 'Violet Crown Social Club', "Shakespeare's Pub", "Maggie Mae's",
+    'The Jackalope', 'The Blind Pig Pub', 'Elephant Room', "Donn's Depot",
+    'Deep Eddy Cabaret', 'Tiki Tatsu-Ya', 'Péché', 'Central Machine Works',
+    'The Dead Rabbit', 'Armadillo Den', "Kitty Cohen's", 'Mama Dearest',
+  ]),
 ];
 
 export const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
