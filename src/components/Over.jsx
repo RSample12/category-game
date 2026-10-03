@@ -1,6 +1,7 @@
 import { RotateCcw, LayoutGrid } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
 import { nameOf, Scoreboard } from './shared.jsx';
+import ShareButton from './ShareButton.jsx';
 
 export default function Over({ s, send, onRematch }) {
   const w = s.winner;
@@ -34,6 +35,7 @@ export default function Over({ s, send, onRematch }) {
         <button className="btn btn-ghost" onClick={() => send({ type: 'NEW_CATEGORY' })}>
           <LayoutGrid className="ico" aria-hidden="true" /> New category
         </button>
+        <ShareButton where="over" />
       </div>
     </div>
   );

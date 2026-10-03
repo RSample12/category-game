@@ -1,6 +1,7 @@
 import { Search } from 'lucide-react';
 import { CATEGORIES } from '../data/categories.js';
 import { Scoreboard } from './shared.jsx';
+import ShareButton from './ShareButton.jsx';
 
 export default function Setup({ s, send, onDeal }) {
   const played = s.scores[0] + s.scores[1] > 0;
@@ -93,6 +94,7 @@ export default function Setup({ s, send, onDeal }) {
             <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you lose.</li>
           </ol>
         </details>
+        <div className="share-row"><ShareButton where="setup" className="btn btn-ghost btn-block" /></div>
         <p className="site-links">
           <a href="/about">About</a>
           <span aria-hidden="true"> · </span>
