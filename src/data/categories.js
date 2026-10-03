@@ -90,6 +90,13 @@ export const CATEGORIES = [
     'Margot Robbie', 'Scarlett Johansson', 'Zendaya', 'Jennifer Lawrence',
     'Meryl Streep', 'Emma Stone', 'Chris Hemsworth', 'Robert Downey Jr.',
   ]),
+  define('cartoons', 'Cartoon Characters', 'Animated icons from every Saturday morning.', [
+    'Mickey Mouse', 'Bugs Bunny', 'Homer Simpson', 'SpongeBob SquarePants',
+    'Scooby-Doo', 'Tom', 'Jerry', 'Daffy Duck',
+    'Bart Simpson', 'Peter Griffin', 'Stewie Griffin', 'Patrick Star',
+    'Fred Flintstone', 'Popeye', 'Donald Duck', 'Goofy',
+    'Eric Cartman', 'Rick Sanchez', 'Bluey', 'Tweety',
+  ]),
 ];
 
 export const getCategory = (id) => CATEGORIES.find((c) => c.id === id);
