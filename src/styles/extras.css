@@ -71,3 +71,12 @@
 .turnbar{grid-template-columns:minmax(0,1fr)}
 .turnrow h2{flex:1 1 0;min-width:0}
 .meter{flex:none}
+
+/* corner buttons (home, sound) get their own strip so they never sit on top of
+   content: the turn bar and the setup masthead reserve it, and the turn row
+   no longer needs side padding to dodge them */
+:root{--chrome:calc(env(safe-area-inset-top,0px) + var(--s2) + 44px + var(--s2))}
+.turnbar{padding-top:var(--chrome);top:0}
+.turnrow{padding-left:0;padding-right:0}
+.masthead{padding-top:var(--chrome)}
+@media (max-width:400px){.meter .tot{display:none}}
