@@ -38,7 +38,9 @@ export default function Setup({ s, send, onDeal }) {
         <Lamp />
         <span className="eyebrow">Two players · one phone · pass and play</span>
         <h1>
-          <span>Crack</span>
+          <span>
+            Cr<span className="crack-a">a</span>ck
+          </span>
           <span>the Case</span>
         </h1>
         <p className="lede">
