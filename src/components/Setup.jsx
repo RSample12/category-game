@@ -10,8 +10,8 @@ export default function Setup({ s, send, onDeal }) {
       <header className="masthead">
         <span className="eyebrow">Two players · one phone · pass and play</span>
         <h1>
-          <span>Category</span>
-          <span>Detectives</span>
+          <span>Crack</span>
+          <span>the Case</span>
         </h1>
         <p className="lede">
           Each of you is dealt a suspect from the same lineup. Ask yes/no questions,
