@@ -96,3 +96,7 @@
 /* hanging lamp beside the title: hangs from the top edge, right of the title, clear of the sound button */
 .masthead{position:relative}
 .lamp{position:absolute;top:0;right:11px;pointer-events:none}
+
+/* smaller banner above the title: one line, so the title (and the lamp beside it) sit higher */
+.masthead .eyebrow{font-size:10px;letter-spacing:.03em;padding:5px 10px 5px 22px;white-space:nowrap}
+.masthead .eyebrow::before{left:8px;width:7px;height:7px;margin-top:-3.5px}
