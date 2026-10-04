@@ -208,10 +208,9 @@ h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;let
   --stamp-ink:#b4281d;
   --muted:#a9bdb1;
 }
-/* ground: a desk lamp pooled at the top, faint leather grain */
+/* ground: faint leather grain (the warm glow now lives behind the setup-screen lamp) */
 body{
-  background-image:radial-gradient(70% 42% at 50% -6%,rgba(227,176,75,.10),transparent 72%),repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
-  background-repeat:no-repeat,repeat;
+  background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
   font-feature-settings:"kern","liga";text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;
 }
 /* type */

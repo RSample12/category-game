@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { CATEGORIES } from '../data/categories.js';
 import { Scoreboard } from './shared.jsx';
@@ -6,19 +7,30 @@ import ShareButton from './ShareButton.jsx';
 /* A hanging brass desk lamp, drawn flat to match the night-desk look. Decorative only. */
 function Lamp() {
   return (
-    <svg className="lamp" viewBox="0 0 64 156" width="64" height="156" aria-hidden="true" focusable="false">
-      <line x1="32" y1="0" x2="32" y2="100" stroke="var(--line)" strokeWidth="2.5" />
-      <rect x="27" y="96" width="10" height="9" rx="2" fill="var(--p1)" />
-      <path d="M32 104 C16 104 8 118 5 134 L59 134 C56 118 48 104 32 104 Z" fill="var(--p1)" />
-      <path d="M32 104 C24 104 18 108 14 114 C22 111 32 110 32 110 Z" fill="#fff" opacity=".22" />
-      <path d="M59 134 C56 118 48 104 32 104 C44 108 50 118 52 134 Z" fill="#000" opacity=".16" />
-      <rect x="3" y="132" width="58" height="5" rx="2.5" fill="#b98c2c" />
-      <path d="M18 137 L46 137 A14 9 0 0 1 18 137 Z" fill="var(--paper)" />
-    </svg>
+    <>
+      <svg className="lamp" viewBox="0 0 64 156" width="64" height="156" aria-hidden="true" focusable="false">
+        <line x1="32" y1="0" x2="32" y2="100" stroke="var(--line)" strokeWidth="2.5" />
+        <rect x="27" y="96" width="10" height="9" rx="2" fill="var(--p1)" />
+        <path d="M32 104 C16 104 8 118 5 134 L59 134 C56 118 48 104 32 104 Z" fill="var(--p1)" />
+        <path d="M32 104 C24 104 18 108 14 114 C22 111 32 110 32 110 Z" fill="#fff" opacity=".22" />
+        <path d="M59 134 C56 118 48 104 32 104 C44 108 50 118 52 134 Z" fill="#000" opacity=".16" />
+        <rect x="3" y="132" width="58" height="5" rx="2.5" fill="#b98c2c" />
+        <path d="M18 137 L46 137 A14 9 0 0 1 18 137 Z" fill="#fff6d6" />
+      </svg>
+    </>
   );
 }
 
+/* The lamp's glow is painted on the page background, so switch it on while this screen is showing. */
+function useLampGlow() {
+  useEffect(() => {
+    document.body.classList.add('lamp-lit');
+    return () => document.body.classList.remove('lamp-lit');
+  }, []);
+}
+
 export default function Setup({ s, send, onDeal }) {
+  useLampGlow();
   const played = s.scores[0] + s.scores[1] > 0;
   return (
     <>
