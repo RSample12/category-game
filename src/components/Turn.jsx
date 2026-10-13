@@ -3,6 +3,7 @@ import { Stamp, Crosshair, Lock } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
 import { remainingIds } from '../game/engine.js';
 import { cx, nameOf, pad } from './shared.jsx';
+import PeekButton from './PeekButton.jsx';
 
 function Sheet({ s, send }) {
   const ref = useRef(null);
@@ -102,7 +103,9 @@ export default function Turn({ s, send }) {
   } else if (pend) {
     tip = <>Tap a stamped suspect again to undo. Locks when you end your turn. <b>Accuse unlocks next turn.</b></>;
   } else {
-    tip = <>Ask {opp} a yes/no question, then rule suspects out.</>;
+    // Before anything is ruled out, the tip line becomes the answerer's peek button,
+    // so the player being questioned can re-check their suspect before answering.
+    tip = null;
   }
 
   return (
@@ -128,7 +131,17 @@ export default function Turn({ s, send }) {
             <Crosshair className="ico" aria-hidden="true" /> Accuse
           </button>
         </div>
-        <p className="tip">{tip}</p>
+        {tip ? (
+          <p className="tip">{tip}</p>
+        ) : (
+          <PeekButton
+            className={`peek-tip p${1 - p}`}
+            secretName={getItem(s.categoryId, s.secrets[1 - p])?.name}
+            label={`${opp}: hold to peek`}
+            owner={`${opp}'s secret`}
+            ariaLabel={`${opp}: hold to peek at your secret. ${nameOf(s, p)}, look away.`}
+          />
+        )}
       </div>
 
       <div className="board">
