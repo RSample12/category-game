@@ -110,3 +110,6 @@ body.lamp-lit{
     repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
   background-repeat:no-repeat,repeat;
 }
+
+/* no string on the suspect card */
+.bigtag::after{content:none}
