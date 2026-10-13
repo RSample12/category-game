@@ -92,6 +92,11 @@ function startDeal(state, { secrets, caseNo }) {
   };
 }
 
+/** How many turns the winner took (each player's own count, not the combined turn number). */
+export function winnerTurns(state) {
+  return Math.max(1, Math.ceil(state.turn / 2));
+}
+
 function passTurn(state) {
   return {
     ...state,

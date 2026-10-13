@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Stamp, Crosshair, Lock } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Stamp, Crosshair, Lock, Eye } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
 import { remainingIds } from '../game/engine.js';
 import { cx, nameOf, pad } from './shared.jsx';
@@ -64,7 +64,72 @@ function Sheet({ s, send }) {
   );
 }
 
+/** Lets the player being questioned re-check their own suspect without ending the turn.
+ *  Hold to show; letting go (or leaving the button) hides it again. */
+function AnswerPeek({ s }) {
+  const [show, setShow] = useState(false);
+  const hide = () => setShow(false);
+  const who = 1 - s.current;
+  const asker = nameOf(s, s.current);
+  const cat = getCategory(s.categoryId);
+  const item = getItem(s.categoryId, s.secrets[who]);
+  const idx = cat.items.findIndex((i) => i.id === item.id);
+  return (
+    <>
+      <button
+        type="button"
+        className="btn btn-ghost peekbtn"
+        aria-label={`${nameOf(s, who)}: hold to check your suspect. ${asker} must look away.`}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture?.(e.pointerId);
+          setShow(true);
+        }}
+        onPointerUp={hide}
+        onPointerCancel={hide}
+        onPointerLeave={hide}
+        onBlur={hide}
+        onContextMenu={(e) => e.preventDefault()}
+        onClick={(e) => {
+          if (e.detail === 0) setShow((v) => !v); // keyboard: toggle
+        }}
+      >
+        <Eye className="ico" aria-hidden="true" />
+      </button>
+      {show && (
+        <div className={`peek-veil p${who}`} role="status">
+          <p className="peek-away">{asker}, look away.</p>
+          <div className="bigtag">
+            <span className="k">{nameOf(s, who)}’s suspect</span>
+            <span className="n">{item.name}</span>
+            <span className="f">
+              <span>{cat.name}</span>
+              <span>Nº {pad(idx + 1)}</span>
+            </span>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function Turn({ s, send }) {
+  // Ending a turn without ruling anything out wastes it, so ask once (second tap confirms).
+  const [armed, setArmed] = useState(false);
+  const armTimer = useRef(0);
+  useEffect(() => () => clearTimeout(armTimer.current), []);
+  useEffect(() => {
+    setArmed(false);
+    clearTimeout(armTimer.current);
+  }, [s.current, s.mode, s.boards[s.current].pending.length]);
+  const endTurn = () => {
+    if (s.boards[s.current].pending.length === 0 && !armed) {
+      setArmed(true);
+      armTimer.current = setTimeout(() => setArmed(false), 4000);
+      return;
+    }
+    send({ type: 'END_TURN' });
+  };
+
   const barRef = useRef(null);
   // Keep keyboard focus out from under the sticky turn bar: publish its height so
   // cards scroll into view below it (WCAG 2.4.11). Changes scrolling only, not appearance.
@@ -160,15 +225,22 @@ export default function Turn({ s, send }) {
       </div>
 
       <div className="actionbar">
-        <div className="in">
+        <div className={`in${guessing ? '' : ' with-peek'}`}>
           {guessing ? (
             <button className="btn btn-ghost btn-block" onClick={() => send({ type: 'SET_MODE', mode: 'elim' })}>
               Back to ruling out
             </button>
           ) : (
-            <button className="btn btn-primary btn-block" onClick={() => send({ type: 'END_TURN' })}>
-              <Lock className="ico" aria-hidden="true" /> {pend ? `Lock ${pend} and end turn` : 'End turn'}
-            </button>
+            <>
+              <AnswerPeek s={s} />
+              <button
+                className={`btn btn-primary${armed ? ' armed' : ''}`}
+                onClick={endTurn}
+              >
+                <Lock className="ico" aria-hidden="true" />{' '}
+                {pend ? `Lock ${pend} and end turn` : armed ? 'Nothing ruled out. Tap again to pass' : 'End turn'}
+              </button>
+            </>
           )}
         </div>
       </div>

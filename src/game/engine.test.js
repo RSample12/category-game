@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  createInitialState, reducer, remainingIds, dealSecrets, restoreState, serialize,
+  createInitialState, reducer, remainingIds, dealSecrets, restoreState, serialize, winnerTurns,
 } from './engine.js';
 import { getCategory } from '../data/categories.js';
 
@@ -210,4 +210,17 @@ test('GO_HOME on setup is a no-op, and works from every game screen', () => {
   for (const st of [dealing, reducer(dealing, { type: 'DEAL_DONE' }), startedGame()]) {
     assert.equal(reducer(st, { type: 'GO_HOME' }).screen, 'setup');
   }
+});
+
+test('winnerTurns: counts the winner\'s own turns, not the combined turn number', () => {
+  // Starter cracks it on their very first turn.
+  let s = run(startedGame(), { type: 'SET_MODE', mode: 'guess' }, ...tap(ITEMS[1]), { type: 'SHEET_CONFIRM' });
+  assert.equal(s.screen, 'over');
+  assert.equal(winnerTurns(s), 1);
+  // Second player cracks it on their first turn (combined turn 2).
+  s = run(startedGame(), { type: 'END_TURN' }, { type: 'START_TURN' },
+    { type: 'SET_MODE', mode: 'guess' }, ...tap(ITEMS[0]), { type: 'SHEET_CONFIRM' });
+  assert.equal(s.screen, 'over');
+  assert.equal(s.winner, 1);
+  assert.equal(winnerTurns(s), 1);
 });

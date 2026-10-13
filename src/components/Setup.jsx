@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Dices } from 'lucide-react';
 import { CATEGORIES } from '../data/categories.js';
 import { Scoreboard } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
@@ -31,6 +31,16 @@ function useLampGlow() {
 
 export default function Setup({ s, send, onDeal }) {
   useLampGlow();
+  const surprise = () => {
+    const others = CATEGORIES.filter((c) => c.id !== s.categoryId);
+    const pick = others[Math.floor(Math.random() * others.length)];
+    send({ type: 'SET_CATEGORY', id: pick.id });
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`cat-${pick.id}`);
+      const smooth = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el?.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
+    });
+  };
   const played = s.scores[0] + s.scores[1] > 0;
   return (
     <>
@@ -81,12 +91,15 @@ export default function Setup({ s, send, onDeal }) {
       <section className="section">
         <div className="section-head">
           <h2>Pick the lineup</h2>
-          <span className="eyebrow">Chosen together</span>
+          <button type="button" className="surprise" onClick={surprise}>
+            <Dices className="ico" aria-hidden="true" /> Surprise me
+          </button>
         </div>
         <div className="cats" role="radiogroup" aria-label="Category">
           {CATEGORIES.map((c) => (
             <button
               key={c.id}
+              id={`cat-${c.id}`}
               className="cat"
               role="radio"
               aria-checked={c.id === s.categoryId}

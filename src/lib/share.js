@@ -13,11 +13,11 @@ export function shareUrl() {
  * Opens the phone's native share sheet when there is one, otherwise copies the link.
  * Resolves to 'shared' | 'copied' | 'cancelled' | 'failed'.
  */
-export async function shareGame(where) {
+export async function shareGame(where, text = TEXT) {
   const url = shareUrl();
   try {
     if (navigator.share) {
-      await navigator.share({ title: TITLE, text: TEXT, url });
+      await navigator.share({ title: TITLE, text, url });
       trackEvent('share', { where, method: 'sheet' });
       return 'shared';
     }
@@ -26,7 +26,7 @@ export async function shareGame(where) {
     /* any other failure: fall through to copying */
   }
   try {
-    await navigator.clipboard.writeText(`${TEXT} ${url}`);
+    await navigator.clipboard.writeText(`${text} ${url}`);
     trackEvent('share', { where, method: 'copy' });
     return 'copied';
   } catch {
