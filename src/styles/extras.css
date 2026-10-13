@@ -117,3 +117,4 @@ body.lamp-lit{
 /* answerer peek: takes the tip line's place on the turn screen; same look as the handoff peek */
 .peek-tip{max-width:none;width:100%}
 .peek-tip{white-space:nowrap;overflow:hidden}
+.peek-tip.show{border-color:var(--p1);color:var(--p1)}
