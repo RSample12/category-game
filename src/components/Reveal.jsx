@@ -51,7 +51,7 @@ export default function Reveal({ s, send }) {
       {card}
       <p className="lede reveal-note">
         {showing
-          ? 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before each of your turns.'
+          ? 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before your turn or while you’re answering.'
           : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their suspect.`}
       </p>
       <div className="stack">
