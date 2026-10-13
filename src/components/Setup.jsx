@@ -91,7 +91,7 @@ export default function Setup({ s, send, onDeal }) {
       <section className="section">
         <div className="section-head">
           <h2>Pick the lineup</h2>
-          <button type="button" className="surprise" onClick={surprise}>
+          <button type="button" className="btn btn-ghost surprise" onClick={surprise}>
             <Dices className="ico" aria-hidden="true" /> Surprise me
           </button>
         </div>

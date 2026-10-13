@@ -71,10 +71,10 @@ function AnswerPeek({ s }) {
   const item = getItem(s.categoryId, s.secrets[1 - s.current]);
   return (
     <PeekButton
-      className={`peek-sm p${1 - s.current}`}
+      className={`peek-top p${1 - s.current}`}
       secretName={item.name}
       label={`${who}: hold to peek`}
-      owner={`${who}'s secret`}
+      owner={who}
       ariaLabel={`${who}: hold to peek at your secret. ${nameOf(s, s.current)}, look away.`}
     />
   );
@@ -107,7 +107,7 @@ export default function Turn({ s, send }) {
     const root = document.documentElement;
     const set = () => {
       root.style.scrollPaddingTop = `${el.offsetHeight + 12}px`;
-      root.style.scrollPaddingBottom = '152px'; // sticky peek + End turn buttons
+      root.style.scrollPaddingBottom = '104px'; // sticky End turn button
     };
     set();
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(set);
@@ -141,6 +141,7 @@ export default function Turn({ s, send }) {
   return (
     <div className={`p${p} ${guessing ? 'mode-guess' : ''}`}>
       <div className="turnbar" ref={barRef}>
+        <AnswerPeek s={s} />
         <div className="turnrow">
           <h1 className="sr-only">Crack the Case, turn {s.turn}</h1>
           <h2>{nameOf(s, p)}</h2>
@@ -200,7 +201,6 @@ export default function Turn({ s, send }) {
             </button>
           ) : (
             <>
-              <AnswerPeek s={s} />
               <button
                 className={`btn btn-primary btn-block${armed ? ' armed' : ''}`}
                 onClick={endTurn}

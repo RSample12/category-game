@@ -111,13 +111,15 @@ body.lamp-lit{
   background-repeat:no-repeat,repeat;
 }
 
-/* answerer peek: a compact version of the handoff peek, centred above End turn */
-.peek-sm{justify-self:center;width:auto;max-width:100%;min-height:40px;padding:0 var(--s4);font-size:var(--t-sm);background:rgba(18,38,33,.92)}
+/* answerer peek: the handoff peek button, sat in the top strip between the home and sound buttons */
+.turnbar{position:sticky}
+.peek-top{position:absolute;top:calc(env(safe-area-inset-top,0px) + var(--s2));left:48px;right:48px;width:auto;max-width:none;min-height:44px;height:44px;padding:0 var(--s3);font-size:15px;white-space:nowrap;overflow:hidden}
+.peek-top .hint,.peek-top .reveal{overflow:hidden;text-overflow:ellipsis}
 .btn.armed{background:var(--stamp);color:#fff}
 
 /* surprise me + game-over turns */
-.surprise{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;min-height:44px;padding:0;background:none;border:0;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:color .15s,text-decoration-color .15s}
-.surprise .ico{width:15px;height:15px}
-.surprise:hover{color:var(--p1);text-decoration-color:currentColor}
+.surprise{white-space:nowrap;flex-shrink:0;align-self:center}
 .turns-line{margin:0;font-family:var(--mono);font-size:var(--t-sm);letter-spacing:.14em;text-transform:uppercase;color:var(--pc,var(--p1))}
-.board{padding-bottom:168px}
+
+/* no string on the suspect card */
+.bigtag::after{content:none}
