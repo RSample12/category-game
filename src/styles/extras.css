@@ -111,14 +111,13 @@ body.lamp-lit{
   background-repeat:no-repeat,repeat;
 }
 
-/* answerer peek: eye button beside End turn + full-screen card while held */
-.actionbar .in.with-peek{grid-template-columns:auto 1fr;align-items:stretch}
-.peekbtn{width:56px;padding:0;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none}
-.peek-veil{position:fixed;inset:0;z-index:30;display:grid;place-content:center;justify-items:center;gap:var(--s5);background:var(--ink);padding:var(--s5)}
-.peek-away{margin:0;font-family:var(--mono);font-size:var(--t-sm);letter-spacing:.14em;text-transform:uppercase;color:var(--pc,var(--p1));text-align:center}
+/* answerer peek: a compact version of the handoff peek, centred above End turn */
+.peek-sm{justify-self:center;width:auto;max-width:100%;min-height:40px;padding:0 var(--s4);font-size:var(--t-sm);background:rgba(18,38,33,.92)}
 .btn.armed{background:var(--stamp);color:#fff}
 
 /* surprise me + game-over turns */
-.surprise{display:inline-flex;white-space:nowrap;flex-shrink:0;align-items:center;gap:var(--s2);min-height:44px;padding:0 var(--s3);background:none;border:1px solid var(--line);border-radius:999px;color:var(--text);font:inherit;font-size:var(--t-sm);cursor:pointer}
-.surprise:hover{border-color:var(--p1);color:var(--p1)}
+.surprise{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;min-height:44px;padding:0;background:none;border:0;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:color .15s,text-decoration-color .15s}
+.surprise .ico{width:15px;height:15px}
+.surprise:hover{color:var(--p1);text-decoration-color:currentColor}
 .turns-line{margin:0;font-family:var(--mono);font-size:var(--t-sm);letter-spacing:.14em;text-transform:uppercase;color:var(--pc,var(--p1))}
+.board{padding-bottom:168px}

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Stamp, Crosshair, Lock, Eye } from 'lucide-react';
+import { Stamp, Crosshair, Lock, Fingerprint } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
 import { remainingIds } from '../game/engine.js';
 import { cx, nameOf, pad } from './shared.jsx';
+import PeekButton from './PeekButton.jsx';
 
 function Sheet({ s, send }) {
   const ref = useRef(null);
@@ -64,51 +65,18 @@ function Sheet({ s, send }) {
   );
 }
 
-/** Lets the player being questioned re-check their own suspect without ending the turn.
- *  Hold to show; letting go (or leaving the button) hides it again. */
+/** The player being questioned can re-check their own suspect mid-turn (same control as the handoff peek). */
 function AnswerPeek({ s }) {
-  const [show, setShow] = useState(false);
-  const hide = () => setShow(false);
-  const who = 1 - s.current;
-  const asker = nameOf(s, s.current);
-  const cat = getCategory(s.categoryId);
-  const item = getItem(s.categoryId, s.secrets[who]);
-  const idx = cat.items.findIndex((i) => i.id === item.id);
+  const who = nameOf(s, 1 - s.current);
+  const item = getItem(s.categoryId, s.secrets[1 - s.current]);
   return (
-    <>
-      <button
-        type="button"
-        className="btn btn-ghost peekbtn"
-        aria-label={`${nameOf(s, who)}: hold to check your suspect. ${asker} must look away.`}
-        onPointerDown={(e) => {
-          e.currentTarget.setPointerCapture?.(e.pointerId);
-          setShow(true);
-        }}
-        onPointerUp={hide}
-        onPointerCancel={hide}
-        onPointerLeave={hide}
-        onBlur={hide}
-        onContextMenu={(e) => e.preventDefault()}
-        onClick={(e) => {
-          if (e.detail === 0) setShow((v) => !v); // keyboard: toggle
-        }}
-      >
-        <Eye className="ico" aria-hidden="true" />
-      </button>
-      {show && (
-        <div className={`peek-veil p${who}`} role="status">
-          <p className="peek-away">{asker}, look away.</p>
-          <div className="bigtag">
-            <span className="k">{nameOf(s, who)}’s suspect</span>
-            <span className="n">{item.name}</span>
-            <span className="f">
-              <span>{cat.name}</span>
-              <span>Nº {pad(idx + 1)}</span>
-            </span>
-          </div>
-        </div>
-      )}
-    </>
+    <PeekButton
+      className={`peek-sm p${1 - s.current}`}
+      secretName={item.name}
+      label={`${who}: hold to peek`}
+      owner={`${who}'s secret`}
+      ariaLabel={`${who}: hold to peek at your secret. ${nameOf(s, s.current)}, look away.`}
+    />
   );
 }
 
@@ -139,7 +107,7 @@ export default function Turn({ s, send }) {
     const root = document.documentElement;
     const set = () => {
       root.style.scrollPaddingTop = `${el.offsetHeight + 12}px`;
-      root.style.scrollPaddingBottom = '104px'; // sticky End turn button
+      root.style.scrollPaddingBottom = '152px'; // sticky peek + End turn buttons
     };
     set();
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(set);
@@ -225,7 +193,7 @@ export default function Turn({ s, send }) {
       </div>
 
       <div className="actionbar">
-        <div className={`in${guessing ? '' : ' with-peek'}`}>
+        <div className="in">
           {guessing ? (
             <button className="btn btn-ghost btn-block" onClick={() => send({ type: 'SET_MODE', mode: 'elim' })}>
               Back to ruling out
@@ -234,7 +202,7 @@ export default function Turn({ s, send }) {
             <>
               <AnswerPeek s={s} />
               <button
-                className={`btn btn-primary${armed ? ' armed' : ''}`}
+                className={`btn btn-primary btn-block${armed ? ' armed' : ''}`}
                 onClick={endTurn}
               >
                 <Lock className="ico" aria-hidden="true" />{' '}
