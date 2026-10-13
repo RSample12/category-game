@@ -116,7 +116,7 @@ export default function Turn({ s, send }) {
           <h2>{nameOf(s, p)}</h2>
           <span className="meter">
             <b>{left}</b>
-            <span className="tot"> / {cat.items.length}</span> left · T{s.turn}
+            <span className="tot"> / {cat.items.length}</span> left · Turn {s.turn}
           </span>
         </div>
         <div className="seg" role="group" aria-label="Action">
@@ -142,6 +142,7 @@ export default function Turn({ s, send }) {
             ariaLabel={`${opp}: hold to peek at your secret. ${nameOf(s, p)}, look away.`}
           />
         )}
+        {!tip && <p className="tip">Ask {opp} a yes/no question.</p>}
       </div>
 
       <div className="board">

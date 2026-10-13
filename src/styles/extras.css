@@ -119,3 +119,4 @@ body.lamp-lit{
 .peek-tip{white-space:nowrap;overflow:hidden}
 .peek-tip.show{border-color:var(--p1);color:var(--p1)}
 .peek-tip{border-radius:var(--r-md)}
+.peek-tip{min-height:40px;padding-block:8px}
