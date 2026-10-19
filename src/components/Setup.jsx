@@ -8,12 +8,12 @@ const RULE_OPTIONS = [
   {
     id: 'last',
     name: 'Last one standing',
-    blurb: 'Crack your target to knock them out, then hunt whoever they were hunting. The last detective left wins.',
+    blurb: 'Solve your target’s suspect to knock them out, then hunt whoever they were hunting. The last detective left wins.',
   },
   {
     id: 'first',
-    name: 'First to crack',
-    blurb: 'The first detective to crack their target wins. Run out of suspects and you’re out, but you still answer.',
+    name: 'First to solve',
+    blurb: 'The first detective to solve their target’s suspect wins. Run out of suspects and you’re out, but you still answer.',
   },
 ];
 

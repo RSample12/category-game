@@ -16,11 +16,11 @@
  *  - Wrong guess eliminates that item and passes the turn. If it was the player's last
  *    remaining item, that player is out.
  *  - Two rule sets for 3-4 players (identical with two players):
- *      'last'  (last one standing): cracking your target knocks them out. You then hunt
+ *      'last'  (last one standing): solving your target's suspect knocks them out. You then hunt
  *              whoever they were hunting, starting a fresh board. A player who runs out
  *              of suspects is out too, and their hunter takes over their target (fresh
  *              board). The last player left wins.
- *      'first' (first to crack): the first player to crack their target wins. A player
+ *      'first' (first to solve): the first player to solve their target's suspect wins. A player
  *              who runs out of suspects is out (their turns are skipped) but still answers
  *              their hunter. If only one player is left in, they win.
  *  - Out players' turns are skipped. Rematch passes the first turn to the next player.

@@ -13,7 +13,7 @@ function Story({ s }) {
           <span className="t">Turn {k.turn}</span>
           {k.how === 'cracked' ? (
             <span>
-              <b className={`p${k.by}`}>{nameOf(s, k.by)}</b> cracked <b className={`p${k.out}`}>{nameOf(s, k.out)}</b>
+              <b className={`p${k.by}`}>{nameOf(s, k.by)}</b> knocked out <b className={`p${k.out}`}>{nameOf(s, k.out)}</b>
             </span>
           ) : (
             <span>
@@ -33,7 +33,7 @@ export default function Over({ s, send, onRematch }) {
   const loser = s.knockouts.length ? s.knockouts[s.knockouts.length - 1].out : 1 - w;
   let line;
   if (solved) {
-    line = `${nameOf(s, w)} named ${accused} and cracked the case.`;
+    line = `${nameOf(s, w)} named ${accused} and solved the case.`;
     if (s.count > 2 && s.rules === 'last') line = `${nameOf(s, w)} named ${accused} and is the last detective standing.`;
   } else if (s.count > 2) {
     line = `${nameOf(s, loser)} accused ${accused}, their last suspect, and it was wrong. ${nameOf(s, w)} is the last detective left.`;

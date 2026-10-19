@@ -266,11 +266,11 @@ test('clockwise ring: each player hunts the next, three reveals each way, turns 
   assert.equal(s.turn, 4);
 });
 
-test('last one standing: cracking your target knocks them out and you take their target, fresh board', () => {
+test('last one standing: solving your target knocks them out and you take their target, fresh board', () => {
   let s = bigGame(3, 'last');
   s = run(s, ...tap(ITEMS[5], ITEMS[6]), END, START); // P0 rules out two, P1's turn
   s = run(s, END, START, END, START); // back to P0
-  s = run(s, ...guess(ITEMS[1])); // P0 cracks P1
+  s = run(s, ...guess(ITEMS[1])); // P0 solves P1
   assert.equal(s.screen, 'handoff');
   assert.deepEqual(s.alive, [true, false, true]);
   assert.equal(s.targets[0], 2); // now hunting whoever P1 was hunting
@@ -278,7 +278,7 @@ test('last one standing: cracking your target knocks them out and you take their
   assert.equal(s.report.kind, 'cracked');
   assert.equal(s.current, 2); // P1 is skipped
   assert.equal(aliveCount(s), 2);
-  // P2 cracks P0: last one standing
+  // P2 solves P0: last one standing
   s = run(s, START, ...guess(ITEMS[0]));
   assert.equal(s.screen, 'over');
   assert.equal(s.winner, 2);
@@ -303,15 +303,15 @@ test('last one standing: running out puts you out and your hunter takes over you
   assert.equal(s.screen, 'handoff');
 });
 
-test('first to crack: the first crack wins outright', () => {
+test('first to solve: the first solve wins outright', () => {
   let s = bigGame(4, 'first');
-  s = run(s, END, START, ...guess(ITEMS[2])); // P1 cracks P2
+  s = run(s, END, START, ...guess(ITEMS[2])); // P1 solves P2
   assert.equal(s.screen, 'over');
   assert.equal(s.winner, 1);
   assert.deepEqual(s.alive, [true, true, true, true]);
 });
 
-test('first to crack: running out skips your turns but nobody takes over; last one in wins', () => {
+test('first to solve: running out skips your turns but nobody takes over; last one in wins', () => {
   let s = bigGame(3, 'first');
   const keep = [ITEMS[3], ITEMS[4]]; // P0 never keeps P1's real item
   s = run(s, ...tap(...ITEMS.filter((id) => !keep.includes(id))), END, START, END, START, END, START);
@@ -324,7 +324,7 @@ test('first to crack: running out skips your turns but nobody takes over; last o
 
 test('rematch passes the first turn round the table', () => {
   let s = bigGame(3, 'last');
-  s = run(s, ...guess(ITEMS[1]), START, ...guess(ITEMS[0])); // P0 out-cracked by P2
+  s = run(s, ...guess(ITEMS[1]), START, ...guess(ITEMS[0])); // P0 knocked out by P2
   assert.equal(s.screen, 'over');
   s = run(s, { type: 'REMATCH', secrets: ITEMS.slice(3, 6), caseNo: 'y' });
   assert.equal(s.starter, 1);

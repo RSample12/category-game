@@ -13,7 +13,7 @@ function Report({ s }) {
   if (r.kind === 'cracked') {
     body = (
       <>
-        {nm(r.p)} cracked {nm(r.out)}’s suspect, {item(r.itemId)}. {nm(r.out)} is out.{' '}
+        {nm(r.p)} solved {nm(r.out)}’s suspect, {item(r.itemId)}. {nm(r.out)} is out.{' '}
         {nm(r.p)} now questions {nm(r.next)}, starting fresh.
       </>
     );
