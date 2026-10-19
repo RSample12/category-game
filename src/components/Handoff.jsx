@@ -1,28 +1,48 @@
 import { ArrowRight } from 'lucide-react';
 import { getItem } from '../data/categories.js';
-import { remainingIds } from '../game/engine.js';
+import { remainingIds, hunterOf } from '../game/engine.js';
 import { nameOf } from './shared.jsx';
 import PeekButton from './PeekButton.jsx';
 
 function Report({ s }) {
   const r = s.report;
   if (!r) return null;
-  const who = <b>{nameOf(s, r.p)}</b>;
+  const nm = (p) => <b>{nameOf(s, p)}</b>;
+  const item = (id) => <b>{getItem(s.categoryId, id).name}</b>;
   let body;
-  if (r.kind === 'accused') {
+  if (r.kind === 'cracked') {
     body = (
       <>
-        {who} accused <b>{getItem(s.categoryId, r.itemId).name}</b>. Wrong.
+        {nm(r.p)} cracked {nm(r.out)}’s suspect, {item(r.itemId)}. {nm(r.out)} is out.{' '}
+        {nm(r.p)} now questions {nm(r.next)}, starting fresh.
+      </>
+    );
+  } else if (r.kind === 'out') {
+    const h = hunterOf(s, r.p);
+    body = (
+      <>
+        {nm(r.p)} accused {item(r.itemId)}. Wrong, and that was their last suspect, so {nm(r.p)} is out.{' '}
+        {r.takeover >= 0 ? (
+          <>{nm(r.takeover)} now questions {nm(r.next)}, starting fresh.</>
+        ) : (
+          h >= 0 && <>{nm(r.p)} still answers {nm(h)}’s questions.</>
+        )}
+      </>
+    );
+  } else if (r.kind === 'accused') {
+    body = (
+      <>
+        {nm(r.p)} accused {item(r.itemId)}. Wrong.
       </>
     );
   } else if (r.count > 0) {
     body = (
       <>
-        {who} ruled out <b>{r.count}</b> suspect{r.count > 1 ? 's' : ''}.
+        {nm(r.p)} ruled out <b>{r.count}</b> suspect{r.count > 1 ? 's' : ''}.
       </>
     );
   } else {
-    body = <>{who} asked a question and ruled nothing out.</>;
+    body = <>{nm(r.p)} asked a question and ruled nothing out.</>;
   }
   return <p className="report">{body}</p>;
 }
@@ -41,6 +61,11 @@ export default function Handoff({ s, send }) {
       <Report s={s} />
       <p className="lede">
         {left} suspect{left === 1 ? '' : 's'} still on your board.
+        {s.count > 2 && (
+          <>
+            {' '}You’re questioning <b className={`who-inline p${s.targets[p]}`}>{nameOf(s, s.targets[p])}</b>.
+          </>
+        )}
       </p>
       <div className="stack">
         <button className="btn btn-primary" onClick={() => send({ type: 'START_TURN' })}>

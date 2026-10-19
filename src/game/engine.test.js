@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  createInitialState, reducer, remainingIds, dealSecrets, restoreState, serialize,
+  createInitialState, reducer, remainingIds, dealSecrets, restoreState, serialize, hunterOf, aliveCount,
 } from './engine.js';
 import { getCategory } from '../data/categories.js';
 
@@ -71,7 +71,7 @@ test('a correct guess wins immediately and scores a point', () => {
   assert.equal(s.screen, 'over');
   assert.equal(s.winner, 0);
   assert.equal(s.reason, 'solved');
-  assert.deepEqual(s.scores, [1, 0]);
+  assert.deepEqual(s.scores.slice(0, 2), [1, 0]);
 });
 
 test('a wrong guess eliminates the item on your board and passes the turn', () => {
@@ -137,7 +137,7 @@ test('wrong guess on your LAST item: opponent wins by default', () => {
   assert.equal(s.screen, 'over');
   assert.equal(s.winner, 1);
   assert.equal(s.reason, 'exhausted');
-  assert.deepEqual(s.scores, [0, 1]);
+  assert.deepEqual(s.scores.slice(0, 2), [0, 1]);
 });
 
 test('a player who starts a turn with one item left gets the prompt immediately', () => {
@@ -154,7 +154,7 @@ test('rematch: new deal, same category, scores kept, first player alternates', (
   s = run(s, { type: 'REMATCH', secrets: [ITEMS[2], ITEMS[3]], caseNo: 'x' });
   assert.equal(s.screen, 'dealing');
   assert.equal(s.categoryId, 'dogs');
-  assert.deepEqual(s.scores, [1, 0]);
+  assert.deepEqual(s.scores.slice(0, 2), [1, 0]);
   assert.equal(s.current, 1);
   assert.deepEqual(s.secrets, [ITEMS[2], ITEMS[3]]);
   assert.deepEqual(s.boards.map((b) => b.locked.length + b.pending.length), [0, 0]);
@@ -175,7 +175,8 @@ test('restore: a refresh never leaves a secret on screen', () => {
   assert.equal(turn.screen, 'handoff'); // hidden until the player taps start
   assert.deepEqual(turn.boards[0].pending, [ITEMS[3]]);
 
-  const showing = { ...createInitialState(), screen: 'reveal', revealStep: 3, secrets: [ITEMS[0], ITEMS[1]] };
+  const dealt = run(createInitialState(), { type: 'DEAL', secrets: [ITEMS[0], ITEMS[1]], caseNo: 'x' }, { type: 'DEAL_DONE' });
+  const showing = { ...dealt, revealStep: 3 };
   assert.equal(restoreState(serialize(showing)).revealStep, 2);
 });
 
@@ -194,10 +195,10 @@ test('GO_HOME mid-game: back to setup, game wiped, names/scores/category kept', 
   assert.equal(s.screen, 'turn');
   s = run(s, { type: 'GO_HOME' });
   assert.equal(s.screen, 'setup');
-  assert.deepEqual(s.secrets, [null, null]);
-  assert.deepEqual(s.boards[0], { locked: [], pending: [], wrong: [] });
-  assert.deepEqual(s.names, ['Ann', 'Bo']);
-  assert.deepEqual(s.scores, [2, 1]);
+  assert.deepEqual(s.secrets, []);
+  assert.deepEqual(s.boards, []);
+  assert.deepEqual(s.names.slice(0, 2), ['Ann', 'Bo']);
+  assert.deepEqual(s.scores.slice(0, 2), [2, 1]);
   assert.equal(s.categoryId, 'pokemon');
   assert.equal(s.starter, 1);
   assert.equal(s.sheet, null);
@@ -210,4 +211,140 @@ test('GO_HOME on setup is a no-op, and works from every game screen', () => {
   for (const st of [dealing, reducer(dealing, { type: 'DEAL_DONE' }), startedGame()]) {
     assert.equal(reducer(st, { type: 'GO_HOME' }).screen, 'setup');
   }
+});
+
+/* ---------------- 3-4 players ---------------- */
+
+const START = { type: 'START_TURN' };
+const END = { type: 'END_TURN' };
+const OK = { type: 'SHEET_CONFIRM' };
+const guess = (id) => [{ type: 'SET_MODE', mode: 'guess' }, { type: 'TAP_ITEM', id }, OK];
+
+/** n players, rules; player i holds ITEMS[i]. Returns state at the first player's turn. */
+function bigGame(n, rules) {
+  let s = run(createInitialState(), { type: 'SET_PLAYERS', count: n }, { type: 'SET_RULES', rules });
+  s = run(s, { type: 'DEAL', secrets: ITEMS.slice(0, n), caseNo: 'x' }, { type: 'DEAL_DONE' });
+  s = run(s, ...Array(2 * n).fill({ type: 'REVEAL_NEXT' }));
+  assert.equal(s.screen, 'handoff');
+  return run(s, START);
+}
+/** Everyone but `p` passes; returns state at p's next turn. */
+function passRound(s) {
+  return run(s, END, START);
+}
+
+test('dealSecrets: n different items', () => {
+  for (let i = 0; i < 100; i += 1) {
+    const { secrets } = dealSecrets('dogs', 4);
+    assert.equal(secrets.length, 4);
+    assert.equal(new Set(secrets).size, 4);
+  }
+});
+
+test('setup: player count is clamped to 2-4 and removing a player clears their slot', () => {
+  let s = run(createInitialState(), { type: 'SET_NAME', index: 2, value: 'Cy' }, { type: 'SET_PLAYERS', count: 9 });
+  assert.equal(s.count, 4);
+  s = run(s, { type: 'SET_PLAYERS', count: 1 });
+  assert.equal(s.count, 2);
+  assert.equal(s.names[2], '');
+  // a deal with the wrong number of secrets is ignored
+  s = run(s, { type: 'SET_PLAYERS', count: 3 });
+  assert.equal(reducer(s, { type: 'DEAL', secrets: ITEMS.slice(0, 2), caseNo: 'x' }).screen, 'setup');
+});
+
+test('clockwise ring: each player hunts the next, three reveals each way, turns go round', () => {
+  let s = bigGame(3, 'last');
+  assert.deepEqual(s.targets, [1, 2, 0]);
+  assert.equal(hunterOf(s, 0), 2);
+  assert.equal(s.current, 0);
+  s = passRound(s);
+  assert.equal(s.current, 1);
+  s = passRound(s);
+  assert.equal(s.current, 2);
+  s = passRound(s);
+  assert.equal(s.current, 0);
+  assert.equal(s.turn, 4);
+});
+
+test('last one standing: cracking your target knocks them out and you take their target, fresh board', () => {
+  let s = bigGame(3, 'last');
+  s = run(s, ...tap(ITEMS[5], ITEMS[6]), END, START); // P0 rules out two, P1's turn
+  s = run(s, END, START, END, START); // back to P0
+  s = run(s, ...guess(ITEMS[1])); // P0 cracks P1
+  assert.equal(s.screen, 'handoff');
+  assert.deepEqual(s.alive, [true, false, true]);
+  assert.equal(s.targets[0], 2); // now hunting whoever P1 was hunting
+  assert.deepEqual(s.boards[0], { locked: [], pending: [], wrong: [] }); // fresh
+  assert.equal(s.report.kind, 'cracked');
+  assert.equal(s.current, 2); // P1 is skipped
+  assert.equal(aliveCount(s), 2);
+  // P2 cracks P0: last one standing
+  s = run(s, START, ...guess(ITEMS[0]));
+  assert.equal(s.screen, 'over');
+  assert.equal(s.winner, 2);
+  assert.equal(s.reason, 'solved');
+  assert.equal(s.scores[2], 1);
+  assert.equal(s.knockouts.length, 2);
+});
+
+test('last one standing: running out puts you out and your hunter takes over your target', () => {
+  let s = bigGame(3, 'last');
+  // P0 rules out everything except ITEMS[0] and ITEMS[2] (P1 really holds ITEMS[1])
+  const others = ITEMS.filter((id) => ![ITEMS[0], ITEMS[2], ITEMS[1]].includes(id));
+  s = run(s, ...tap(...others, ITEMS[1]), END, START, END, START, END, START);
+  s = run(s, ...guess(ITEMS[0])); // wrong, one left
+  s = run(s, START, END, START, END, START); // back to P0, last-suspect sheet
+  assert.equal(s.sheet.type, 'last');
+  s = run(s, OK); // wrong again: out of suspects
+  assert.deepEqual(s.alive, [false, true, true]);
+  assert.equal(s.report.kind, 'out');
+  assert.equal(s.report.takeover, 2); // P2 was hunting P0
+  assert.equal(s.targets[2], 1); // P2 now hunts P0's target
+  assert.equal(s.screen, 'handoff');
+});
+
+test('first to crack: the first crack wins outright', () => {
+  let s = bigGame(4, 'first');
+  s = run(s, END, START, ...guess(ITEMS[2])); // P1 cracks P2
+  assert.equal(s.screen, 'over');
+  assert.equal(s.winner, 1);
+  assert.deepEqual(s.alive, [true, true, true, true]);
+});
+
+test('first to crack: running out skips your turns but nobody takes over; last one in wins', () => {
+  let s = bigGame(3, 'first');
+  const keep = [ITEMS[3], ITEMS[4]]; // P0 never keeps P1's real item
+  s = run(s, ...tap(...ITEMS.filter((id) => !keep.includes(id))), END, START, END, START, END, START);
+  s = run(s, ...guess(ITEMS[3]), START, END, START, END, START, OK);
+  assert.deepEqual(s.alive, [false, true, true]);
+  assert.deepEqual(s.targets, [1, 2, 0]); // unchanged: P2 still questions P0
+  assert.equal(s.report.takeover, -1);
+  assert.equal(s.current, 1);
+});
+
+test('rematch passes the first turn round the table', () => {
+  let s = bigGame(3, 'last');
+  s = run(s, ...guess(ITEMS[1]), START, ...guess(ITEMS[0])); // P0 out-cracked by P2
+  assert.equal(s.screen, 'over');
+  s = run(s, { type: 'REMATCH', secrets: ITEMS.slice(3, 6), caseNo: 'y' });
+  assert.equal(s.starter, 1);
+  assert.equal(s.current, 1);
+  assert.deepEqual(s.alive, [true, true, true]);
+});
+
+test('restore: a v2 two-player save migrates; a 3-player game survives a refresh', () => {
+  const v2 = {
+    v: 2,
+    state: { ...startedGame(), names: ['Ann', 'Bo'], scores: [1, 2], count: undefined, targets: undefined, alive: undefined, knockouts: undefined },
+  };
+  const m = restoreState(JSON.stringify(v2));
+  assert.equal(m.screen, 'handoff');
+  assert.equal(m.count, 2);
+  assert.deepEqual(m.targets, [1, 0]);
+  assert.deepEqual(m.names.slice(0, 2), ['Ann', 'Bo']);
+  const big = run(bigGame(3, 'first'), ...tap(ITEMS[9]));
+  const r = restoreState(serialize(big));
+  assert.equal(r.count, 3);
+  assert.equal(r.rules, 'first');
+  assert.equal(r.screen, 'handoff');
 });

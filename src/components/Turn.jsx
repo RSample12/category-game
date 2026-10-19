@@ -9,8 +9,14 @@ function Sheet({ s, send }) {
   const ref = useRef(null);
   const confirmRef = useRef(null);
   const item = getItem(s.categoryId, s.sheet.itemId);
-  const opp = nameOf(s, 1 - s.current);
+  const opp = nameOf(s, s.targets[s.current]);
   const isLast = s.sheet.type === 'last';
+  const multi = s.count > 2;
+  // What a correct accusation does depends on the rules and how many are still in.
+  const right =
+    multi && s.rules === 'last' && s.alive.filter(Boolean).length > 2
+      ? `Right and ${opp} is out, and you take over their target.`
+      : 'Right and you win the case.';
 
   // Focus the primary action, trap Tab inside, close on Escape, restore focus after.
   useEffect(() => {
@@ -49,8 +55,8 @@ function Sheet({ s, send }) {
         </h3>
         <p>
           {isLast
-            ? `That's the only one you haven't ruled out, so it's your accusation. If ${opp} isn't holding it, you lose.`
-            : 'Right and you win the case. Wrong and it’s ruled out and your turn ends.'}
+            ? `That's the only one you haven't ruled out, so it's your accusation. If ${opp} isn't holding it, you ${multi ? 'are out' : 'lose'}.`
+            : `${right} Wrong and it’s ruled out and your turn ends.`}
         </p>
         <div className="row">
           <button className="btn btn-ghost" onClick={() => send({ type: 'SHEET_CANCEL' })}>
@@ -93,7 +99,8 @@ export default function Turn({ s, send }) {
   const guessing = s.mode === 'guess';
   const pend = b.pending.length;
   const left = remainingIds(s, p).length;
-  const opp = nameOf(s, 1 - p);
+  const tgt = s.targets[p];
+  const opp = nameOf(s, tgt);
 
   let tip;
   if (guessing) {
@@ -135,11 +142,11 @@ export default function Turn({ s, send }) {
           <p className="tip">{tip}</p>
         ) : (
           <PeekButton
-            className={`peek-tip p${1 - p}`}
-            secretName={getItem(s.categoryId, s.secrets[1 - p])?.name}
+            className={`peek-tip p${tgt}`}
+            secretName={getItem(s.categoryId, s.secrets[tgt])?.name}
             label={`${opp}: hold to peek`}
             owner={`${opp}'s secret`}
-            ariaLabel={`${opp}: hold to peek at your secret. ${nameOf(s, p)}, look away.`}
+            ariaLabel={`${opp}: hold to peek at your secret. ${s.count > 2 ? 'Everyone else' : nameOf(s, p)}, look away.`}
           />
         )}
         {!tip && <p className="tip">Ask {opp} a yes/no question.</p>}

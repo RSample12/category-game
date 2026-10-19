@@ -1,8 +1,22 @@
 import { useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus, X } from 'lucide-react';
+import { MAX_PLAYERS } from '../game/engine.js';
 import { CATEGORIES } from '../data/categories.js';
-import { Scoreboard } from './shared.jsx';
+import { Scoreboard, playersOf } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
+
+const RULE_OPTIONS = [
+  {
+    id: 'last',
+    name: 'Last one standing',
+    blurb: 'Crack your target to knock them out, then hunt whoever they were hunting. The last detective left wins.',
+  },
+  {
+    id: 'first',
+    name: 'First to crack',
+    blurb: 'The first detective to crack their target wins. Run out of suspects and you’re out, but you still answer.',
+  },
+];
 
 /* A hanging brass desk lamp, drawn flat to match the night-desk look. Decorative only. */
 function Lamp() {
@@ -36,7 +50,7 @@ export default function Setup({ s, send, onDeal }) {
     <>
       <header className="masthead">
         <Lamp />
-        <span className="eyebrow">Two players · one phone · pass and play</span>
+        <span className="eyebrow">2–4 players · one phone · pass and play</span>
         <h1>
           <span>Crack</span>
           <span>the Case</span>
@@ -52,20 +66,45 @@ export default function Setup({ s, send, onDeal }) {
           <h2>The detectives</h2>
         </div>
         <div className="names">
-          {[0, 1].map((p) => (
-            <div className={`field p${p}`} key={p}>
-              <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
-              <input
-                id={`name-${p}`}
-                maxLength={14}
-                autoComplete="off"
-                placeholder={`Player ${p + 1}`}
-                value={s.names[p]}
-                onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
-              />
-            </div>
-          ))}
+          {playersOf(s).map((p) => {
+            const removable = p >= 2 && p === s.count - 1;
+            return (
+              <div className={`field p${p}`} key={p}>
+                <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
+                <div className="input-wrap">
+                  <input
+                    id={`name-${p}`}
+                    maxLength={14}
+                    autoComplete="off"
+                    placeholder={`Player ${p + 1}`}
+                    value={s.names[p]}
+                    className={removable ? 'has-x' : undefined}
+                    onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
+                  />
+                  {removable && (
+                    <button
+                      type="button"
+                      className="field-x"
+                      aria-label={`Remove Detective ${p + 1}`}
+                      onClick={() => send({ type: 'SET_PLAYERS', count: s.count - 1 })}
+                    >
+                      <X className="ico" aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
+        {s.count < MAX_PLAYERS && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-block add-player"
+            onClick={() => send({ type: 'SET_PLAYERS', count: s.count + 1 })}
+          >
+            <Plus className="ico" aria-hidden="true" /> Add a detective
+          </button>
+        )}
         {played && (
           <>
             <Scoreboard s={s} />
@@ -77,6 +116,37 @@ export default function Setup({ s, send, onDeal }) {
           </>
         )}
       </section>
+
+      {s.count > 2 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>How it ends</h2>
+          </div>
+          <p className="section-note">
+            Each detective questions the next one in the list and answers the one before.
+          </p>
+          <div className="cats rule-opts" role="radiogroup" aria-label="How it ends">
+            {RULE_OPTIONS.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className="cat rule"
+                role="radio"
+                aria-checked={s.rules === r.id}
+                onClick={() => send({ type: 'SET_RULES', rules: r.id })}
+              >
+                <span style={{ minWidth: 0 }}>
+                  <h3>{r.name}</h3>
+                  <p>{r.blurb}</p>
+                </span>
+                <span className="count">
+                  <span className="radio" aria-hidden="true" />
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">
@@ -116,10 +186,13 @@ export default function Setup({ s, send, onDeal }) {
           <summary>How a turn works</summary>
           <ol>
             <li><strong>Ask</strong> your opponent one yes/no question out loud about their secret.</li>
+            {s.count > 2 && (
+              <li>With 3 or 4 detectives, your opponent is the next one in the list. The app always says who you’re questioning.</li>
+            )}
             <li><strong>Rule out</strong> suspects on your board, or <strong>accuse</strong> one. Never both in one turn.</li>
             <li>Rule-outs can be undone until you end your turn. After that they're locked.</li>
             <li>Rule out all but one, end your turn, and accuse that last suspect on your next turn.</li>
-            <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you lose.</li>
+            <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you {s.count > 2 ? 'are out' : 'lose'}.</li>
           </ol>
         </details>
         <div className="share-row"><ShareButton where="setup" className="btn btn-ghost btn-block" /></div>

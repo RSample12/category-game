@@ -10,8 +10,13 @@ export function soundFor(prev, next) {
       case 'dealing':
         return 'shuffle';
       case 'handoff':
-        // coming straight from a turn that ended in a wrong accusation
-        return prev.screen === 'turn' && next.report?.kind === 'accused' ? 'wrong' : 'handoff';
+        // coming straight from a turn that ended in an accusation
+        if (prev.screen === 'turn') {
+          if (next.report?.kind === 'accused') return 'wrong';
+          if (next.report?.kind === 'cracked') return 'win'; // a knockout, game goes on
+          if (next.report?.kind === 'out') return 'lose';
+        }
+        return 'handoff';
       case 'over':
         return next.reason === 'solved' ? 'win' : 'lose';
       default:

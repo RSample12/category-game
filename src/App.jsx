@@ -41,10 +41,11 @@ function announcement(s) {
     case 'dealing': return 'Dealing suspects.';
     case 'reveal':
       return s.revealStep % 2 === 0
-        ? `Hand the device to ${nameOf(s, s.revealStep < 2 ? 0 : 1)}.`
-        : `${nameOf(s, s.revealStep < 2 ? 0 : 1)}, your secret is on screen.`;
+        ? `Hand the device to ${nameOf(s, Math.floor(s.revealStep / 2))}.`
+        : `${nameOf(s, Math.floor(s.revealStep / 2))}, your secret is on screen.`;
     case 'handoff': return `Pass the device to ${nameOf(s, s.current)}.`;
-    case 'turn': return `${nameOf(s, s.current)}'s turn. ${remainingIds(s, s.current).length} suspects left.`;
+    case 'turn':
+      return `${nameOf(s, s.current)}'s turn, questioning ${nameOf(s, s.targets[s.current])}. ${remainingIds(s, s.current).length} suspects left.`;
     case 'over': return `${nameOf(s, s.winner)} wins.`;
     default: return '';
   }
@@ -64,10 +65,14 @@ export default function App() {
 
   const deal = useCallback(
     (type) => {
-      trackEvent(type === 'REMATCH' ? 'rematch' : 'game_started', { category: state.categoryId });
-      send({ type, ...dealSecrets(state.categoryId) });
+      trackEvent(type === 'REMATCH' ? 'rematch' : 'game_started', {
+        category: state.categoryId,
+        players: state.count,
+        rules: state.count > 2 ? state.rules : 'duel',
+      });
+      send({ type, ...dealSecrets(state.categoryId, state.count) });
     },
-    [send, state.categoryId],
+    [send, state.categoryId, state.count, state.rules],
   );
 
   // Anonymous count of finished games (no names, no personal data).

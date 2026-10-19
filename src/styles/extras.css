@@ -120,3 +120,24 @@ body.lamp-lit{
 .peek-tip.show{border-color:var(--p1);color:var(--p1)}
 .peek-tip{border-radius:var(--r-md)}
 .peek-tip{min-height:40px;padding-block:8px}
+
+/* ---------- 3-4 players ---------- */
+:root{--p3:#7db5e8;--p4:#c39ae6}           /* detective three: sky, four: lilac */
+.p2{--pc:var(--p3)} .p3{--pc:var(--p4)}
+.input-wrap{position:relative}
+.field input.has-x{padding-right:44px}
+.field-x{position:absolute;top:0;right:0;bottom:0;width:44px;display:grid;place-items:center;background:none;border:0;color:var(--muted);cursor:pointer;border-radius:0 6px 6px 0}
+.field-x:hover{color:var(--text)}
+.field-x .ico{width:18px;height:18px}
+.add-player{min-height:48px}
+.section-note{margin:0;color:var(--muted);font-size:var(--t-sm)}
+.cat.rule{grid-template-columns:1fr auto}
+.cat.rule h3{font-size:22px}
+.score.multi{grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:var(--s2)}
+.score.multi .who,.score.multi .who:last-child{text-align:center}
+.score.multi .pts{font-size:32px}
+.who-inline{color:var(--pc)}
+.story{list-style:none;margin:0;padding:0;width:100%;max-width:420px;display:grid;gap:var(--s2);text-align:left}
+.story li{display:flex;gap:var(--s3);align-items:baseline;font-size:var(--t-sm);color:var(--muted);background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s2) var(--s3)}
+.story .t{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.story b{color:var(--pc);font-weight:600}

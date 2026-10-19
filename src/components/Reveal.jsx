@@ -1,5 +1,6 @@
 import { Eye, EyeOff } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
+import { hunterOf } from '../game/engine.js';
 import { nameOf, pad } from './shared.jsx';
 
 /**
@@ -12,7 +13,8 @@ import { nameOf, pad } from './shared.jsx';
  * single screen (see .reveal-stage in extras.css).
  */
 export default function Reveal({ s, send }) {
-  const p = s.revealStep < 2 ? 0 : 1;
+  const p = Math.floor(s.revealStep / 2);
+  const last = p === s.count - 1;
   const showing = s.revealStep % 2 === 1;
   const next = () => send({ type: 'REVEAL_NEXT' });
   const name = nameOf(s, p);
@@ -42,7 +44,7 @@ export default function Reveal({ s, send }) {
 
   return (
     <div className={`stage reveal-stage p${p}`}>
-      <span className="badge">Secret {p + 1} of 2</span>
+      <span className="badge">Secret {p + 1} of {s.count}</span>
       {/* Always two lines: a small label, then the name. Long names shrink to fit (--fit). */}
       <h1 style={{ '--fit': Math.min(1, 9 / Math.max(name.length, 1)) }}>
         <span className="lead">{showing ? 'Secret for' : 'Hand it to'}</span>
@@ -51,14 +53,18 @@ export default function Reveal({ s, send }) {
       {card}
       <p className="lede reveal-note">
         {showing
-          ? 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before your turn or while you’re answering.'
-          : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their suspect.`}
+          ? s.count > 2
+            ? `Memorize it. ${nameOf(s, hunterOf(s, p))} will ask you yes/no questions about it, and you’ll question ${nameOf(s, s.targets[p])}. You can peek again before your turn or while you’re answering.`
+            : 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before your turn or while you’re answering.'
+          : s.count > 2
+            ? `Everyone except ${name}, look away. ${name} is about to see their suspect.`
+            : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their suspect.`}
       </p>
       <div className="stack">
         <button className="btn btn-primary" onClick={next}>
           {showing ? (
             <>
-              <EyeOff className="ico" aria-hidden="true" /> Hide it{p === 0 ? ' and pass' : ''}
+              <EyeOff className="ico" aria-hidden="true" /> Hide it{last ? '' : ' and pass'}
             </>
           ) : (
             <>
