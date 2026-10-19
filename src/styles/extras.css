@@ -141,3 +141,7 @@ body.lamp-lit{
 .story li{display:flex;gap:var(--s3);align-items:baseline;font-size:var(--t-sm);color:var(--muted);background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s2) var(--s3)}
 .story .t{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
 .story b{color:var(--pc);font-weight:600}
+
+/* setup: two players / multiplayer switch */
+.section .seg button{min-height:44px}
+.howmany{display:grid;gap:var(--s2)}

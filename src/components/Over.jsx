@@ -1,6 +1,6 @@
 import { RotateCcw, LayoutGrid } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
-import { nameOf, playersOf, Scoreboard } from './shared.jsx';
+import { nameOf, playersOf } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
 
 /** One line per knockout, in order: how the case unfolded. */
@@ -57,7 +57,6 @@ export default function Over({ s, send, onRematch }) {
           </div>
         ))}
       </div>
-      <Scoreboard s={s} />
       <div className="stack">
         <button className="btn btn-primary" onClick={onRematch}>
           <RotateCcw className="ico" aria-hidden="true" /> Rematch · {getCategory(s.categoryId).name}

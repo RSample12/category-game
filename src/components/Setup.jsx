@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
-import { Search, Plus, X } from 'lucide-react';
-import { MAX_PLAYERS } from '../game/engine.js';
+import { useEffect, useRef } from 'react';
+import { Search } from 'lucide-react';
 import { CATEGORIES } from '../data/categories.js';
-import { Scoreboard, playersOf } from './shared.jsx';
+import { playersOf } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
 
 const RULE_OPTIONS = [
@@ -45,7 +44,13 @@ function useLampGlow() {
 
 export default function Setup({ s, send, onDeal }) {
   useLampGlow();
-  const played = s.scores[0] + s.scores[1] > 0;
+  const multi = s.count > 2;
+  // Switching back to Multiplayer returns to the last group size used (3 or 4).
+  const lastMulti = useRef(multi ? s.count : 3);
+  const setCount = (n) => {
+    if (n > 2) lastMulti.current = n;
+    send({ type: 'SET_PLAYERS', count: n });
+  };
   return (
     <>
       <header className="masthead">
@@ -65,56 +70,41 @@ export default function Setup({ s, send, onDeal }) {
         <div className="section-head">
           <h2>The detectives</h2>
         </div>
-        <div className="names">
-          {playersOf(s).map((p) => {
-            const removable = p >= 2 && p === s.count - 1;
-            return (
-              <div className={`field p${p}`} key={p}>
-                <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
-                <div className="input-wrap">
-                  <input
-                    id={`name-${p}`}
-                    maxLength={14}
-                    autoComplete="off"
-                    placeholder={`Player ${p + 1}`}
-                    value={s.names[p]}
-                    className={removable ? 'has-x' : undefined}
-                    onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
-                  />
-                  {removable && (
-                    <button
-                      type="button"
-                      className="field-x"
-                      aria-label={`Remove Detective ${p + 1}`}
-                      onClick={() => send({ type: 'SET_PLAYERS', count: s.count - 1 })}
-                    >
-                      <X className="ico" aria-hidden="true" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        {s.count < MAX_PLAYERS && (
-          <button
-            type="button"
-            className="btn btn-ghost btn-block add-player"
-            onClick={() => send({ type: 'SET_PLAYERS', count: s.count + 1 })}
-          >
-            <Plus className="ico" aria-hidden="true" /> Add a detective
+        <div className="seg p0" role="group" aria-label="Game type">
+          <button type="button" aria-pressed={!multi} onClick={() => setCount(2)}>
+            Two players
           </button>
-        )}
-        {played && (
-          <>
-            <Scoreboard s={s} />
-            <div>
-              <button className="linkish" onClick={() => send({ type: 'RESET_SCORE' })}>
-                Reset score
-              </button>
+          <button type="button" aria-pressed={multi} onClick={() => setCount(Math.max(3, lastMulti.current))}>
+            Multiplayer
+          </button>
+        </div>
+        {multi && (
+          <div className="howmany">
+            <span className="eyebrow" id="howmany-label">How many detectives?</span>
+            <div className="seg p0" role="group" aria-labelledby="howmany-label">
+              {[3, 4].map((n) => (
+                <button type="button" key={n} aria-pressed={s.count === n} onClick={() => setCount(n)}>
+                  {n}
+                </button>
+              ))}
             </div>
-          </>
+          </div>
         )}
+        <div className="names">
+          {playersOf(s).map((p) => (
+            <div className={`field p${p}`} key={p}>
+              <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
+              <input
+                id={`name-${p}`}
+                maxLength={14}
+                autoComplete="off"
+                placeholder={`Player ${p + 1}`}
+                value={s.names[p]}
+                onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
+              />
+            </div>
+          ))}
+        </div>
       </section>
 
       {s.count > 2 && (
