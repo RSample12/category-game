@@ -1,8 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
 import { CATEGORIES } from '../data/categories.js';
-import { Scoreboard } from './shared.jsx';
+import { playersOf } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
+
+const RULE_OPTIONS = [
+  {
+    id: 'last',
+    name: 'Last one standing',
+    blurb: 'Solve your target’s suspect to knock them out, then hunt whoever they were hunting. The last detective left wins.',
+  },
+  {
+    id: 'first',
+    name: 'First to solve',
+    blurb: 'The first detective to solve their target’s suspect wins. Run out of suspects and you’re out, but you still answer.',
+  },
+];
 
 /* A hanging brass desk lamp, drawn flat to match the night-desk look. Decorative only. */
 function Lamp() {
@@ -31,12 +44,18 @@ function useLampGlow() {
 
 export default function Setup({ s, send, onDeal }) {
   useLampGlow();
-  const played = s.scores[0] + s.scores[1] > 0;
+  const multi = s.count > 2;
+  // Switching back to Multiplayer returns to the last group size used (3 or 4).
+  const lastMulti = useRef(multi ? s.count : 3);
+  const setCount = (n) => {
+    if (n > 2) lastMulti.current = n;
+    send({ type: 'SET_PLAYERS', count: n });
+  };
   return (
     <>
       <header className="masthead">
         <Lamp />
-        <span className="eyebrow">Two players · one phone · pass and play</span>
+        <span className="eyebrow">2–4 players · one phone · pass and play</span>
         <h1>
           <span>Crack</span>
           <span>the Case</span>
@@ -51,8 +70,28 @@ export default function Setup({ s, send, onDeal }) {
         <div className="section-head">
           <h2>The detectives</h2>
         </div>
+        <div className="seg p0" role="group" aria-label="Game type">
+          <button type="button" aria-pressed={!multi} onClick={() => setCount(2)}>
+            Two players
+          </button>
+          <button type="button" aria-pressed={multi} onClick={() => setCount(Math.max(3, lastMulti.current))}>
+            Multiplayer
+          </button>
+        </div>
+        {multi && (
+          <div className="howmany">
+            <span className="eyebrow" id="howmany-label">How many detectives?</span>
+            <div className="seg p0" role="group" aria-labelledby="howmany-label">
+              {[3, 4].map((n) => (
+                <button type="button" key={n} aria-pressed={s.count === n} onClick={() => setCount(n)}>
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="names">
-          {[0, 1].map((p) => (
+          {playersOf(s).map((p) => (
             <div className={`field p${p}`} key={p}>
               <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
               <input
@@ -66,17 +105,38 @@ export default function Setup({ s, send, onDeal }) {
             </div>
           ))}
         </div>
-        {played && (
-          <>
-            <Scoreboard s={s} />
-            <div>
-              <button className="linkish" onClick={() => send({ type: 'RESET_SCORE' })}>
-                Reset score
-              </button>
-            </div>
-          </>
-        )}
       </section>
+
+      {s.count > 2 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>How it ends</h2>
+          </div>
+          <p className="section-note">
+            Each detective questions the next one in the list and answers the one before.
+          </p>
+          <div className="cats rule-opts" role="radiogroup" aria-label="How it ends">
+            {RULE_OPTIONS.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className="cat rule"
+                role="radio"
+                aria-checked={s.rules === r.id}
+                onClick={() => send({ type: 'SET_RULES', rules: r.id })}
+              >
+                <span style={{ minWidth: 0 }}>
+                  <h3>{r.name}</h3>
+                  <p>{r.blurb}</p>
+                </span>
+                <span className="count">
+                  <span className="radio" aria-hidden="true" />
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">
@@ -116,10 +176,13 @@ export default function Setup({ s, send, onDeal }) {
           <summary>How a turn works</summary>
           <ol>
             <li><strong>Ask</strong> your opponent one yes/no question out loud about their secret.</li>
+            {s.count > 2 && (
+              <li>With 3 or 4 detectives, your opponent is the next one in the list. The app always says who you’re questioning.</li>
+            )}
             <li><strong>Rule out</strong> suspects on your board, or <strong>accuse</strong> one. Never both in one turn.</li>
             <li>Rule-outs can be undone until you end your turn. After that they're locked.</li>
             <li>Rule out all but one, end your turn, and accuse that last suspect on your next turn.</li>
-            <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you lose.</li>
+            <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you {s.count > 2 ? 'are out' : 'lose'}.</li>
           </ol>
         </details>
         <div className="share-row"><ShareButton where="setup" className="btn btn-ghost btn-block" /></div>
