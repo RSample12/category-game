@@ -1,21 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { GROUPS, getCategory } from '../data/categories.js';
-import { playersOf } from './shared.jsx';
+import PlayersSheet from './PlayersSheet.jsx';
 import ShareButton from './ShareButton.jsx';
-
-const RULE_OPTIONS = [
-  {
-    id: 'last',
-    name: 'Last one standing',
-    blurb: 'Solve your target’s suspect to knock them out, then hunt whoever they were hunting. The last detective left wins.',
-  },
-  {
-    id: 'first',
-    name: 'First to solve',
-    blurb: 'The first detective to solve their target’s suspect wins. Run out of suspects and you’re out, but you still answer.',
-  },
-];
 
 /* A hanging brass desk lamp, drawn flat to match the night-desk look. Decorative only. */
 function Lamp() {
@@ -44,7 +31,6 @@ function useLampGlow() {
 
 export default function Setup({ s, send, onDeal }) {
   useLampGlow();
-  const multi = s.count > 2;
   const chosen = getCategory(s.categoryId);
   // One theme group open at a time; the one holding the chosen lineup starts open.
   const [openGroup, setOpenGroup] = useState(chosen?.group ?? null);
@@ -56,12 +42,9 @@ export default function Setup({ s, send, onDeal }) {
       document.getElementById(`group-${id}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }, 340);
   };
-  // Switching back to Multiplayer returns to the last group size used (3 or 4).
-  const lastMulti = useRef(multi ? s.count : 3);
-  const setCount = (n) => {
-    if (n > 2) lastMulti.current = n;
-    send({ type: 'SET_PLAYERS', count: n });
-  };
+  // Player count, names and rules live in the "Who's playing?" panel opened by Play.
+  const [picking, setPicking] = useState(false);
+  const closePicking = useCallback(() => setPicking(false), []);
   return (
     <>
       <header className="masthead">
@@ -76,76 +59,6 @@ export default function Setup({ s, send, onDeal }) {
           rule suspects out, and accuse first.
         </p>
       </header>
-
-      <section className="section">
-        <div className="section-head">
-          <h2>The detectives</h2>
-        </div>
-        <div className="seg p0" role="group" aria-label="Game type">
-          <button type="button" aria-pressed={!multi} onClick={() => setCount(2)}>
-            Two players
-          </button>
-          <button type="button" aria-pressed={multi} onClick={() => setCount(Math.max(3, lastMulti.current))}>
-            Multiplayer
-          </button>
-        </div>
-        {multi && (
-          <div className="howmany">
-            <span className="eyebrow" id="howmany-label">How many detectives?</span>
-            <div className="seg p0" role="group" aria-labelledby="howmany-label">
-              {[3, 4].map((n) => (
-                <button type="button" key={n} aria-pressed={s.count === n} onClick={() => setCount(n)}>
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        <div className="names">
-          {playersOf(s).map((p) => (
-            <div className={`field p${p}`} key={p}>
-              <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
-              <input
-                id={`name-${p}`}
-                maxLength={14}
-                autoComplete="off"
-                placeholder={`Player ${p + 1}`}
-                value={s.names[p]}
-                onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {s.count > 2 && (
-        <section className="section">
-          <div className="section-head">
-            <h2>How it ends</h2>
-          </div>
-          <p className="section-note">
-            Each detective questions the next one in the list and answers the one before.
-          </p>
-          <div className="seg p0" role="radiogroup" aria-label="How it ends">
-            {RULE_OPTIONS.map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                role="radio"
-                aria-checked={s.rules === r.id}
-                aria-describedby={s.rules === r.id ? 'rule-desc' : undefined}
-                onClick={() => send({ type: 'SET_RULES', rules: r.id })}
-              >
-                {r.name}
-              </button>
-            ))}
-          </div>
-          {/* Only the chosen rule is described, like the lineup tiles. */}
-          <p className="rule-desc" id="rule-desc">
-            {RULE_OPTIONS.find((r) => r.id === s.rules)?.blurb}
-          </p>
-        </section>
-      )}
 
       <section className="section">
         <div className="section-head">
@@ -241,10 +154,13 @@ export default function Setup({ s, send, onDeal }) {
       </section>
 
       <div className="cta">
-        <button className="btn btn-primary btn-block" onClick={onDeal}>
-          <Search className="ico" aria-hidden="true" /> Deal · {chosen?.name}
+        <button className="btn btn-primary btn-block" onClick={() => setPicking(true)}>
+          <Search className="ico" aria-hidden="true" /> Play · {chosen?.name}
         </button>
       </div>
+      {picking && (
+        <PlayersSheet s={s} send={send} categoryName={chosen?.name} onClose={closePicking} onDeal={onDeal} />
+      )}
     </>
   );
 }
