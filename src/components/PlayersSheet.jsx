@@ -1,34 +1,32 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
-import { playersOf } from './shared.jsx';
+import { nameOf, playersOf } from './shared.jsx';
 
-const RULE_OPTIONS = [
-  {
-    id: 'last',
-    name: 'Last one standing',
-    blurb: 'Solve your target’s suspect to knock them out, then hunt whoever they were hunting. The last detective left wins.',
-  },
-  {
-    id: 'first',
-    name: 'First to solve',
-    blurb: 'The first detective to solve their target’s suspect wins. Run out of suspects and you’re out, but you still answer.',
-  },
+const COUNTS = [
+  { n: 2, label: 'Duel' },
+  { n: 3, label: 'Three-way' },
+  { n: 4, label: 'Full table' },
 ];
 
+const RULE_OPTIONS = [
+  { id: 'last', name: 'Last one standing', blurb: 'Solve your target to knock them out. Take over their target.' },
+  { id: 'first', name: 'First to solve', blurb: 'The first correct accusation wins the case.' },
+];
+
+/** A case number like the one on the dealing screen, picked when the briefing opens. */
+const newCaseNo = () =>
+  `${String(new Date().getFullYear()).slice(2)}-${1000 + Math.floor(Math.random() * 9000)}`;
+
 /**
- * "Who's playing?" — opens from the setup screen's Play button. Holds every game-setup
- * switch (two players / multiplayer, how many, names, how it ends) so the main screen
- * stays a clean title + lineup.
+ * "Assemble your detectives": opens from the setup screen's Play button. Everything here is
+ * cardstock, like the lineup and the suspect cards: pick how many detectives, write each name
+ * on an ID badge, and (for 3-4) choose how the case ends.
  */
-export default function PlayersSheet({ s, send, categoryName, categoryBlurb, onClose, onDeal }) {
+export default function PlayersSheet({ s, send, categoryName, onClose, onDeal }) {
   const ref = useRef(null);
+  const [caseNo] = useState(newCaseNo);
   const multi = s.count > 2;
-  // Switching back to Multiplayer returns to the last group size used (3 or 4).
-  const lastMulti = useRef(multi ? s.count : 3);
-  const setCount = (n) => {
-    if (n > 2) lastMulti.current = n;
-    send({ type: 'SET_PLAYERS', count: n });
-  };
+  const players = playersOf(s);
 
   // Focus the panel (not a text box, so the phone keyboard doesn't jump up), trap Tab,
   // close on Escape, stop the page behind from scrolling, restore focus after.
@@ -65,47 +63,44 @@ export default function PlayersSheet({ s, send, categoryName, categoryBlurb, onC
   return (
     <div className="scrim" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div
-        className="sheet players-sheet"
+        className="sheet brief"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="players-title"
+        aria-labelledby="brief-title"
         tabIndex={-1}
         ref={ref}
       >
-        <div className="ps-head">
+        <div className="brief-head">
           <span className="eyebrow">
-            {categoryName}
-            {categoryBlurb && <span className="ps-blurb"> · {categoryBlurb}</span>}
+            Case Nº {caseNo} · {categoryName}
           </span>
-          <h3 id="players-title">Who’s playing?</h3>
+          <h3 id="brief-title">Assemble your detectives</h3>
         </div>
 
-        <div className="seg p0" role="group" aria-label="Game type">
-          <button type="button" aria-pressed={!multi} onClick={() => setCount(2)}>
-            Two players
-          </button>
-          <button type="button" aria-pressed={multi} onClick={() => setCount(Math.max(3, lastMulti.current))}>
-            Multiplayer
-          </button>
-        </div>
-
-        {multi && (
-          <div className="ps-block">
-            <span className="eyebrow" id="howmany-label">How many detectives?</span>
-            <div className="seg p0" role="group" aria-labelledby="howmany-label">
-              {[3, 4].map((n) => (
-                <button type="button" key={n} aria-pressed={s.count === n} onClick={() => setCount(n)}>
-                  {n}
-                </button>
-              ))}
-            </div>
+        <div className="brief-block">
+          <span className="eyebrow" id="count-label">Detectives</span>
+          <div className="count-tags" role="radiogroup" aria-labelledby="count-label">
+            {COUNTS.map((c) => (
+              <button
+                key={c.n}
+                type="button"
+                className="paper-pick count-tag"
+                role="radio"
+                aria-checked={s.count === c.n}
+                aria-label={`${c.n} detectives, ${c.label}`}
+                onClick={() => send({ type: 'SET_PLAYERS', count: c.n })}
+              >
+                <b>{c.n}</b>
+                <span>{c.label}</span>
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
-        <div className="names">
-          {playersOf(s).map((p) => (
-            <div className={`field p${p}`} key={p}>
-              <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
+        <div className="badges">
+          {players.map((p) => (
+            <label className={`badge p${p}`} key={p}>
+              <span className="k">Detective {String(p + 1).padStart(2, '0')}</span>
               <input
                 id={`name-${p}`}
                 maxLength={14}
@@ -114,41 +109,54 @@ export default function PlayersSheet({ s, send, categoryName, categoryBlurb, onC
                 value={s.names[p]}
                 onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
               />
-            </div>
+            </label>
           ))}
         </div>
 
         {multi && (
-          <div className="ps-block">
-            <span className="eyebrow" id="ends-label">How it ends</span>
-            <div className="seg p0" role="radiogroup" aria-labelledby="ends-label">
-              {RULE_OPTIONS.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={s.rules === r.id}
-                  aria-describedby={s.rules === r.id ? 'rule-desc' : undefined}
-                  onClick={() => send({ type: 'SET_RULES', rules: r.id })}
-                >
-                  {r.name}
-                </button>
-              ))}
+          <>
+            <div className="brief-block brief-in">
+              <span className="eyebrow" id="ends-label">How it ends</span>
+              <div className="rule-cards" role="radiogroup" aria-labelledby="ends-label">
+                {RULE_OPTIONS.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    className="paper-pick rule-card"
+                    role="radio"
+                    aria-checked={s.rules === r.id}
+                    onClick={() => send({ type: 'SET_RULES', rules: r.id })}
+                  >
+                    <span className="t">{r.name}</span>
+                    <span className="d">{r.blurb}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            {/* Only the chosen rule is described, like the lineup tiles. */}
-            <p className="rule-desc" id="rule-desc">
-              {RULE_OPTIONS.find((r) => r.id === s.rules)?.blurb} Each detective questions the next one in
-              the list.
-            </p>
-          </div>
+            <div className="brief-block brief-in">
+              <span className="eyebrow" id="ring-label">Who questions who</span>
+              <p className="chain" aria-labelledby="ring-label">
+                {[...players, players[0]].map((p, i) => (
+                  <span key={i}>
+                    {i > 0 && (
+                      <span className="ar" aria-hidden="true">
+                        {' '}→{' '}
+                      </span>
+                    )}
+                    <b className={`p${p}`}>{nameOf(s, p)}</b>
+                  </span>
+                ))}
+              </p>
+            </div>
+          </>
         )}
 
         <div className="row">
           <button type="button" className="btn btn-ghost" onClick={onClose}>
             Back
           </button>
-          <button type="button" className="btn btn-primary" onClick={onDeal}>
-            <Search className="ico" aria-hidden="true" /> Deal suspects
+          <button type="button" className="btn btn-primary" onClick={() => onDeal(caseNo)}>
+            <Search className="ico" aria-hidden="true" /> Deal {s.count} suspects
           </button>
         </div>
       </div>
