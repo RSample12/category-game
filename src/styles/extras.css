@@ -145,3 +145,20 @@ body.lamp-lit{
 /* setup: two players / multiplayer switch */
 .section .seg button{min-height:44px}
 .howmany{display:grid;gap:var(--s2)}
+
+/* ---------- compact lineup: two-column tiles, description on the chosen one only ---------- */
+/* Tab sits above the name so long names get the tile's full width (no mid-word breaks). */
+.cats.lineup{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s2)}
+.lineup .cat{grid-template-columns:minmax(0,1fr);align-content:start;gap:var(--s2);padding:var(--s3)}
+.lineup .cat .tab{width:30px;height:34px;font-size:18px}
+.lineup .cat .tab::before{top:4px;width:6px;height:6px;margin-left:-3px}
+.lineup .cat .tab b{margin-top:6px}
+.lineup .cat h3{font-size:18px;line-height:1;overflow-wrap:break-word;hyphens:manual}
+.lineup .cat p{margin-top:var(--s1);font-size:12.5px;line-height:1.35}
+.lineup .cat .radio{position:absolute;top:var(--s3);right:var(--s3);width:18px;height:18px;margin:0;border-width:2px}
+.lineup .cat[aria-checked="true"] .radio{background:radial-gradient(circle,var(--p1) 0 4px,transparent 5px)}
+.cats.lineup .cat:last-child:nth-child(odd){grid-column:1/-1}
+@media (min-width:640px){
+  .cats.lineup{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cats.lineup .cat:last-child:nth-child(odd){grid-column:auto}
+}

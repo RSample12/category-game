@@ -143,7 +143,7 @@ export default function Setup({ s, send, onDeal }) {
           <h2>Pick the lineup</h2>
           <span className="eyebrow">Chosen together</span>
         </div>
-        <div className="cats" role="radiogroup" aria-label="Category">
+        <div className="cats lineup" role="radiogroup" aria-label="Category">
           {CATEGORIES.map((c) => (
             <button
               key={c.id}
@@ -157,15 +157,10 @@ export default function Setup({ s, send, onDeal }) {
               </span>
               <span style={{ minWidth: 0 }}>
                 <h3>{c.name}</h3>
-                <p>{c.blurb}</p>
+                {/* Only the chosen lineup shows its description, to keep the list compact. */}
+                {c.id === s.categoryId && <p>{c.blurb}</p>}
               </span>
-              <span className="count">
-                {c.items.length}
-                <br />
-                suspects
-                <br />
-                <span className="radio" aria-hidden="true" />
-              </span>
+              <span className="radio" aria-hidden="true" />
             </button>
           ))}
         </div>
