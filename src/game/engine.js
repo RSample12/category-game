@@ -25,7 +25,7 @@
  *              their hunter. If only one player is left in, they win.
  *  - Out players' turns are skipped. Rematch passes the first turn to the next player.
  */
-import { getCategory, CATEGORIES } from '../data/categories.js';
+import { getCategory, DEFAULT_CATEGORY_ID } from '../data/categories.js';
 
 export const STATE_VERSION = 3;
 export const MIN_PLAYERS = 2;
@@ -46,7 +46,7 @@ export function createInitialState(saved = {}) {
     rules: RULES.includes(saved.rules) ? saved.rules : 'last',
     names: padTo(saved.names, MAX_PLAYERS, ''),
     scores: padTo(saved.scores, MAX_PLAYERS, 0),
-    categoryId: saved.categoryId ?? CATEGORIES[0].id,
+    categoryId: saved.categoryId ?? DEFAULT_CATEGORY_ID,
     secrets: [],
     boards: [],
     targets: [], // targets[p] = the player p is hunting
