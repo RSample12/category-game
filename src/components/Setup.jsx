@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
-import { CATEGORIES } from '../data/categories.js';
+import { GROUPS } from '../data/categories.js';
 import { playersOf } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
 
@@ -143,25 +143,33 @@ export default function Setup({ s, send, onDeal }) {
           <h2>Pick the lineup</h2>
           <span className="eyebrow">Chosen together</span>
         </div>
-        <div className="cats lineup" role="radiogroup" aria-label="Category">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.id}
-              className="cat"
-              role="radio"
-              aria-checked={c.id === s.categoryId}
-              onClick={() => send({ type: 'SET_CATEGORY', id: c.id })}
-            >
-              <span className="tab">
-                <b>{c.name[0]}</b>
-              </span>
-              <span style={{ minWidth: 0 }}>
-                <h3>{c.name}</h3>
-                {/* Only the chosen lineup shows its description, to keep the list compact. */}
-                {c.id === s.categoryId && <p>{c.blurb}</p>}
-              </span>
-              <span className="radio" aria-hidden="true" />
-            </button>
+        <div className="lineup-groups" role="radiogroup" aria-label="Category">
+          {GROUPS.map((g) => (
+            <div className="lineup-group" role="group" aria-labelledby={`group-${g.id}`} key={g.id}>
+              <p className="group-head" id={`group-${g.id}`}>{g.name}</p>
+              <div className="cats lineup">
+                {g.categories.map((c) => (
+                  <button
+                    key={c.id}
+                    id={`cat-${c.id}`}
+                    className="cat"
+                    role="radio"
+                    aria-checked={c.id === s.categoryId}
+                    onClick={() => send({ type: 'SET_CATEGORY', id: c.id })}
+                  >
+                    <span className="tab">
+                      <b>{c.name[0]}</b>
+                    </span>
+                    <span style={{ minWidth: 0 }}>
+                      <h3>{c.name}</h3>
+                      {/* Only the chosen lineup shows its description, to keep the list compact. */}
+                      {c.id === s.categoryId && <p>{c.blurb}</p>}
+                    </span>
+                    <span className="radio" aria-hidden="true" />
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </section>
