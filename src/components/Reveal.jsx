@@ -25,9 +25,10 @@ export default function Reveal({ s, send }) {
     const cat = getCategory(s.categoryId);
     const idx = cat.items.findIndex((i) => i.id === item.id);
     card = (
-      <div className="bigtag" key="face" role="img" aria-label={`Your suspect is ${item.name}`}>
-        <span className="k">Your suspect</span>
-        <span className="n">{item.name}</span>
+      <div className="bigtag" key="face" role="img" aria-label={`Your cover is ${item.name}`}>
+        <span className="k">Your cover</span>
+        <span className="ts" aria-hidden="true">Top secret</span>
+        <span className="n"><span className="declass">{item.name}</span></span>
         <span className="f">
           <span>{cat.name}</span>
           <span>Nº {pad(idx + 1)}</span>
@@ -37,7 +38,7 @@ export default function Reveal({ s, send }) {
   } else {
     card = (
       <div className="cover" key="back" aria-hidden="true">
-        <span>Classified</span>
+        <span>Eyes only</span>
       </div>
     );
   }
@@ -55,10 +56,10 @@ export default function Reveal({ s, send }) {
         {showing
           ? s.count > 2
             ? `Memorize it. ${nameOf(s, hunterOf(s, p))} will ask you yes/no questions about it, and you’ll question ${nameOf(s, s.targets[p])}. You can peek again before your turn or while you’re answering.`
-            : 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before your turn or while you’re answering.'
+            : 'Memorize it. Your rival will ask you yes/no questions about it. You can peek again before your turn or while you’re answering.'
           : s.count > 2
-            ? `Everyone except ${name}, look away. ${name} is about to see their suspect.`
-            : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their suspect.`}
+            ? `Everyone except ${name}, look away. ${name} is about to see their cover.`
+            : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their cover.`}
       </p>
       <div className="stack">
         <button className="btn btn-primary" onClick={next}>

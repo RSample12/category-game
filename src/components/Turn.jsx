@@ -15,8 +15,8 @@ function Sheet({ s, send }) {
   // What a correct accusation does depends on the rules and how many are still in.
   const right =
     multi && s.rules === 'last' && s.alive.filter(Boolean).length > 2
-      ? `Right and ${opp} is out, and you take over their target.`
-      : 'Right and you win the case.';
+      ? `Right and ${opp} is burned, and you take over their target.`
+      : 'Right and their cover is blown.';
 
   // Focus the primary action, trap Tab inside, close on Escape, restore focus after.
   useEffect(() => {
@@ -49,21 +49,21 @@ function Sheet({ s, send }) {
   return (
     <div className={`scrim p${s.current}`}>
       <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" ref={ref}>
-        <span className="eyebrow">{isLast ? 'One suspect left' : 'Final answer'}</span>
+        <span className="eyebrow">{isLast ? 'One cover left' : 'Final answer'}</span>
         <h3 id="sheet-title">
-          Accuse <em>{item.name}</em>?
+          Expose <em>{item.name}</em>?
         </h3>
         <p>
           {isLast
-            ? `That's the only one you haven't ruled out, so it's your accusation. If ${opp} isn't holding it, you ${multi ? 'are out' : 'lose'}.`
-            : `${right} Wrong and it’s ruled out and your turn ends.`}
+            ? `That's the only one you haven't ruled out, so it's your call. If it isn't ${opp}'s cover, you ${multi ? 'are burned' : 'lose'}.`
+            : `${right} Wrong and it’s redacted and your turn ends.`}
         </p>
         <div className="row">
           <button className="btn btn-ghost" onClick={() => send({ type: 'SHEET_CANCEL' })}>
             {isLast ? (s.sheet.undo ? 'Undo last' : 'Not yet') : 'Cancel'}
           </button>
           <button className="btn btn-danger" ref={confirmRef} onClick={() => send({ type: 'SHEET_CONFIRM' })}>
-            Accuse
+            Expose
           </button>
         </div>
       </div>
@@ -104,11 +104,11 @@ export default function Turn({ s, send }) {
 
   let tip;
   if (guessing) {
-    tip = <>Tap the suspect you think <b>{opp}</b> is holding.</>;
+    tip = <>Tap the cover you think <b>{opp}</b> is hiding behind.</>;
   } else if (pend && left === 1) {
-    tip = <>One suspect left. End your turn, then you can accuse it next turn.</>;
+    tip = <>One cover left. End your turn, then expose it next turn.</>;
   } else if (pend) {
-    tip = <>Tap a stamped suspect again to undo. Locks when you end your turn. <b>Accuse unlocks next turn.</b></>;
+    tip = <>Tap a redacted card again to undo. Locks when you end your turn. <b>Expose unlocks next turn.</b></>;
   } else {
     // Before anything is ruled out, the tip line becomes the answerer's peek button,
     // so the player being questioned can re-check their suspect before answering.
@@ -119,7 +119,7 @@ export default function Turn({ s, send }) {
     <div className={`p${p} ${guessing ? 'mode-guess' : ''}`}>
       <div className="turnbar" ref={barRef}>
         <div className="turnrow">
-          <h1 className="sr-only">Prime Suspicion, turn {s.turn}</h1>
+          <h1 className="sr-only">Cover Blown, turn {s.turn}</h1>
           <h2>{nameOf(s, p)}</h2>
           <span className="meter">
             <b>{left}</b>
@@ -128,14 +128,14 @@ export default function Turn({ s, send }) {
         </div>
         <div className="seg" role="group" aria-label="Action">
           <button aria-pressed={!guessing} onClick={() => send({ type: 'SET_MODE', mode: 'elim' })}>
-            <Stamp className="ico" aria-hidden="true" /> Rule out
+            <Stamp className="ico" aria-hidden="true" /> Redact
           </button>
           <button
             aria-pressed={guessing}
             disabled={pend > 0}
             onClick={() => send({ type: 'SET_MODE', mode: 'guess' })}
           >
-            <Crosshair className="ico" aria-hidden="true" /> Accuse
+            <Crosshair className="ico" aria-hidden="true" /> Expose
           </button>
         </div>
         {tip ? (
@@ -156,12 +156,12 @@ export default function Turn({ s, send }) {
         {cat.items.map((it, i) => {
           const locked = b.locked.includes(it.id);
           const pending = b.pending.includes(it.id);
-          const stamp = locked ? (b.wrong.includes(it.id) ? 'Wrong' : 'Ruled out') : pending ? 'Ruled out' : '';
-          const label = `${it.name}${locked ? ', ruled out' : pending ? ', ruled out this turn, tap to undo' : ''}`;
+          const stamp = locked ? (b.wrong.includes(it.id) ? 'Burned' : 'Redacted') : pending ? 'Redacted' : '';
+          const label = `${it.name}${locked ? ', redacted' : pending ? ', redacted this turn, tap to undo' : ''}`;
           return (
             <button
               key={it.id}
-              className={cx('tag', locked && 'locked', pending && 'pending', s.justId === it.id && 'just')}
+              className={cx('tag', locked && 'locked', locked && b.wrong.includes(it.id) && 'burned', pending && 'pending', s.justId === it.id && 'just')}
               style={{ '--i': i }}
               disabled={locked}
               aria-label={label}

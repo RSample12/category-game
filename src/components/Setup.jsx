@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { GROUPS, getCategory } from '../data/categories.js';
 import PlayersSheet from './PlayersSheet.jsx';
-import LineupRoom from './LineupRoom.jsx';
+import Dossier from './Dossier.jsx';
 import { pad } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
 
@@ -30,17 +30,13 @@ export default function Setup({ s, send, onDeal }) {
   return (
     <>
       <header className="masthead lineup-masthead">
-        <LineupRoom caseNo={caseNo} />
+        <Dossier caseNo={caseNo} />
         <div className="intro">
           <div className="chips">
-            <span className="chip">2–4 detectives</span>
+            <span className="chip">2–4 agents</span>
             <span className="chip">one phone</span>
             <span className="chip">pass &amp; play</span>
           </div>
-          <p className="lede">
-            Everyone is secretly holding a suspect.{' '}
-            <b>Ask yes/no questions, rule them out, and name yours first.</b>
-          </p>
         </div>
       </header>
 
@@ -107,12 +103,12 @@ export default function Setup({ s, send, onDeal }) {
           <ol>
             <li><strong>Ask</strong> your opponent one yes/no question out loud about their secret.</li>
             {s.count > 2 && (
-              <li>With 3 or 4 detectives, your opponent is the next one in the list. The app always says who you’re questioning.</li>
+              <li>With 3 or 4 agents, your opponent is the next one in the list. The app always says who you’re questioning.</li>
             )}
-            <li><strong>Rule out</strong> suspects on your board, or <strong>accuse</strong> one. Never both in one turn.</li>
-            <li>Rule-outs can be undone until you end your turn. After that they're locked.</li>
-            <li>Rule out all but one, end your turn, and accuse that last suspect on your next turn.</li>
-            <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you {s.count > 2 ? 'are out' : 'lose'}.</li>
+            <li><strong>Redact</strong> cards on your board, or <strong>expose</strong> one. Never both in one turn.</li>
+            <li>Redactions can be undone until you end your turn. After that they're locked.</li>
+            <li>Redact all but one, end your turn, and expose that last card on your next turn.</li>
+            <li>A wrong exposure redacts that card and ends your turn. Run out of leads and you {s.count > 2 ? 'are burned' : 'lose'}.</li>
           </ol>
         </details>
         <div className="share-row"><ShareButton where="setup" className="btn btn-ghost btn-block" /></div>

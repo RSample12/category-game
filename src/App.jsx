@@ -37,7 +37,7 @@ function init() {
 /** What a screen reader should hear when the screen changes. */
 function announcement(s) {
   switch (s.screen) {
-    case 'setup': return 'Prime Suspicion. Pick a lineup and play.';
+    case 'setup': return 'Cover Blown. Pick a lineup and play.';
     case 'dealing': return 'Dealing suspects.';
     case 'reveal':
       return s.revealStep % 2 === 0

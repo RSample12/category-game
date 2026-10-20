@@ -1,46 +1,31 @@
 /* =====================================================================
-   Prime Suspicion — THEME
+   Cover Blown — THEME
    Every colour and texture in the app is set here, so trying a new palette means
    editing only this file. Loaded last (after app.css and extras.css).
    ===================================================================== */
 :root{
-  /* grounds */
-  --ink:#121211;          /* page */
-  --ink-2:#1c1b19;        /* panels, bars */
-  --ink-3:#262420;        /* raised controls */
-  --raise:#24221e;        /* selected panel */
-  --line:#36332d;
-  --hover-line:#5a5448;
-  --ghost-hover:#2f2c27;
+  /* grounds: gunmetal */
+  --ink:#131518; --ink-2:#1c1f23; --ink-3:#262a2f; --raise:#22262b;
+  --line:#33383f; --hover-line:#4f5660; --ghost-hover:#2b3036;
   /* text */
-  --text:#f1ece2;
-  --muted:#a6a092;
-  --placeholder:#8b8577;
+  --text:#eef0f1; --muted:#9ba2a9; --placeholder:#7f878e;
   /* paper (cards, tags, badges) */
-  --paper:#efe7d4;
-  --paper-2:#d8ceb6;
-  --paper-ink:#1a1814;
-  /* accents: detective colours (p1 is also the app accent) */
-  --p1:#d9a441;           /* gold */
-  --p2:#e07a5f;           /* coral */
-  --p3:#7fb2d9;           /* steel blue */
-  --p4:#b99ad8;           /* lilac */
-  --accent-soft:rgba(217,164,65,.55);
-  --stamp:#d8574a;
-  --stamp-ink:#b4281d;
-  --win:#8bd17c;
-  /* shadows are tinted with this rgb triplet */
-  --tint:6,6,5;
-  /* lineup room (setup header) */
-  --wall-top:#211f1b;
-  --wall-bottom:#151412;
-  --chart-line:241,236,226;   /* rgb of the height-chart lines */
-  --beam:255,228,178;         /* rgb of the spotlight */
-  --figure:#2b2925;
-  --figure-lit:#3d3931;
-  --placard:#0c0c0b;
+  --paper:#ece7dc; --paper-2:#d4cdbd; --paper-ink:#15171a;
+  --manila:#d3bd8f; --manila-2:#cbb487; --manila-ink:#1c1a15;
+  /* accents: agent colours (p1 is also the app accent: signal red) */
+  --p1:#e2483d; --p2:#4fb3a9; --p3:#e8b04a; --p4:#9b8cf0;
+  --accent-soft:rgba(226,72,61,.6);
+  --stamp:#e2483d; --stamp-ink:#c22f25; --win:#8bd17c;
+  --redact:#121315;            /* redaction marker ink */
+  --tint:5,6,8;
   /* textures */
-  --grain-opacity:.22;
-  --page-texture:repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
+  --page-texture:url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27160%27%20height%3D%27160%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.85%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27/%3E%3CfeColorMatrix%20values%3D%270%200%200%200%200%20%200%200%200%200%200%20%200%200%200%200%200%20%200%200%200%200.07%200%27/%3E%3C/filter%3E%3Crect%20width%3D%27160%27%20height%3D%27160%27%20filter%3D%27url%28%23n%29%27/%3E%3C/svg%3E");
+  --paper-texture:url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cfilter%20id%3D%27f%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.02%20.9%27%20numOctaves%3D%272%27%20seed%3D%274%27/%3E%3CfeColorMatrix%20values%3D%270%200%200%200%20.3%20%200%200%200%200%20.25%20%200%200%200%200%20.18%20%200%200%200%20.10%200%27/%3E%3C/filter%3E%3Crect%20width%3D%27200%27%20height%3D%27200%27%20filter%3D%27url%28%23f%29%27/%3E%3C/svg%3E");
+  --manila-texture:url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27220%27%3E%3Cfilter%20id%3D%27m%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.012%20.6%27%20numOctaves%3D%273%27%20seed%3D%279%27/%3E%3CfeColorMatrix%20values%3D%270%200%200%200%20.45%20%200%200%200%200%20.34%20%200%200%200%200%20.16%20%200%200%200%20.16%200%27/%3E%3C/filter%3E%3Crect%20width%3D%27220%27%20height%3D%27220%27%20filter%3D%27url%28%23m%29%27/%3E%3C/svg%3E");
 }
 body{background-color:var(--ink);background-image:var(--page-texture)}
+/* faint monitor scanlines over everything */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.016) 0 1px,transparent 1px 3px)}
+#app{position:relative;z-index:1}
+.case-card,.tag,.bigtag,.paper-pick,.id-badge,.mini{background-image:var(--paper-texture);background-blend-mode:multiply}
+.btn-primary{color:#fff}

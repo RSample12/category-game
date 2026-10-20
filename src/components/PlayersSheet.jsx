@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
-import { nameOf, playersOf } from './shared.jsx';
+import { nameOf, playersOf, CODENAMES } from './shared.jsx';
 
 const COUNTS = [
   { n: 2, label: 'Duel' },
@@ -42,12 +42,12 @@ function Badge({ s, send, p, hidden = false }) {
         if (el) el.inert = hidden;
       }}
     >
-      <span className="k">Detective {String(p + 1).padStart(2, '0')}</span>
+      <span className="k">Agent {String(p + 1).padStart(2, '0')}</span>
       <input
         id={`name-${p}`}
         maxLength={14}
         autoComplete="off"
-        placeholder={`Player ${p + 1}`}
+        placeholder={`Agent ${CODENAMES[p]}`}
         value={s.names[p]}
         onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
       />
@@ -110,13 +110,13 @@ export default function PlayersSheet({ s, send, caseNo: givenCaseNo, categoryNam
       >
         <div className="brief-head">
           <span className="eyebrow">
-            Case Nº {caseNo} · {categoryName}
+            File Nº {caseNo} · {categoryName}
           </span>
-          <h3 id="brief-title">Assemble your detectives</h3>
+          <h3 id="brief-title">Assemble your agents</h3>
         </div>
 
         <div className="brief-block">
-          <span className="eyebrow" id="count-label">Detectives</span>
+          <span className="eyebrow" id="count-label">Agents</span>
           <div className="count-tags" role="radiogroup" aria-labelledby="count-label">
             {COUNTS.map((c) => (
               <button
@@ -125,7 +125,7 @@ export default function PlayersSheet({ s, send, caseNo: givenCaseNo, categoryNam
                 className="paper-pick count-tag"
                 role="radio"
                 aria-checked={s.count === c.n}
-                aria-label={`${c.n} detectives, ${c.label}`}
+                aria-label={`${c.n} agents, ${c.label}`}
                 onClick={() => send({ type: 'SET_PLAYERS', count: c.n })}
               >
                 <b>{c.n}</b>

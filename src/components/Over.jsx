@@ -13,11 +13,11 @@ function Story({ s }) {
           <span className="t">Turn {k.turn}</span>
           {k.how === 'cracked' ? (
             <span>
-              <b className={`p${k.by}`}>{nameOf(s, k.by)}</b> knocked out <b className={`p${k.out}`}>{nameOf(s, k.out)}</b>
+              <b className={`p${k.by}`}>{nameOf(s, k.by)}</b> burned <b className={`p${k.out}`}>{nameOf(s, k.out)}</b>
             </span>
           ) : (
             <span>
-              <b className={`p${k.out}`}>{nameOf(s, k.out)}</b> ran out of suspects
+              <b className={`p${k.out}`}>{nameOf(s, k.out)}</b> ran out of leads
             </span>
           )}
         </li>
@@ -33,17 +33,17 @@ export default function Over({ s, send, onRematch }) {
   const loser = s.knockouts.length ? s.knockouts[s.knockouts.length - 1].out : 1 - w;
   let line;
   if (solved) {
-    line = `${nameOf(s, w)} named ${accused} and solved the case.`;
-    if (s.count > 2 && s.rules === 'last') line = `${nameOf(s, w)} named ${accused} and is the last detective standing.`;
+    line = `${nameOf(s, w)} exposed ${accused} and blew the cover.`;
+    if (s.count > 2 && s.rules === 'last') line = `${nameOf(s, w)} exposed ${accused} and is the last agent standing.`;
   } else if (s.count > 2) {
-    line = `${nameOf(s, loser)} accused ${accused}, their last suspect, and it was wrong. ${nameOf(s, w)} is the last detective left.`;
+    line = `${nameOf(s, loser)} tried to expose ${accused}, their last lead, and it was wrong. ${nameOf(s, w)} is the last agent left.`;
   } else {
-    line = `${nameOf(s, loser)} accused ${accused}, their last suspect, and it was wrong. ${nameOf(s, w)} wins by default.`;
+    line = `${nameOf(s, loser)} tried to expose ${accused}, their last lead, and it was wrong. ${nameOf(s, w)} wins by default.`;
   }
 
   return (
     <div className={`stage p${w} shake`}>
-      <span className={`slam${solved ? '' : ' loss'}`}>{solved ? 'Case closed' : 'Out of suspects'}</span>
+      <span className={`slam${solved ? '' : ' loss'}`}>{solved ? 'Cover blown' : 'Out of leads'}</span>
       <h1>
         <span className="who-big">{nameOf(s, w)}</span> wins
       </h1>
@@ -51,8 +51,9 @@ export default function Over({ s, send, onRematch }) {
       <Story s={s} />
       <div className="secrets">
         {playersOf(s).map((p) => (
-          <div className={`mini p${p}`} key={p}>
-            <span className="k">{nameOf(s, p)} held</span>
+          <div className={`mini p${p}${p !== w ? ' burned' : ''}`} key={p}>
+            <span className="k">{nameOf(s, p)}’s cover</span>
+            {p !== w && <span className="burn" aria-hidden="true">Burned</span>}
             <span className="n">{getItem(s.categoryId, s.secrets[p])?.name}</span>
           </div>
         ))}

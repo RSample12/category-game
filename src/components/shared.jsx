@@ -1,6 +1,8 @@
 export const cx = (...parts) => parts.filter(Boolean).join(' ');
 export const pad = (n) => String(n).padStart(2, '0');
-export const nameOf = (s, p) => (s.names[p] ?? '').trim() || `Player ${p + 1}`;
+/** Agents without a typed name get a codename. */
+export const CODENAMES = ['Fox', 'Raven', 'Viper', 'Ghost'];
+export const nameOf = (s, p) => (s.names[p] ?? '').trim() || `Agent ${CODENAMES[p] ?? p + 1}`;
 export const playersOf = (s) => Array.from({ length: s.count }, (_, i) => i);
 
 /** "Ann", "Ann and Bo", "Ann, Bo and Cy". */
