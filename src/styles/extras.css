@@ -165,7 +165,7 @@ body.lamp-lit{
 
 /* lineup theme groups: one open at a time */
 .lineup-groups{display:grid;gap:var(--s2)}
-.lineup-group{display:grid;gap:var(--s2)}
+.lineup-group{display:grid}
 .group-head{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:52px;padding:var(--s3) var(--s4);background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);color:var(--text);cursor:pointer;text-align:left;font:inherit;box-shadow:var(--sh-1);transition:border-color .2s var(--ease),background .2s var(--ease)}
 .group-head:hover{border-color:#4b7566}
 .group-head .gname{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:22px;line-height:1;letter-spacing:.01em}
@@ -179,11 +179,6 @@ body.lamp-lit{
 /* ---------- setup polish ---------- */
 /* "How it ends": a switch like Two players / Multiplayer, with the chosen rule described below */
 .rule-desc{margin:0;color:var(--muted);font-size:var(--t-sm);line-height:1.45}
-/* the open group and its tiles share one box, so the next bar reads as separate */
-.lineup-group.open{background:rgba(var(--tint),.35);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s2)}
-/* open bar: lighter, no outline; gold outline stays reserved for "holds your pick" */
-.lineup-group.open .group-head{background:var(--ink-3);border-color:transparent;box-shadow:none}
-.lineup-group.open .group-head.picked{border-color:rgba(227,176,75,.55)}
 /* small text a touch larger */
 .masthead .eyebrow{font-size:11px}
 .field label{font-size:12px}
@@ -191,3 +186,21 @@ body.lamp-lit{
 .site-links a{min-height:44px;display:inline-flex;align-items:center}
 .seg button[role="radio"][aria-checked="true"]{background:var(--pc);color:var(--paper-ink)}
 .seg button[role="radio"]:not([aria-checked="true"]):hover{color:var(--text)}
+
+/* ---------- theme groups: bars that slide open ---------- */
+/* closed bars preview the paper tabs inside; they fade out as the group opens */
+.gtabs{margin-left:auto;display:flex;gap:4px;transition:opacity .2s var(--ease)}
+.gtabs span{width:18px;height:22px;border-radius:var(--r-xs);background:var(--paper);color:var(--paper-ink);font-family:var(--display);font-weight:900;font-size:12px;line-height:1;display:grid;place-items:center;box-shadow:var(--sh-1)}
+.gtabs+.chev{margin-left:0}
+.open .gtabs{opacity:0}
+.group-head[aria-expanded="true"]{border-color:#4b7566}
+.group-head.picked{border-color:rgba(227,176,75,.55)}
+/* the panel animates its height (0fr -> 1fr) and the tiles drift in */
+.group-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s var(--ease)}
+.lineup-group.open .group-panel{grid-template-rows:1fr}
+.group-panel-inner{min-height:0;overflow:hidden;margin-inline:-4px;padding-inline:4px}
+.group-panel .cats.lineup{padding-block:var(--s2);opacity:0;transform:translateY(-8px);transition:opacity .2s var(--ease),transform .32s var(--ease)}
+.lineup-group.open .group-panel .cats.lineup{opacity:1;transform:none;transition-delay:.05s,0s}
+@media (prefers-reduced-motion:reduce){
+  .group-panel,.group-panel .cats.lineup,.gtabs{transition:none}
+}
