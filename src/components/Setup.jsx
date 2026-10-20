@@ -126,33 +126,30 @@ export default function Setup({ s, send, onDeal }) {
           <p className="section-note">
             Each detective questions the next one in the list and answers the one before.
           </p>
-          <div className="cats rule-opts" role="radiogroup" aria-label="How it ends">
+          <div className="seg p0" role="radiogroup" aria-label="How it ends">
             {RULE_OPTIONS.map((r) => (
               <button
                 key={r.id}
                 type="button"
-                className="cat rule"
                 role="radio"
                 aria-checked={s.rules === r.id}
+                aria-describedby={s.rules === r.id ? 'rule-desc' : undefined}
                 onClick={() => send({ type: 'SET_RULES', rules: r.id })}
               >
-                <span style={{ minWidth: 0 }}>
-                  <h3>{r.name}</h3>
-                  <p>{r.blurb}</p>
-                </span>
-                <span className="count">
-                  <span className="radio" aria-hidden="true" />
-                </span>
+                {r.name}
               </button>
             ))}
           </div>
+          {/* Only the chosen rule is described, like the lineup tiles. */}
+          <p className="rule-desc" id="rule-desc">
+            {RULE_OPTIONS.find((r) => r.id === s.rules)?.blurb}
+          </p>
         </section>
       )}
 
       <section className="section">
         <div className="section-head">
           <h2>Pick the lineup</h2>
-          <span className="eyebrow">Chosen together</span>
         </div>
         <div className="lineup-groups">
           {GROUPS.map((g) => {
@@ -232,7 +229,7 @@ export default function Setup({ s, send, onDeal }) {
 
       <div className="cta">
         <button className="btn btn-primary btn-block" onClick={onDeal}>
-          <Search className="ico" aria-hidden="true" /> Deal suspects
+          <Search className="ico" aria-hidden="true" /> Deal · {chosen?.name}
         </button>
       </div>
     </>
