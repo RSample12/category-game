@@ -1,6 +1,6 @@
 import { trackEvent } from './analytics.js';
 
-const TITLE = 'Crack the Case';
+const TITLE = 'Prime Suspicion';
 const TEXT = '2–4 players, one phone. Can you out-deduce me?';
 
 /** The link people receive. Uses whatever domain the game is served from, so it keeps

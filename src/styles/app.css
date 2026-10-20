@@ -1,4 +1,4 @@
-/* Crack the Case: night-desk theme, elevated.
+/* Prime Suspicion: base styles. Colours and textures live in theme.css.
    Ported unchanged from the standalone build, then extended in extras.css. */
 /* Layout: single-column case file on a night-desk ground — sticky turn header, evidence-tag grid, thumb-zone action bar. Deliberately single-theme (dark). */
 :root{
@@ -42,7 +42,7 @@ h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;let
 .btn-primary{background:var(--pc,var(--p1));color:var(--paper-ink)}
 .btn-primary:hover{filter:brightness(1.06)}
 .btn-ghost{background:var(--ink-3);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
-.btn-ghost:hover{background:#2a4a41}
+.btn-ghost:hover{background:var(--ghost-hover)}
 .btn-danger{background:var(--stamp);color:#fff}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
 .btn-block{width:100%}
@@ -61,12 +61,12 @@ h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;let
 .field{display:grid;gap:6px;min-width:0}
 .field label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--pc)}
 .field input{width:100%;min-width:0;background:var(--ink-2);border:1px solid var(--line);border-left:4px solid var(--pc);border-radius:6px;color:var(--text);padding:12px;font:600 17px var(--body)}
-.field input::placeholder{color:#6f8a7e}
+.field input::placeholder{color:var(--placeholder)}
 .field input:focus{outline:none;border-color:var(--pc)}
 .cats{display:grid;gap:10px}
 .cat{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;text-align:left;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;transition:border-color .15s,background .15s}
-.cat:hover{border-color:#4b7566}
-.cat[aria-checked="true"]{border-color:var(--p1);background:#1c3a32}
+.cat:hover{border-color:var(--hover-line)}
+.cat[aria-checked="true"]{border-color:var(--p1);background:var(--raise)}
 .cat .tab{width:44px;height:52px;background:var(--paper);color:var(--paper-ink);border-radius:4px 4px 4px 4px;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:26px;position:relative}
 .cat .tab::before{content:"";position:absolute;top:6px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--ink-2)}
 .cat .tab b{margin-top:8px}
@@ -218,7 +218,7 @@ h1,h2,h3{text-wrap:balance}
 .masthead h1,.stage h1{letter-spacing:-.01em}
 .lede{text-wrap:pretty;font-size:var(--t-md);line-height:1.55}
 .cat p,.tip,.report,.rules ol{font-size:var(--t-sm)}
-.field input::placeholder{color:#86a092}
+.field input::placeholder{color:var(--placeholder)}
 /* hero: the kicker becomes a stuck-on file label, echoing the evidence tags */
 .masthead{padding-block:var(--s6) var(--s2);gap:var(--s3)}
 .masthead .eyebrow{justify-self:start;max-width:100%;font-size:11px;letter-spacing:.08em;background:var(--paper);color:var(--paper-ink);padding:var(--s2) var(--s3) var(--s2) 28px;border-radius:var(--r-xs);position:relative;transform:rotate(-1.5deg);box-shadow:var(--sh-1)}

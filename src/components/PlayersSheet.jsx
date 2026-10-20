@@ -60,9 +60,9 @@ function Badge({ s, send, p, hidden = false }) {
  * cardstock, like the lineup and the suspect cards: pick how many detectives, write each name
  * on an ID badge, and (for 3-4) choose how the case ends.
  */
-export default function PlayersSheet({ s, send, categoryName, onClose, onDeal }) {
+export default function PlayersSheet({ s, send, caseNo: givenCaseNo, categoryName, onClose, onDeal }) {
   const ref = useRef(null);
-  const [caseNo] = useState(newCaseNo);
+  const [caseNo] = useState(() => givenCaseNo || newCaseNo());
   const multi = s.count > 2;
   const players = playersOf(s);
 

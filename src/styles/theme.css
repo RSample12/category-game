@@ -1,0 +1,46 @@
+/* =====================================================================
+   Prime Suspicion — THEME
+   Every colour and texture in the app is set here, so trying a new palette means
+   editing only this file. Loaded last (after app.css and extras.css).
+   ===================================================================== */
+:root{
+  /* grounds */
+  --ink:#121211;          /* page */
+  --ink-2:#1c1b19;        /* panels, bars */
+  --ink-3:#262420;        /* raised controls */
+  --raise:#24221e;        /* selected panel */
+  --line:#36332d;
+  --hover-line:#5a5448;
+  --ghost-hover:#2f2c27;
+  /* text */
+  --text:#f1ece2;
+  --muted:#a6a092;
+  --placeholder:#8b8577;
+  /* paper (cards, tags, badges) */
+  --paper:#efe7d4;
+  --paper-2:#d8ceb6;
+  --paper-ink:#1a1814;
+  /* accents: detective colours (p1 is also the app accent) */
+  --p1:#d9a441;           /* gold */
+  --p2:#e07a5f;           /* coral */
+  --p3:#7fb2d9;           /* steel blue */
+  --p4:#b99ad8;           /* lilac */
+  --accent-soft:rgba(217,164,65,.55);
+  --stamp:#d8574a;
+  --stamp-ink:#b4281d;
+  --win:#8bd17c;
+  /* shadows are tinted with this rgb triplet */
+  --tint:6,6,5;
+  /* lineup room (setup header) */
+  --wall-top:#211f1b;
+  --wall-bottom:#151412;
+  --chart-line:241,236,226;   /* rgb of the height-chart lines */
+  --beam:255,228,178;         /* rgb of the spotlight */
+  --figure:#2b2925;
+  --figure-lit:#3d3931;
+  --placard:#0c0c0b;
+  /* textures */
+  --grain-opacity:.22;
+  --page-texture:repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
+}
+body{background-color:var(--ink);background-image:var(--page-texture)}

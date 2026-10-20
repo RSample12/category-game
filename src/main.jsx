@@ -8,6 +8,7 @@ import '@fontsource/ibm-plex-mono/500';
 import '@fontsource/ibm-plex-mono/600';
 import './styles/app.css';
 import './styles/extras.css';
+import './styles/theme.css';
 import App from './App.jsx';
 import { startAnalytics } from './lib/analytics.js';
 
