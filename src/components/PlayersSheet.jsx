@@ -17,6 +17,44 @@ const RULE_OPTIONS = [
 const newCaseNo = () =>
   `${String(new Date().getFullYear()).slice(2)}-${1000 + Math.floor(Math.random() * 9000)}`;
 
+/** Height-animated show/hide (grid rows 0fr -> 1fr). Closed content is inert: no Tab, no screen reader. */
+function Collapse({ open, children, tight = false }) {
+  return (
+    <div
+      className={`collapse${tight ? ' tight' : ''}${open ? ' open' : ''}`}
+      aria-hidden={!open}
+      ref={(el) => {
+        if (el) el.inert = !open;
+      }}
+    >
+      <div className="collapse-in">{children}</div>
+    </div>
+  );
+}
+
+/** One detective's ID badge; the name is typed straight onto the card. */
+function Badge({ s, send, p, hidden = false }) {
+  return (
+    <label
+      className={`id-badge p${p}${hidden ? ' id-badge-off' : ''}`}
+      aria-hidden={hidden || undefined}
+      ref={(el) => {
+        if (el) el.inert = hidden;
+      }}
+    >
+      <span className="k">Detective {String(p + 1).padStart(2, '0')}</span>
+      <input
+        id={`name-${p}`}
+        maxLength={14}
+        autoComplete="off"
+        placeholder={`Player ${p + 1}`}
+        value={s.names[p]}
+        onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
+      />
+    </label>
+  );
+}
+
 /**
  * "Assemble your detectives": opens from the setup screen's Play button. Everything here is
  * cardstock, like the lineup and the suspect cards: pick how many detectives, write each name
@@ -98,24 +136,22 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
         </div>
 
         <div className="badges">
-          {players.map((p) => (
-            <label className={`badge p${p}`} key={p}>
-              <span className="k">Detective {String(p + 1).padStart(2, '0')}</span>
-              <input
-                id={`name-${p}`}
-                maxLength={14}
-                autoComplete="off"
-                placeholder={`Player ${p + 1}`}
-                value={s.names[p]}
-                onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
-              />
-            </label>
+          {[0, 1].map((p) => (
+            <Badge key={p} s={s} send={send} p={p} />
           ))}
         </div>
+        {/* Detectives 3-4 and the 3-4 player rules slide open and shut, so the sheet grows and
+            shrinks smoothly instead of jumping. */}
+        <Collapse open={multi} tight>
+          <div className="badges">
+            <Badge s={s} send={send} p={2} />
+            <Badge s={s} send={send} p={3} hidden={s.count < 4} />
+          </div>
+        </Collapse>
 
-        {multi && (
-          <>
-            <div className="brief-block brief-in">
+        <Collapse open={multi}>
+          <div className="brief-more">
+            <div className="brief-block">
               <span className="eyebrow" id="ends-label">How it ends</span>
               <div className="rule-cards" role="radiogroup" aria-labelledby="ends-label">
                 {RULE_OPTIONS.map((r) => (
@@ -133,7 +169,7 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
                 ))}
               </div>
             </div>
-            <div className="brief-block brief-in">
+            <div className="brief-block">
               <span className="eyebrow" id="ring-label">Who questions who</span>
               <p className="chain" aria-labelledby="ring-label">
                 {[...players, players[0]].map((p, i) => (
@@ -148,8 +184,8 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
                 ))}
               </p>
             </div>
-          </>
-        )}
+          </div>
+        </Collapse>
 
         <div className="row">
           <button type="button" className="btn btn-ghost" onClick={onClose}>
