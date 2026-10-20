@@ -165,7 +165,7 @@ body.lamp-lit{
 
 /* lineup theme groups: one open at a time */
 .lineup-groups{display:grid;gap:var(--s2)}
-.lineup-group{display:grid;gap:var(--s2)}
+.lineup-group{display:grid}
 .group-head{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:52px;padding:var(--s3) var(--s4);background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);color:var(--text);cursor:pointer;text-align:left;font:inherit;box-shadow:var(--sh-1);transition:border-color .2s var(--ease),background .2s var(--ease)}
 .group-head:hover{border-color:#4b7566}
 .group-head .gname{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:22px;line-height:1;letter-spacing:.01em}
@@ -179,11 +179,6 @@ body.lamp-lit{
 /* ---------- setup polish ---------- */
 /* "How it ends": a switch like Two players / Multiplayer, with the chosen rule described below */
 .rule-desc{margin:0;color:var(--muted);font-size:var(--t-sm);line-height:1.45}
-/* the open group and its tiles share one box, so the next bar reads as separate */
-.lineup-group.open{background:rgba(var(--tint),.35);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s2)}
-/* open bar: lighter, no outline; gold outline stays reserved for "holds your pick" */
-.lineup-group.open .group-head{background:var(--ink-3);border-color:transparent;box-shadow:none}
-.lineup-group.open .group-head.picked{border-color:rgba(227,176,75,.55)}
 /* small text a touch larger */
 .masthead .eyebrow{font-size:11px}
 .field label{font-size:12px}
@@ -191,3 +186,45 @@ body.lamp-lit{
 .site-links a{min-height:44px;display:inline-flex;align-items:center}
 .seg button[role="radio"][aria-checked="true"]{background:var(--pc);color:var(--paper-ink)}
 .seg button[role="radio"]:not([aria-checked="true"]):hover{color:var(--text)}
+
+/* ---------- theme groups: bars that slide open ---------- */
+.group-head[aria-expanded="true"]{border-color:#4b7566}
+.group-head.picked{border-color:rgba(227,176,75,.55)}
+/* the panel animates its height (0fr -> 1fr) and the tiles drift in */
+.group-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s var(--ease)}
+.lineup-group.open .group-panel{grid-template-rows:1fr}
+.group-panel-inner{min-height:0;overflow:hidden;margin-inline:-4px;padding-inline:4px}
+.group-panel .cats.lineup{padding-block:var(--s2);opacity:0;transform:translateY(-8px);transition:opacity .2s var(--ease),transform .32s var(--ease)}
+.lineup-group.open .group-panel .cats.lineup{opacity:1;transform:none;transition-delay:.05s,0s}
+@media (prefers-reduced-motion:reduce){
+  .group-panel,.group-panel .cats.lineup{transition:none}
+}
+
+/* ---------- "Who's playing?" panel (opened by Play) ---------- */
+.players-sheet{text-align:left;gap:var(--s4);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
+.players-sheet:focus{outline:none}
+.players-sheet h3{font-size:34px}
+.ps-head{display:grid;gap:var(--s1)}
+.ps-block{display:grid;gap:var(--s2)}
+.players-sheet .seg button{min-height:44px}
+.players-sheet .row{grid-template-columns:auto 1fr}
+.players-sheet .row .btn-ghost{padding-inline:var(--s5)}
+.players-sheet .seg button{font-size:14.5px;padding-inline:var(--s2);line-height:1.15}
+/* selected switch keeps dark text on hover (touch hover sticks after a tap) */
+.seg button[role="radio"][aria-checked="true"]:hover{color:var(--paper-ink)}
+
+/* ---------- lineup cards: evidence-tag cardstock, one size for all ---------- */
+.cats.lineup{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.case-card{position:relative;appearance:none;border:0;text-align:left;height:96px;padding:26px 10px 10px;display:grid;align-content:end;background:var(--paper);color:var(--paper-ink);border-radius:var(--r-xs);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 1px 0 var(--paper-2),var(--sh-1);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.case-card::before{content:"";position:absolute;top:9px;left:10px;width:9px;height:9px;border-radius:50%;background:var(--ink);box-shadow:inset 0 0 0 2px var(--paper-2)}
+.case-card .no{position:absolute;top:7px;right:9px;font-family:var(--mono);font-size:11px;color:#6f6853;font-variant-numeric:tabular-nums}
+.case-card h3{font-family:var(--display);font-weight:800;font-size:19px;line-height:.95;overflow-wrap:break-word;hyphens:manual}
+.case-card:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 1px 0 var(--paper-2),var(--sh-2)}
+/* chosen: picked up off the pile — tilted, lifted, brass ring */
+.case-card[aria-checked="true"]{transform:rotate(-1.5deg) translateY(-2px);box-shadow:0 0 0 3px var(--p1),var(--sh-2)}
+.case-card[aria-checked="true"] .no{color:var(--paper-ink);font-weight:600}
+.ps-blurb{text-transform:none;letter-spacing:0;font-family:var(--body);font-size:13px}
+@media (min-width:640px){.cats.lineup{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.case-card,.case-card[aria-checked="true"]{transition:none}}
+.group-panel-inner{margin-inline:-8px;padding-inline:8px}
+.group-panel .cats.lineup{padding-block:10px}

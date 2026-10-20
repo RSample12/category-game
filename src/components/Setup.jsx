@@ -1,21 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { GROUPS, getCategory } from '../data/categories.js';
-import { playersOf } from './shared.jsx';
+import PlayersSheet from './PlayersSheet.jsx';
+import { pad } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
-
-const RULE_OPTIONS = [
-  {
-    id: 'last',
-    name: 'Last one standing',
-    blurb: 'Solve your target’s suspect to knock them out, then hunt whoever they were hunting. The last detective left wins.',
-  },
-  {
-    id: 'first',
-    name: 'First to solve',
-    blurb: 'The first detective to solve their target’s suspect wins. Run out of suspects and you’re out, but you still answer.',
-  },
-];
 
 /* A hanging brass desk lamp, drawn flat to match the night-desk look. Decorative only. */
 function Lamp() {
@@ -44,24 +32,20 @@ function useLampGlow() {
 
 export default function Setup({ s, send, onDeal }) {
   useLampGlow();
-  const multi = s.count > 2;
   const chosen = getCategory(s.categoryId);
   // One theme group open at a time; the one holding the chosen lineup starts open.
   const [openGroup, setOpenGroup] = useState(chosen?.group ?? null);
   const toggleGroup = (id) => {
     const next = openGroup === id ? null : id;
     setOpenGroup(next);
-    // Closing a group above can shift the tapped header upward; keep it in view.
-    requestAnimationFrame(() => {
-      document.getElementById(`group-${id}`)?.scrollIntoView({ block: 'nearest' });
-    });
+    // Closing a group above can slide the tapped header upward; once the motion settles, keep it in view.
+    setTimeout(() => {
+      document.getElementById(`group-${id}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, 340);
   };
-  // Switching back to Multiplayer returns to the last group size used (3 or 4).
-  const lastMulti = useRef(multi ? s.count : 3);
-  const setCount = (n) => {
-    if (n > 2) lastMulti.current = n;
-    send({ type: 'SET_PLAYERS', count: n });
-  };
+  // Player count, names and rules live in the "Who's playing?" panel opened by Play.
+  const [picking, setPicking] = useState(false);
+  const closePicking = useCallback(() => setPicking(false), []);
   return (
     <>
       <header className="masthead">
@@ -76,76 +60,6 @@ export default function Setup({ s, send, onDeal }) {
           rule suspects out, and accuse first.
         </p>
       </header>
-
-      <section className="section">
-        <div className="section-head">
-          <h2>The detectives</h2>
-        </div>
-        <div className="seg p0" role="group" aria-label="Game type">
-          <button type="button" aria-pressed={!multi} onClick={() => setCount(2)}>
-            Two players
-          </button>
-          <button type="button" aria-pressed={multi} onClick={() => setCount(Math.max(3, lastMulti.current))}>
-            Multiplayer
-          </button>
-        </div>
-        {multi && (
-          <div className="howmany">
-            <span className="eyebrow" id="howmany-label">How many detectives?</span>
-            <div className="seg p0" role="group" aria-labelledby="howmany-label">
-              {[3, 4].map((n) => (
-                <button type="button" key={n} aria-pressed={s.count === n} onClick={() => setCount(n)}>
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        <div className="names">
-          {playersOf(s).map((p) => (
-            <div className={`field p${p}`} key={p}>
-              <label htmlFor={`name-${p}`}>Detective {p + 1}</label>
-              <input
-                id={`name-${p}`}
-                maxLength={14}
-                autoComplete="off"
-                placeholder={`Player ${p + 1}`}
-                value={s.names[p]}
-                onChange={(e) => send({ type: 'SET_NAME', index: p, value: e.target.value })}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {s.count > 2 && (
-        <section className="section">
-          <div className="section-head">
-            <h2>How it ends</h2>
-          </div>
-          <p className="section-note">
-            Each detective questions the next one in the list and answers the one before.
-          </p>
-          <div className="seg p0" role="radiogroup" aria-label="How it ends">
-            {RULE_OPTIONS.map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                role="radio"
-                aria-checked={s.rules === r.id}
-                aria-describedby={s.rules === r.id ? 'rule-desc' : undefined}
-                onClick={() => send({ type: 'SET_RULES', rules: r.id })}
-              >
-                {r.name}
-              </button>
-            ))}
-          </div>
-          {/* Only the chosen rule is described, like the lineup tiles. */}
-          <p className="rule-desc" id="rule-desc">
-            {RULE_OPTIONS.find((r) => r.id === s.rules)?.blurb}
-          </p>
-        </section>
-      )}
 
       <section className="section">
         <div className="section-head">
@@ -166,39 +80,38 @@ export default function Setup({ s, send, onDeal }) {
                   onClick={() => toggleGroup(g.id)}
                 >
                   <span className="gname">{g.name}</span>
-                  {/* A closed group still shows when it holds the chosen lineup. */}
+                  {/* A closed group still shows the chosen lineup's name if it lives here. */}
                   {picked && !open && <span className="gpick">{chosen.name}</span>}
                   <ChevronDown className="ico chev" aria-hidden="true" />
                 </button>
-                {open && (
-                  <div
-                    id={`panel-${g.id}`}
-                    className="cats lineup"
-                    role="radiogroup"
-                    aria-labelledby={`group-${g.id}`}
-                  >
-                    {g.categories.map((c) => (
-                      <button
-                        key={c.id}
-                        id={`cat-${c.id}`}
-                        className="cat"
-                        role="radio"
-                        aria-checked={c.id === s.categoryId}
-                        onClick={() => send({ type: 'SET_CATEGORY', id: c.id })}
-                      >
-                        <span className="tab">
-                          <b>{c.name[0]}</b>
-                        </span>
-                        <span style={{ minWidth: 0 }}>
+                {/* Always rendered so it can slide open and shut; inert while closed. */}
+                <div
+                  className="group-panel"
+                  id={`panel-${g.id}`}
+                  aria-hidden={!open}
+                  ref={(el) => {
+                    if (el) el.inert = !open; // keeps closed tiles out of Tab order (React 18 drops the attribute)
+                  }}
+                >
+                  <div className="group-panel-inner">
+                    <div className="cats lineup" role="radiogroup" aria-labelledby={`group-${g.id}`}>
+                      {/* Evidence-tag cards, all the same size, like the suspect cards in a game. */}
+                      {g.categories.map((c, i) => (
+                        <button
+                          key={c.id}
+                          id={`cat-${c.id}`}
+                          className="case-card"
+                          role="radio"
+                          aria-checked={c.id === s.categoryId}
+                          onClick={() => send({ type: 'SET_CATEGORY', id: c.id })}
+                        >
+                          <span className="no" aria-hidden="true">Nº {pad(i + 1)}</span>
                           <h3>{c.name}</h3>
-                          {/* Only the chosen lineup shows its description, to keep the list compact. */}
-                          {c.id === s.categoryId && <p>{c.blurb}</p>}
-                        </span>
-                        <span className="radio" aria-hidden="true" />
-                      </button>
-                    ))}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             );
           })}
@@ -228,10 +141,13 @@ export default function Setup({ s, send, onDeal }) {
       </section>
 
       <div className="cta">
-        <button className="btn btn-primary btn-block" onClick={onDeal}>
-          <Search className="ico" aria-hidden="true" /> Deal · {chosen?.name}
+        <button className="btn btn-primary btn-block" onClick={() => setPicking(true)}>
+          <Search className="ico" aria-hidden="true" /> Play · {chosen?.name}
         </button>
       </div>
+      {picking && (
+        <PlayersSheet s={s} send={send} categoryName={chosen?.name} categoryBlurb={chosen?.blurb} onClose={closePicking} onDeal={onDeal} />
+      )}
     </>
   );
 }
