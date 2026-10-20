@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { GROUPS, getCategory } from '../data/categories.js';
 import PlayersSheet from './PlayersSheet.jsx';
+import { pad } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
 
 /* A hanging brass desk lamp, drawn flat to match the night-desk look. Decorative only. */
@@ -79,16 +80,8 @@ export default function Setup({ s, send, onDeal }) {
                   onClick={() => toggleGroup(g.id)}
                 >
                   <span className="gname">{g.name}</span>
-                  {/* Closed: the chosen lineup's name if it lives here, otherwise a peek at the tabs inside. */}
-                  {picked && !open ? (
-                    <span className="gpick">{chosen.name}</span>
-                  ) : (
-                    <span className="gtabs" aria-hidden="true">
-                      {g.categories.map((c) => (
-                        <span key={c.id}>{c.name[0]}</span>
-                      ))}
-                    </span>
-                  )}
+                  {/* A closed group still shows the chosen lineup's name if it lives here. */}
+                  {picked && !open && <span className="gpick">{chosen.name}</span>}
                   <ChevronDown className="ico chev" aria-hidden="true" />
                 </button>
                 {/* Always rendered so it can slide open and shut; inert while closed. */}
@@ -102,24 +95,18 @@ export default function Setup({ s, send, onDeal }) {
                 >
                   <div className="group-panel-inner">
                     <div className="cats lineup" role="radiogroup" aria-labelledby={`group-${g.id}`}>
-                      {g.categories.map((c) => (
+                      {/* Evidence-tag cards, all the same size, like the suspect cards in a game. */}
+                      {g.categories.map((c, i) => (
                         <button
                           key={c.id}
                           id={`cat-${c.id}`}
-                          className="cat"
+                          className="case-card"
                           role="radio"
                           aria-checked={c.id === s.categoryId}
                           onClick={() => send({ type: 'SET_CATEGORY', id: c.id })}
                         >
-                          <span className="tab">
-                            <b>{c.name[0]}</b>
-                          </span>
-                          <span style={{ minWidth: 0 }}>
-                            <h3>{c.name}</h3>
-                            {/* Only the chosen lineup shows its description, to keep the list compact. */}
-                            {c.id === s.categoryId && <p>{c.blurb}</p>}
-                          </span>
-                          <span className="radio" aria-hidden="true" />
+                          <span className="no" aria-hidden="true">Nº {pad(i + 1)}</span>
+                          <h3>{c.name}</h3>
                         </button>
                       ))}
                     </div>
@@ -159,7 +146,7 @@ export default function Setup({ s, send, onDeal }) {
         </button>
       </div>
       {picking && (
-        <PlayersSheet s={s} send={send} categoryName={chosen?.name} onClose={closePicking} onDeal={onDeal} />
+        <PlayersSheet s={s} send={send} categoryName={chosen?.name} categoryBlurb={chosen?.blurb} onClose={closePicking} onDeal={onDeal} />
       )}
     </>
   );

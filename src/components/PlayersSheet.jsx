@@ -20,7 +20,7 @@ const RULE_OPTIONS = [
  * switch (two players / multiplayer, how many, names, how it ends) so the main screen
  * stays a clean title + lineup.
  */
-export default function PlayersSheet({ s, send, categoryName, onClose, onDeal }) {
+export default function PlayersSheet({ s, send, categoryName, categoryBlurb, onClose, onDeal }) {
   const ref = useRef(null);
   const multi = s.count > 2;
   // Switching back to Multiplayer returns to the last group size used (3 or 4).
@@ -73,7 +73,10 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
         ref={ref}
       >
         <div className="ps-head">
-          <span className="eyebrow">{categoryName}</span>
+          <span className="eyebrow">
+            {categoryName}
+            {categoryBlurb && <span className="ps-blurb"> · {categoryBlurb}</span>}
+          </span>
           <h3 id="players-title">Who’s playing?</h3>
         </div>
 
