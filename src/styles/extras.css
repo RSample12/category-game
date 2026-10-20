@@ -265,3 +265,17 @@ body.lamp-lit{
 .chain b{color:var(--pc);font-weight:700}
 .brief-in{animation:badge-in .28s var(--ease) backwards}
 @media (prefers-reduced-motion:reduce){.badge,.brief-in,.paper-pick{animation:none;transition:none}}
+
+/* ---------- briefing sheet: smooth resize between 2 and 3-4 players ---------- */
+/* A closed block takes no space and cancels the sheet's gap; opening animates its height,
+   so the sheet itself grows and shrinks smoothly. Inner padding leaves room for focus rings
+   and the tilted, ringed "picked" card. */
+.collapse{display:grid;grid-template-rows:0fr;margin-top:calc(-1 * var(--s4) - 6px);opacity:0;transition:grid-template-rows .34s var(--ease),margin-top .34s var(--ease),opacity .22s var(--ease)}
+.collapse.open{grid-template-rows:1fr;margin-top:-6px;opacity:1;transition-delay:0s,0s,.06s}
+.collapse-in{min-height:0;overflow:hidden;margin-inline:-8px;padding:6px 8px}
+.brief-more{display:grid;gap:var(--s4)}
+.badge-off{opacity:0;transform:translateY(6px) scale(.98);pointer-events:none}
+.badge{transition:opacity .22s var(--ease),transform .28s var(--ease),box-shadow .2s var(--ease)}
+@media (prefers-reduced-motion:reduce){.collapse,.collapse.open,.badge{transition:none}}
+.collapse.tight{margin-top:calc(-1 * var(--s4) - 6px)}
+.collapse.tight.open{margin-top:calc(10px - var(--s4) - 6px)}
