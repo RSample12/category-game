@@ -146,7 +146,7 @@ export default function Setup({ s, send, onDeal }) {
         </button>
       </div>
       {picking && (
-        <PlayersSheet s={s} send={send} categoryName={chosen?.name} categoryBlurb={chosen?.blurb} onClose={closePicking} onDeal={onDeal} />
+        <PlayersSheet s={s} send={send} categoryName={chosen?.name} onClose={closePicking} onDeal={onDeal} />
       )}
     </>
   );

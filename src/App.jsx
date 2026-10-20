@@ -64,13 +64,15 @@ export default function App() {
   }, []);
 
   const deal = useCallback(
-    (type) => {
+    (type, caseNo) => {
       trackEvent(type === 'REMATCH' ? 'rematch' : 'game_started', {
         category: state.categoryId,
         players: state.count,
         rules: state.count > 2 ? state.rules : 'duel',
       });
-      send({ type, ...dealSecrets(state.categoryId, state.count) });
+      const dealt = dealSecrets(state.categoryId, state.count);
+      // The setup panel shows a case number before dealing; keep that same number.
+      send({ type, ...dealt, caseNo: caseNo || dealt.caseNo });
     },
     [send, state.categoryId, state.count, state.rules],
   );
@@ -125,7 +127,7 @@ export default function App() {
 
   let view;
   switch (state.screen) {
-    case 'setup': view = <Setup s={state} send={send} onDeal={() => deal('DEAL')} />; break;
+    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} />; break;
     case 'dealing': view = <Dealing caseNo={state.caseNo} categoryName={getCategory(state.categoryId).name} />; break;
     case 'reveal': view = <Reveal s={state} send={send} />; break;
     case 'handoff': view = <Handoff s={state} send={send} />; break;
