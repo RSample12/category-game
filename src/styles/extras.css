@@ -265,10 +265,3 @@ body.lamp-lit{
 .chain b{color:var(--pc);font-weight:700}
 .brief-in{animation:badge-in .28s var(--ease) backwards}
 @media (prefers-reduced-motion:reduce){.badge,.brief-in,.paper-pick{animation:none;transition:none}}
-
-/* ---------- "Chosen" stamp on picked cards (lineup, count, how it ends) ---------- */
-/* Same red stamp as "Ruled out" on the game board, slapped across the middle of the card. */
-.pick-stamp{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
-.pick-stamp span{font-family:var(--display);font-weight:900;font-size:17px;letter-spacing:.04em;text-transform:uppercase;color:var(--stamp-ink);border:3px solid var(--stamp-ink);border-radius:4px;padding:2px 6px;background:rgba(235,228,211,.72);transform:rotate(-14deg);animation:thunk .28s cubic-bezier(.2,1.6,.4,1) backwards}
-.count-tag .pick-stamp span{font-size:14px;padding:1px 5px;border-width:2.5px}
-@media (prefers-reduced-motion:reduce){.pick-stamp span{animation:none}}
