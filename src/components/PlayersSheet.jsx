@@ -36,7 +36,7 @@ function Collapse({ open, children, tight = false }) {
 function Badge({ s, send, p, hidden = false }) {
   return (
     <label
-      className={`badge p${p}${hidden ? ' badge-off' : ''}`}
+      className={`id-badge p${p}${hidden ? ' id-badge-off' : ''}`}
       aria-hidden={hidden || undefined}
       ref={(el) => {
         if (el) el.inert = hidden;
