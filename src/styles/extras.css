@@ -175,3 +175,19 @@ body.lamp-lit{
 .group-head[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .group-head.picked{border-color:rgba(227,176,75,.55)}
 @media (prefers-reduced-motion:reduce){.group-head .chev{transition:none}}
+
+/* ---------- setup polish ---------- */
+/* "How it ends": a switch like Two players / Multiplayer, with the chosen rule described below */
+.rule-desc{margin:0;color:var(--muted);font-size:var(--t-sm);line-height:1.45}
+/* the open group and its tiles share one box, so the next bar reads as separate */
+.lineup-group.open{background:rgba(var(--tint),.35);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s2)}
+/* open bar: lighter, no outline; gold outline stays reserved for "holds your pick" */
+.lineup-group.open .group-head{background:var(--ink-3);border-color:transparent;box-shadow:none}
+.lineup-group.open .group-head.picked{border-color:rgba(227,176,75,.55)}
+/* small text a touch larger */
+.masthead .eyebrow{font-size:11px}
+.field label{font-size:12px}
+/* About / Privacy: full 44px tap height */
+.site-links a{min-height:44px;display:inline-flex;align-items:center}
+.seg button[role="radio"][aria-checked="true"]{background:var(--pc);color:var(--paper-ink)}
+.seg button[role="radio"]:not([aria-checked="true"]):hover{color:var(--text)}
