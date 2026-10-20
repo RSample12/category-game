@@ -60,7 +60,11 @@ export default function App() {
     dispatch(action);
     if (action.type === 'TAP_ITEM') buzz(8);
     else if (action.type === 'END_TURN' || action.type === 'SHEET_CONFIRM') buzz(18);
-    if (action.type === 'SET_CATEGORY') play('select');
+    // Picking a card stamps it, so it sounds like a stamp too.
+    if (['SET_CATEGORY', 'SET_PLAYERS', 'SET_RULES'].includes(action.type)) {
+      play('stamp');
+      buzz(8);
+    }
   }, []);
 
   const deal = useCallback(

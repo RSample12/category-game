@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
-import { nameOf, playersOf } from './shared.jsx';
+import { nameOf, playersOf, PickStamp } from './shared.jsx';
 
 const COUNTS = [
   { n: 2, label: 'Duel' },
@@ -92,6 +92,7 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
               >
                 <b>{c.n}</b>
                 <span>{c.label}</span>
+                {s.count === c.n && <PickStamp />}
               </button>
             ))}
           </div>
@@ -129,6 +130,7 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
                   >
                     <span className="t">{r.name}</span>
                     <span className="d">{r.blurb}</span>
+                    {s.rules === r.id && <PickStamp />}
                   </button>
                 ))}
               </div>

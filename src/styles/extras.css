@@ -265,3 +265,22 @@ body.lamp-lit{
 .chain b{color:var(--pc);font-weight:700}
 .brief-in{animation:badge-in .28s var(--ease) backwards}
 @media (prefers-reduced-motion:reduce){.badge,.brief-in,.paper-pick{animation:none;transition:none}}
+
+/* ---------- "Chosen" stamp on picked cards (lineup, count, how it ends) ---------- */
+/* Ink green, so it never reads as the red "Ruled out" stamp from the game board. */
+:root{--ok-ink:#1f6b50}
+.pick-stamp{position:absolute;top:6px;right:6px;pointer-events:none}
+.pick-stamp span{display:inline-block;font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ok-ink);border:2.5px solid var(--ok-ink);border-radius:3px;padding:1px 5px;background:rgba(239,230,207,.78);transform:rotate(-12deg);animation:pick-thunk .28s cubic-bezier(.2,1.6,.4,1) backwards}
+@keyframes pick-thunk{from{transform:rotate(-12deg) scale(1.9);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
+/* the stamp takes the Nº corner on a chosen lineup card */
+.case-card[aria-checked="true"] .no{visibility:hidden}
+.case-card .pick-stamp{top:8px;right:8px}
+.case-card .pick-stamp span{font-size:15px}
+.rule-card .pick-stamp{top:5px;right:6px}
+@media (prefers-reduced-motion:reduce){.pick-stamp span{animation:none}}
+/* keep the stamp clear of the card's main text */
+.count-tag .pick-stamp{top:5px;right:5px}
+.count-tag .pick-stamp span{font-size:11px;padding:0 4px;border-width:2px;transform:rotate(-8deg);animation-name:pick-thunk-sm}
+@keyframes pick-thunk-sm{from{transform:rotate(-8deg) scale(1.9);opacity:0}to{transform:rotate(-8deg) scale(1);opacity:1}}
+.rule-card{padding-top:40px}
+.rule-card .pick-stamp span{font-size:12px;padding:0 5px;border-width:2px}

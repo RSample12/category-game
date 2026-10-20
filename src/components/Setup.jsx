@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { GROUPS, getCategory } from '../data/categories.js';
 import PlayersSheet from './PlayersSheet.jsx';
-import { pad } from './shared.jsx';
+import { pad, PickStamp } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
 
 /* A hanging brass desk lamp, drawn flat to match the night-desk look. Decorative only. */
@@ -107,6 +107,7 @@ export default function Setup({ s, send, onDeal }) {
                         >
                           <span className="no" aria-hidden="true">Nº {pad(i + 1)}</span>
                           <h3>{c.name}</h3>
+                          {c.id === s.categoryId && <PickStamp />}
                         </button>
                       ))}
                     </div>

@@ -36,3 +36,12 @@ export function Scoreboard({ s }) {
     </div>
   );
 }
+
+/** The ink stamp that thunks onto a picked card (lineup, player count, how it ends). */
+export function PickStamp() {
+  return (
+    <span className="pick-stamp" aria-hidden="true">
+      <span>Chosen</span>
+    </span>
+  );
+}
