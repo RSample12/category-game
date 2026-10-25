@@ -1,7 +1,7 @@
 import { trackEvent } from './analytics.js';
 
-const TITLE = 'Crack the Case';
-const TEXT = '2–4 players, one phone. Can you out-deduce me?';
+const TITLE = 'Guess Mine';
+const TEXT = '2–4 players, one phone. Can you guess mine?';
 
 /** The link people receive. Uses whatever domain the game is served from, so it keeps
  *  working if the site moves. `ref=share` lets analytics tell shared visits apart. */

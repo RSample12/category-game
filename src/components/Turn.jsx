@@ -119,7 +119,7 @@ export default function Turn({ s, send }) {
     <div className={`p${p} ${guessing ? 'mode-guess' : ''}`}>
       <div className="turnbar" ref={barRef}>
         <div className="turnrow">
-          <h1 className="sr-only">Crack the Case, turn {s.turn}</h1>
+          <h1 className="sr-only">Guess Mine, turn {s.turn}</h1>
           <h2>{nameOf(s, p)}</h2>
           <span className="meter">
             <b>{left}</b>
