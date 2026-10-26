@@ -305,3 +305,12 @@
 /* tagline beside the card fan */
 .tagline{font-size:19px;line-height:1.3;color:var(--muted);text-wrap:balance}
 .tagline b{display:block;margin-top:2px;color:var(--text);font-weight:700}
+/* smaller card fan */
+.hero-row{grid-template-columns:minmax(0,1fr) 100px}
+.hero-fan{width:100px;height:86px}
+.hf-card{width:46px;height:64px;font-size:10px;padding:13px 4px 5px;border-radius:3px}
+.hf-card::before{top:6px;left:6px;width:5px;height:5px}
+.hf-1{left:2px;top:16px}
+.hf-2{left:26px;top:6px}
+.hf-3{left:50px;top:14px;font-size:28px}
+.hf-stamp{left:-3px;top:23px;font-size:8px;border-width:1.5px;padding:0 2px}
