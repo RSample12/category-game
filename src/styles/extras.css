@@ -330,3 +330,8 @@
 .lockup .hf-2{left:calc(var(--c) * .56);top:calc(var(--c) * .1)}
 .lockup .hf-3{left:calc(var(--c) * 1.12);top:calc(var(--c) * .26);font-size:calc(var(--c) * .62)}
 .lockup .hf-stamp{left:calc(var(--c) * -.06);top:calc(var(--c) * .48);font-size:calc(var(--c) * .17);border-width:1.5px;padding:0 2px}
+
+/* title: the wider body face — GUESS bold, WORK regular */
+.lockup h1{font-family:var(--body);text-transform:uppercase;letter-spacing:-.025em;line-height:.86}
+.lockup h1 span:first-child{font-weight:700}
+.lockup h1 span+span{font-weight:400}

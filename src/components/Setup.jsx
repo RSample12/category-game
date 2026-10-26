@@ -1,11 +1,39 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { GROUPS, getCategory } from '../data/categories.js';
 import PlayersSheet from './PlayersSheet.jsx';
 import { pad } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
 
+/**
+ * Sizes the title lockup so GUESSWORK spans the column exactly. Every part of the lockup is
+ * sized from one unit (--u), so measuring the title once and scaling the unit keeps the title,
+ * tagline and card fan in proportion whatever font the phone renders.
+ */
+function useFitLockup(ref) {
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const BASE = 5;
+    const fit = () => {
+      const h1 = el.querySelector('h1');
+      const avail = Math.min(document.documentElement.clientWidth, 760) - 32; // 16px page gutters
+      el.style.setProperty('--u', `${BASE}px`);
+      const w = h1.scrollWidth;
+      if (!w) return;
+      const u = Math.min(6, (BASE * avail) / w);
+      el.style.setProperty('--u', `${u.toFixed(3)}px`);
+    };
+    fit();
+    document.fonts?.ready?.then(fit);
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [ref]);
+}
+
 export default function Setup({ s, send, onDeal }) {
+  const lockupRef = useRef(null);
+  useFitLockup(lockupRef);
   const chosen = getCategory(s.categoryId);
   // One theme group open at a time; the one holding the chosen lineup starts open.
   const [openGroup, setOpenGroup] = useState(chosen?.group ?? null);
@@ -26,7 +54,7 @@ export default function Setup({ s, send, onDeal }) {
         <span className="eyebrow">2–4 players · one phone · pass and play</span>
         {/* Title, tagline and card fan form one lockup: the block is exactly as wide as the
             title, the tagline starts under the G and the fan ends under the K. */}
-        <div className="lockup">
+        <div className="lockup" ref={lockupRef}>
           <h1>
             <span>Guess</span><span>work</span>
           </h1>
