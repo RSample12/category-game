@@ -268,3 +268,8 @@
 @media (prefers-reduced-motion:reduce){.collapse,.collapse.open,.id-badge{transition:none}}
 .collapse.tight{margin-top:calc(-1 * var(--s4) - 6px)}
 .collapse.tight.open{margin-top:calc(10px - var(--s4) - 6px)}
+
+/* one-word title: GUESSWORK on a single line, sized to fit the column */
+.masthead h1{white-space:nowrap}
+.masthead h1 span{display:inline}
+.masthead h1{font-size:clamp(40px,12.6vw,96px)}
