@@ -314,3 +314,19 @@
 .hf-2{left:26px;top:6px}
 .hf-3{left:50px;top:14px;font-size:28px}
 .hf-stamp{left:-3px;top:23px;font-size:8px;border-width:1.5px;padding:0 2px}
+
+/* ---------- title lockup: title + tagline + fan as one block, scaled together ---------- */
+/* One unit (--u) drives every size, so the three always keep the same proportions. */
+.lockup{--u:clamp(3.1px,1.06vw,6px);justify-self:start;display:inline-grid;grid-template-columns:max-content;gap:calc(var(--u) * 3.2)}
+.lockup h1{font-size:calc(var(--u) * 12);line-height:.82;margin:0}
+.lockup .hero-row{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u) * 2.5);width:100%;grid-template-columns:none}
+.lockup .tagline{margin:0;font-size:calc(var(--u) * 4.4);line-height:1.25;text-wrap:nowrap}
+.lockup .tagline span,.lockup .tagline b{display:block;white-space:nowrap}
+.lockup .tagline b{margin-top:calc(var(--u) * .4)}
+.lockup .hero-fan{--c:calc(var(--u) * 10.5);width:calc(var(--c) * 2.15);height:calc(var(--c) * 1.75);flex:none;margin-right:calc(var(--u) * .6)}
+.lockup .hf-card{width:var(--c);height:calc(var(--c) * 1.38);font-size:calc(var(--c) * .21);padding:calc(var(--c) * .28) calc(var(--c) * .09) calc(var(--c) * .11);border-radius:calc(var(--c) * .07)}
+.lockup .hf-card::before{top:calc(var(--c) * .12);left:calc(var(--c) * .12);width:calc(var(--c) * .11);height:calc(var(--c) * .11)}
+.lockup .hf-1{left:0;top:calc(var(--c) * .3)}
+.lockup .hf-2{left:calc(var(--c) * .56);top:calc(var(--c) * .1)}
+.lockup .hf-3{left:calc(var(--c) * 1.12);top:calc(var(--c) * .26);font-size:calc(var(--c) * .62)}
+.lockup .hf-stamp{left:calc(var(--c) * -.06);top:calc(var(--c) * .48);font-size:calc(var(--c) * .17);border-width:1.5px;padding:0 2px}

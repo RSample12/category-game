@@ -24,23 +24,27 @@ export default function Setup({ s, send, onDeal }) {
     <>
       <header className="masthead">
         <span className="eyebrow">2–4 players · one phone · pass and play</span>
-        <h1>
-          <span>Guess</span><span>work</span>
-        </h1>
-        <div className="hero-row">
-          <p className="lede tagline">
-            Everyone’s got a secret. <b>Guess theirs first.</b>
-          </p>
-          {/* The same fan of suspect cards as the share image. Decorative. */}
-          <div className="hero-fan" aria-hidden="true">
-            <span className="hf-card hf-1">
-              <b>Poodle</b>
-              <i className="hf-stamp">Ruled out</i>
-            </span>
-            <span className="hf-card hf-2">
-              <b>Pug</b>
-            </span>
-            <span className="hf-card hf-3">?</span>
+        {/* Title, tagline and card fan form one lockup: the block is exactly as wide as the
+            title, the tagline starts under the G and the fan ends under the K. */}
+        <div className="lockup">
+          <h1>
+            <span>Guess</span><span>work</span>
+          </h1>
+          <div className="hero-row">
+            <p className="lede tagline">
+              <span>Everyone’s got a secret.</span> <b>Guess theirs first.</b>
+            </p>
+            {/* The same fan of suspect cards as the share image. Decorative. */}
+            <div className="hero-fan" aria-hidden="true">
+              <span className="hf-card hf-1">
+                <b>Poodle</b>
+                <i className="hf-stamp">Ruled out</i>
+              </span>
+              <span className="hf-card hf-2">
+                <b>Pug</b>
+              </span>
+              <span className="hf-card hf-3">?</span>
+            </div>
           </div>
         </div>
       </header>
