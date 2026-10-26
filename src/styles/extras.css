@@ -424,3 +424,4 @@ html,body{overflow-x:clip}
    and give the clipped turn-bar name room for descenders */
 .lockup h1,.stage h1,.sheet h3,.slam,.turnrow h2,.shuffle~h1,.recap .mini-tag,.how3 .q,.hf-3{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1}
 .turnrow h2{line-height:1.1;padding-block:2px}
+.bigtag .n,.mini .n{display:block;max-width:100%}

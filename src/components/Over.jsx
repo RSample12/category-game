@@ -1,6 +1,7 @@
 import { RotateCcw, LayoutGrid } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
 import { nameOf, playersOf } from './shared.jsx';
+import FitName from './FitName.jsx';
 import ShareButton from './ShareButton.jsx';
 
 /** One line per knockout, in order: how the case unfolded. */
@@ -53,7 +54,7 @@ export default function Over({ s, send, onRematch }) {
         {playersOf(s).map((p) => (
           <div className={`mini p${p}`} key={p}>
             <span className="k">{nameOf(s, p)} picked</span>
-            <span className="n">{getItem(s.categoryId, s.secrets[p])?.name}</span>
+            <FitName text={getItem(s.categoryId, s.secrets[p])?.name ?? ''} maxLines={2} min={14} />
           </div>
         ))}
       </div>

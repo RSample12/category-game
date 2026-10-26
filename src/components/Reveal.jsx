@@ -2,6 +2,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
 import { hunterOf } from '../game/engine.js';
 import { nameOf, pad } from './shared.jsx';
+import FitName from './FitName.jsx';
 
 /**
  * Two private reveals: each player hides their secret before the phone moves on.
@@ -27,7 +28,7 @@ export default function Reveal({ s, send }) {
     card = (
       <div className="bigtag" key="face" role="img" aria-label={`Your pick is ${item.name}`}>
         <span className="k">Your pick</span>
-        <span className="n">{item.name}</span>
+        <FitName text={item.name} maxLines={2} min={22} />
         <span className="f">
           <span>{cat.name}</span>
           <span>Nº {pad(idx + 1)}</span>
