@@ -398,3 +398,6 @@
 @media (prefers-reduced-motion:reduce){
   .qfield i,.lockup-tag,.lockup h1,.lockup .tagline,.lockup .hf-card,.recap{animation:none}
 }
+
+/* the intro stamp briefly scales the title past the screen edge; never let that make the page scroll sideways */
+html,body{overflow-x:clip}
