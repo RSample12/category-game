@@ -354,7 +354,7 @@
 .masthead{grid-template-columns:minmax(0,1fr)}
 /* drifting question marks behind everything */
 .qfield{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.qfield i{position:absolute;font-family:'Young Serif',Georgia,serif;font-style:normal;line-height:1;color:rgba(227,176,75,.07);transform:rotate(var(--r));animation:qdrift var(--d) ease-in-out var(--delay) infinite alternate}
+.qfield i{position:absolute;font-family:'Young Serif',Georgia,serif;font-style:normal;line-height:1;color:rgba(227,176,75,.045);transform:rotate(var(--r));animation:qdrift var(--d) ease-in-out var(--delay) infinite alternate}
 @keyframes qdrift{to{transform:translate(18px,-26px) rotate(calc(var(--r) + 8deg))}}
 #app>main{position:relative;z-index:1}
 /* recap: full column width, same edges as the lineup bars (the masthead keeps 52px on the right for the sound button) */
