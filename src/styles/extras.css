@@ -93,23 +93,12 @@
 /* main landmark wraps each screen and keeps the old flex column layout (no visual change) */
 #app>main{flex:1;display:flex;flex-direction:column;min-height:0}
 
-/* hanging lamp beside the title: hangs from the top edge, right of the title, clear of the sound button */
+/* title block */
 .masthead{position:relative}
-.lamp{position:absolute;top:0;right:11px;pointer-events:none}
 
-/* smaller banner above the title: one line, so the title (and the lamp beside it) sit higher */
+/* smaller banner above the title: one line */
 .masthead .eyebrow{font-size:10px;letter-spacing:.03em;padding:5px 10px 5px 22px;white-space:nowrap}
 .masthead .eyebrow::before{left:8px;width:7px;height:7px;margin-top:-3.5px}
-
-/* the lamp glows: a warm pool of light centred on the lamp shade, painted on the page background so it can
-   reach the screen edge without causing sideways scroll. The shade sits 43px in from the right edge of the
-   centred content column (max 760px wide, 16px page gutters). Only while the setup screen is showing. */
-body.lamp-lit{
-  background-image:
-    radial-gradient(circle 180px at calc(50% + min(50% - 16px, 380px) - 43px) 120px,rgba(255,214,120,.34) 0,rgba(227,176,75,.16) 32%,rgba(227,176,75,.05) 58%,transparent 72%),
-    repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 2px,transparent 2px 6px);
-  background-repeat:no-repeat,repeat;
-}
 
 /* no string on the suspect card */
 .bigtag::after{content:none}
@@ -279,3 +268,65 @@ body.lamp-lit{
 @media (prefers-reduced-motion:reduce){.collapse,.collapse.open,.id-badge{transition:none}}
 .collapse.tight{margin-top:calc(-1 * var(--s4) - 6px)}
 .collapse.tight.open{margin-top:calc(10px - var(--s4) - 6px)}
+
+/* one-word title: GUESSWORK on a single line, sized to fit the column */
+.masthead h1{white-space:nowrap}
+.masthead h1 span{display:inline}
+.masthead h1{font-size:clamp(40px,12.6vw,96px)}
+
+/* setup: a fan of suspect cards beside the intro (matches the share image) */
+.hero-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--s3)}
+.hero-row .lede{margin:0}
+.hero-fan{position:relative;width:132px;height:112px;flex:none}
+.hf-card{position:absolute;top:8px;width:62px;height:84px;border-radius:4px;background:var(--paper);color:var(--paper-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 18px rgba(var(--tint),.55);padding:16px 6px 7px;box-sizing:border-box;
+  display:grid;align-content:end;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:13px;line-height:.95;overflow:hidden}
+.hf-card::before{content:"";position:absolute;top:7px;left:7px;width:6px;height:6px;border-radius:50%;background:var(--ink)}
+.hf-1{left:0;top:16px;transform:rotate(-12deg)}
+.hf-2{left:34px;top:4px;transform:rotate(-2deg)}
+.hf-3{left:70px;top:14px;transform:rotate(9deg);background:var(--ink-2);border:2px solid var(--p1);color:var(--p1);font-size:40px;font-weight:900;place-items:center;align-content:center;text-align:center;padding:0}
+.hf-3::before{background:var(--p1)}
+.hf-stamp{position:absolute;left:2px;top:30px;transform:rotate(-14deg);font-style:normal;font-family:var(--display);font-weight:900;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--stamp-ink);border:2px solid var(--stamp-ink);border-radius:2px;padding:0 3px;background:rgba(235,228,211,.75);white-space:nowrap}
+/* deal-in: the cards fan out when the screen loads */
+.hf-card{animation:fan-in .5s cubic-bezier(.2,.9,.3,1) backwards}
+.hf-2{animation-delay:.08s} .hf-3{animation-delay:.16s}
+@keyframes fan-in{from{opacity:0;transform:translate(20px,10px) rotate(0)}}
+@media (prefers-reduced-motion:reduce){.hf-card{animation:none}}
+/* fan sits inside the column (clear of the sound button); scaled to fit narrow phones */
+.hero-row{grid-template-columns:minmax(0,1fr) 118px;gap:var(--s2)}
+.hero-row .lede{max-width:none}
+.hero-fan{width:118px;height:100px}
+.hf-card{overflow:visible;width:54px;height:76px;font-size:11.5px;padding:15px 5px 6px}
+.hf-1{left:2px;top:18px}
+.hf-2{left:30px;top:6px}
+.hf-3{left:58px;top:16px;font-size:34px}
+.hf-stamp{left:-3px;top:27px;font-size:9.5px}
+
+/* tagline beside the card fan */
+.tagline{font-size:19px;line-height:1.3;color:var(--muted);text-wrap:balance}
+.tagline b{display:block;margin-top:2px;color:var(--text);font-weight:700}
+/* smaller card fan */
+.hero-row{grid-template-columns:minmax(0,1fr) 100px}
+.hero-fan{width:100px;height:86px}
+.hf-card{width:46px;height:64px;font-size:10px;padding:13px 4px 5px;border-radius:3px}
+.hf-card::before{top:6px;left:6px;width:5px;height:5px}
+.hf-1{left:2px;top:16px}
+.hf-2{left:26px;top:6px}
+.hf-3{left:50px;top:14px;font-size:28px}
+.hf-stamp{left:-3px;top:23px;font-size:8px;border-width:1.5px;padding:0 2px}
+
+/* ---------- title lockup: title + tagline + fan as one block, scaled together ---------- */
+/* One unit (--u) drives every size, so the three always keep the same proportions. */
+.lockup{--u:clamp(3.1px,1.06vw,6px);justify-self:start;display:inline-grid;grid-template-columns:max-content;gap:calc(var(--u) * 3.2)}
+.lockup h1{font-size:calc(var(--u) * 12);line-height:.82;margin:0}
+.lockup .hero-row{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u) * 2.5);width:100%;grid-template-columns:none}
+.lockup .tagline{margin:0;font-size:calc(var(--u) * 4.4);line-height:1.25;text-wrap:nowrap}
+.lockup .tagline span,.lockup .tagline b{display:block;white-space:nowrap}
+.lockup .tagline b{margin-top:calc(var(--u) * .4)}
+.lockup .hero-fan{--c:calc(var(--u) * 10.5);width:calc(var(--c) * 2.15);height:calc(var(--c) * 1.75);flex:none;margin-right:calc(var(--u) * .6)}
+.lockup .hf-card{width:var(--c);height:calc(var(--c) * 1.38);font-size:calc(var(--c) * .21);padding:calc(var(--c) * .28) calc(var(--c) * .09) calc(var(--c) * .11);border-radius:calc(var(--c) * .07)}
+.lockup .hf-card::before{top:calc(var(--c) * .12);left:calc(var(--c) * .12);width:calc(var(--c) * .11);height:calc(var(--c) * .11)}
+.lockup .hf-1{left:0;top:calc(var(--c) * .3)}
+.lockup .hf-2{left:calc(var(--c) * .56);top:calc(var(--c) * .1)}
+.lockup .hf-3{left:calc(var(--c) * 1.12);top:calc(var(--c) * .26);font-size:calc(var(--c) * .62)}
+.lockup .hf-stamp{left:calc(var(--c) * -.06);top:calc(var(--c) * .48);font-size:calc(var(--c) * .17);border-width:1.5px;padding:0 2px}
