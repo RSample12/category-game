@@ -52,10 +52,16 @@ export default function Setup({ s, send, onDeal }) {
   return (
     <>
       <header className="masthead">
-        <span className="eyebrow">2–4 players · one phone · pass and play</span>
         {/* Title, tagline and card fan form one lockup: the block is exactly as wide as the
             title, the tagline starts under the G and the fan ends under the K. */}
         <div className="lockup" ref={lockupRef}>
+          <span className="eyebrow lockup-tag">
+            <span>2–4 players</span>
+            <span aria-hidden="true">·</span>
+            <span>one phone</span>
+            <span aria-hidden="true">·</span>
+            <span>pass and play</span>
+          </span>
           <h1>
             <span>Guess</span><span>work</span>
           </h1>
