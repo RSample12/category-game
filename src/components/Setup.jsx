@@ -29,7 +29,7 @@ export default function Setup({ s, send, onDeal }) {
         </h1>
         <div className="hero-row">
           <p className="lede tagline">
-            Ask yes or no. Rule them out. <b>Guess theirs first.</b>
+            Everyone’s got a secret. <b>Guess theirs first.</b>
           </p>
           {/* The same fan of suspect cards as the share image. Decorative. */}
           <div className="hero-fan" aria-hidden="true">
