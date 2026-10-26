@@ -17,7 +17,8 @@ function useFitLockup(ref) {
     const BASE = 5;
     const fit = () => {
       const h1 = el.querySelector('h1');
-      const avail = Math.min(document.documentElement.clientWidth, 760) - 32; // 16px page gutters
+      // 16px page gutters; the title fills 88% of the column so it sits a little smaller.
+      const avail = (Math.min(document.documentElement.clientWidth, 760) - 32) * 0.88;
       el.style.setProperty('--u', `${BASE}px`);
       const w = h1.scrollWidth;
       if (!w) return;
@@ -51,10 +52,16 @@ export default function Setup({ s, send, onDeal }) {
   return (
     <>
       <header className="masthead">
-        <span className="eyebrow">2–4 players · one phone · pass and play</span>
         {/* Title, tagline and card fan form one lockup: the block is exactly as wide as the
             title, the tagline starts under the G and the fan ends under the K. */}
         <div className="lockup" ref={lockupRef}>
+          <span className="eyebrow lockup-tag">
+            <span>2–4 players</span>
+            <span aria-hidden="true">·</span>
+            <span>one phone</span>
+            <span aria-hidden="true">·</span>
+            <span>pass and play</span>
+          </span>
           <h1>
             <span>Guess</span><span>work</span>
           </h1>
