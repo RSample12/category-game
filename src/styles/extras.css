@@ -335,3 +335,9 @@
 .lockup h1{font-family:var(--body);text-transform:uppercase;letter-spacing:-.025em;line-height:.86}
 .lockup h1 span:first-child{font-weight:700}
 .lockup h1 span+span{font-weight:400}
+
+/* title face: Young Serif (OFL, self-hosted in public/fonts). One weight only, so GUESS and WORK
+   are split by colour. */
+@font-face{font-family:'Young Serif';src:url('/fonts/young-serif.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}
+.lockup h1{font-family:'Young Serif',Georgia,serif;letter-spacing:-.01em;line-height:.9}
+.lockup h1 span:first-child,.lockup h1 span+span{font-weight:400}

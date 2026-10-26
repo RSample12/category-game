@@ -17,7 +17,8 @@ function useFitLockup(ref) {
     const BASE = 5;
     const fit = () => {
       const h1 = el.querySelector('h1');
-      const avail = Math.min(document.documentElement.clientWidth, 760) - 32; // 16px page gutters
+      // 16px page gutters; the title fills 88% of the column so it sits a little smaller.
+      const avail = (Math.min(document.documentElement.clientWidth, 760) - 32) * 0.88;
       el.style.setProperty('--u', `${BASE}px`);
       const w = h1.scrollWidth;
       if (!w) return;
