@@ -301,3 +301,7 @@
 .hf-2{left:30px;top:6px}
 .hf-3{left:58px;top:16px;font-size:34px}
 .hf-stamp{left:-3px;top:27px;font-size:9.5px}
+
+/* tagline beside the card fan */
+.tagline{font-size:19px;line-height:1.3;color:var(--muted);text-wrap:balance}
+.tagline b{display:block;margin-top:2px;color:var(--text);font-weight:700}
