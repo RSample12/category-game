@@ -11,6 +11,8 @@ import { getCategory } from './data/categories.js';
 import { buzz } from './lib/haptics.js';
 import { play, unlock } from './lib/sound.js';
 import { trackEvent } from './lib/analytics.js';
+import { saveLastGame } from './lib/lastGame.js';
+import { getItem } from './data/categories.js';
 import { soundFor } from './lib/soundEvents.js';
 import SoundToggle from './components/SoundToggle.jsx';
 import HomeButton from './components/HomeButton.jsx';
@@ -64,13 +66,14 @@ export default function App() {
   }, []);
 
   const deal = useCallback(
-    (type, caseNo) => {
+    (type, caseNo, categoryId = state.categoryId) => {
       trackEvent(type === 'REMATCH' ? 'rematch' : 'game_started', {
-        category: state.categoryId,
+        category: categoryId,
         players: state.count,
         rules: state.count > 2 ? state.rules : 'duel',
       });
-      const dealt = dealSecrets(state.categoryId, state.count);
+      if (categoryId !== state.categoryId) send({ type: 'SET_CATEGORY', id: categoryId });
+      const dealt = dealSecrets(categoryId, state.count);
       // The setup panel shows a case number before dealing; keep that same number.
       send({ type, ...dealt, caseNo: caseNo || dealt.caseNo });
     },
@@ -79,7 +82,20 @@ export default function App() {
 
   // Anonymous count of finished games (no names, no personal data).
   useEffect(() => {
-    if (state.screen === 'over') trackEvent('game_finished', { category: state.categoryId });
+    if (state.screen !== 'over') return;
+    trackEvent('game_finished', { category: state.categoryId });
+    // Remember a one-line summary for the setup screen's "Last game" recap.
+    const w = nameOf(state, state.winner);
+    let text;
+    if (state.reason === 'solved') {
+      const owner = state.secrets.indexOf(state.lastAccused);
+      const item = getItem(state.categoryId, state.lastAccused)?.name ?? '';
+      const turns = Math.max(1, Math.ceil(state.turn / state.count));
+      text = owner >= 0 ? `got ${nameOf(state, owner)}’s ${item} in ${turns} turn${turns === 1 ? '' : 's'}` : 'cracked the case';
+    } else {
+      text = 'won when the others ran out of suspects';
+    }
+    saveLastGame({ categoryId: state.categoryId, winner: w, text, count: state.count });
   }, [state.screen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist so an accidental refresh can resume the game (secrets stay hidden on restore).
@@ -127,7 +143,7 @@ export default function App() {
 
   let view;
   switch (state.screen) {
-    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} />; break;
+    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} onRematch={(categoryId) => deal('DEAL', undefined, categoryId)} />; break;
     case 'dealing': view = <Dealing caseNo={state.caseNo} categoryName={getCategory(state.categoryId).name} />; break;
     case 'reveal': view = <Reveal s={state} send={send} />; break;
     case 'handoff': view = <Handoff s={state} send={send} />; break;

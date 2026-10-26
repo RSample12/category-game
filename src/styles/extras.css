@@ -347,3 +347,54 @@
   font-size:calc(var(--u) * 2.05);letter-spacing:.06em;padding:calc(var(--u) * 1.1) calc(var(--u) * 2) calc(var(--u) * 1.1) calc(var(--u) * 4.4);margin-bottom:calc(var(--u) * .6)}
 .lockup .lockup-tag::before{left:calc(var(--u) * 1.6);width:calc(var(--u) * 1.3);height:calc(var(--u) * 1.3);margin-top:calc(var(--u) * -.65)}
 .lockup .lockup-tag{font-size:calc(var(--u) * 2.9);letter-spacing:.05em;padding-right:calc(var(--u) * 2.4)}
+
+/* =====================================================================
+   Setup extras: drifting ?, last-game recap, category icons, how-to strip, intro
+   ===================================================================== */
+.masthead{grid-template-columns:minmax(0,1fr)}
+/* drifting question marks behind everything */
+.qfield{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.qfield i{position:absolute;font-family:'Young Serif',Georgia,serif;font-style:normal;line-height:1;color:rgba(227,176,75,.07);transform:rotate(var(--r));animation:qdrift var(--d) ease-in-out var(--delay) infinite alternate}
+@keyframes qdrift{to{transform:translate(18px,-26px) rotate(calc(var(--r) + 8deg))}}
+#app>main{position:relative;z-index:1}
+/* recap: full column width, same edges as the lineup bars (the masthead keeps 52px on the right for the sound button) */
+.recap{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;width:calc(100% + 52px);margin-top:var(--s3);
+  background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 10px 10px 12px;box-shadow:var(--sh-1);box-sizing:border-box}
+.recap .mini-tag{width:30px;height:40px;border-radius:3px;background:var(--paper);display:grid;place-items:center;font-family:'Young Serif',Georgia,serif;color:var(--paper-ink);font-size:16px;transform:rotate(-6deg);box-shadow:var(--sh-1)}
+.recap-text{min-width:0;display:grid;gap:2px}
+.recap .rt{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recap .rb{font-size:13.5px;line-height:1.3;color:var(--text)}
+.recap .rb b{color:var(--p1)}
+.recap .rbtn{font:700 13px var(--body);color:var(--paper-ink);background:var(--p1);border:0;border-radius:8px;padding:0 12px;min-height:44px;white-space:nowrap;cursor:pointer}
+/* category icons (Material Design Icons) */
+.case-card .cat-ic{position:absolute;right:9px;bottom:9px;width:28px;height:28px;color:#a99f84}
+.case-card[aria-checked="true"] .cat-ic{color:var(--p1)}
+.case-card h3{padding-right:30px}
+/* how to play strip */
+.how3{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.how3 li{position:relative;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 8px 10px;display:grid;gap:8px;justify-items:center;text-align:center}
+.how3 .n{position:absolute;top:6px;left:8px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.how3 .art{width:46px;height:58px;position:relative}
+.how3 .cd{position:absolute;inset:0;background:var(--paper);border-radius:4px;box-shadow:var(--sh-1)}
+.how3 .t{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:17px;line-height:1}
+.how3 .d{font-size:11.5px;color:var(--muted);line-height:1.3}
+.how3 .bub{position:absolute;right:-14px;top:-8px;background:var(--p1);color:var(--paper-ink);font:800 10px var(--body);border-radius:10px;padding:3px 6px;white-space:nowrap}
+.how3 .x{position:absolute;left:3px;right:3px;top:18px;transform:rotate(-14deg);border:2px solid var(--stamp-ink);color:var(--stamp-ink);font:900 9px var(--display);text-transform:uppercase;text-align:center;border-radius:2px;background:rgba(235,228,211,.7)}
+.how3 .q{position:absolute;inset:0;display:grid;place-items:center;background:var(--ink-3);border:2px solid var(--p1);border-radius:4px;color:var(--p1);font:400 26px 'Young Serif',Georgia,serif}
+.how3+.rules{margin-top:var(--s1)}
+/* bigger card fan */
+.lockup .hero-fan{--c:calc(var(--u) * 12.4)}
+/* intro: the tag slides in, the title stamps down, the tagline fades up, the cards deal out */
+.lockup-tag{animation:in-tag .45s cubic-bezier(.2,.9,.3,1) both}
+.lockup h1{animation:in-stamp .5s .2s cubic-bezier(.2,1.5,.4,1) both}
+.lockup .tagline{animation:in-fade .4s .6s ease both}
+.lockup .hf-card{animation:deal-in .5s cubic-bezier(.2,.9,.3,1) both}
+.lockup .hf-1{animation-delay:.75s}.lockup .hf-2{animation-delay:.85s}.lockup .hf-3{animation-delay:.95s}
+.recap{animation:in-fade .4s 1.05s ease both}
+@keyframes in-tag{from{opacity:0;transform:translateX(-30px) rotate(-6deg)}}
+@keyframes in-stamp{from{opacity:0;transform:scale(1.5)}}
+@keyframes in-fade{from{opacity:0;transform:translateY(6px)}}
+@keyframes deal-in{from{opacity:0;transform:translate(40px,20px) rotate(0)}}
+@media (prefers-reduced-motion:reduce){
+  .qfield i,.lockup-tag,.lockup h1,.lockup .tagline,.lockup .hf-card,.recap{animation:none}
+}

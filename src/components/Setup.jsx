@@ -4,6 +4,8 @@ import { GROUPS, getCategory } from '../data/categories.js';
 import PlayersSheet from './PlayersSheet.jsx';
 import { pad } from './shared.jsx';
 import ShareButton from './ShareButton.jsx';
+import { CATEGORY_ICONS } from '../data/categoryIcons.js';
+import { loadLastGame } from '../lib/lastGame.js';
 
 /**
  * Sizes the title lockup so GUESSWORK spans the column exactly. Every part of the lockup is
@@ -32,7 +34,45 @@ function useFitLockup(ref) {
   }, [ref]);
 }
 
-export default function Setup({ s, send, onDeal }) {
+/** Faint question marks drifting behind the setup screen. Positions are fixed so they never jump. */
+const QMARKS = [
+  [6, 4, 64, -12], [78, 9, 88, 14], [42, 22, 40, -6], [88, 34, 54, 20], [12, 41, 76, 8],
+  [60, 52, 36, -18], [30, 63, 92, 10], [82, 70, 48, -10], [8, 82, 58, 16], [52, 88, 70, -4],
+];
+function QuestionField() {
+  return (
+    <div className="qfield" aria-hidden="true">
+      {QMARKS.map(([x, y, size, rot], i) => (
+        <i key={i} style={{ left: `${x}%`, top: `${y}%`, fontSize: size, '--r': `${rot}deg`, '--d': `${18 + (i % 5) * 4}s`, '--delay': `${-i * 2.3}s` }}>
+          ?
+        </i>
+      ))}
+    </div>
+  );
+}
+
+/** "Last game" recap, shown once a game has been finished on this phone. */
+function Recap({ onRematch }) {
+  const [game] = useState(loadLastGame);
+  const cat = game && getCategory(game.categoryId);
+  if (!game || !cat) return null;
+  return (
+    <div className="recap">
+      <span className="mini-tag" aria-hidden="true">?</span>
+      <span className="recap-text">
+        <span className="rt">Last game · {cat.name}</span>
+        <span className="rb">
+          <b>{game.winner}</b> {game.text}
+        </span>
+      </span>
+      <button type="button" className="rbtn" onClick={() => onRematch(game.categoryId)}>
+        Rematch
+      </button>
+    </div>
+  );
+}
+
+export default function Setup({ s, send, onDeal, onRematch }) {
   const lockupRef = useRef(null);
   useFitLockup(lockupRef);
   const chosen = getCategory(s.categoryId);
@@ -51,6 +91,7 @@ export default function Setup({ s, send, onDeal }) {
   const closePicking = useCallback(() => setPicking(false), []);
   return (
     <>
+      <QuestionField />
       <header className="masthead">
         {/* Title, tagline and card fan form one lockup: the block is exactly as wide as the
             title, the tagline starts under the G and the fan ends under the K. */}
@@ -82,6 +123,7 @@ export default function Setup({ s, send, onDeal }) {
             </div>
           </div>
         </div>
+        <Recap onRematch={onRematch} />
       </header>
 
       <section className="section">
@@ -130,6 +172,11 @@ export default function Setup({ s, send, onDeal }) {
                         >
                           <span className="no" aria-hidden="true">Nº {pad(i + 1)}</span>
                           <h3>{c.name}</h3>
+                          {CATEGORY_ICONS[c.id] && (
+                            <svg className="cat-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                              <path d={CATEGORY_ICONS[c.id]} fill="currentColor" />
+                            </svg>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -142,8 +189,31 @@ export default function Setup({ s, send, onDeal }) {
       </section>
 
       <section className="section">
+        <div className="section-head">
+          <h2>How to play</h2>
+        </div>
+        <ol className="how3">
+          <li>
+            <span className="n" aria-hidden="true">01</span>
+            <span className="art" aria-hidden="true"><span className="cd" /><span className="bub">Is it…?</span></span>
+            <span className="t">Ask</span>
+            <span className="d">One yes/no question</span>
+          </li>
+          <li>
+            <span className="n" aria-hidden="true">02</span>
+            <span className="art" aria-hidden="true"><span className="cd" /><span className="x">Ruled out</span></span>
+            <span className="t">Rule out</span>
+            <span className="d">Cross off what it can’t be</span>
+          </li>
+          <li>
+            <span className="n" aria-hidden="true">03</span>
+            <span className="art" aria-hidden="true"><span className="q">?</span></span>
+            <span className="t">Guess</span>
+            <span className="d">Name their pick first</span>
+          </li>
+        </ol>
         <details className="rules">
-          <summary>How a turn works</summary>
+          <summary>Full rules</summary>
           <ol>
             <li><strong>Ask</strong> your opponent one yes/no question out loud about their secret.</li>
             {s.count > 2 && (
