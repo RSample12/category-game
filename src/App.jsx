@@ -40,14 +40,14 @@ function init() {
 function announcement(s) {
   switch (s.screen) {
     case 'setup': return 'Guesswork. Pick a lineup and play.';
-    case 'dealing': return 'Dealing suspects.';
+    case 'dealing': return 'Dealing cards.';
     case 'reveal':
       return s.revealStep % 2 === 0
         ? `Hand the device to ${nameOf(s, Math.floor(s.revealStep / 2))}.`
         : `${nameOf(s, Math.floor(s.revealStep / 2))}, your secret is on screen.`;
     case 'handoff': return `Pass the device to ${nameOf(s, s.current)}.`;
     case 'turn':
-      return `${nameOf(s, s.current)}'s turn, questioning ${nameOf(s, s.targets[s.current])}. ${remainingIds(s, s.current).length} suspects left.`;
+      return `${nameOf(s, s.current)}'s turn, questioning ${nameOf(s, s.targets[s.current])}. ${remainingIds(s, s.current).length} cards left.`;
     case 'over': return `${nameOf(s, s.winner)} wins.`;
     default: return '';
   }
@@ -56,6 +56,8 @@ function announcement(s) {
 export default function App() {
   const [state, dispatch] = useReducer(reducer, undefined, init);
   const root = useRef(null);
+  // The setup recap repeats the game-over screen, so skip it until the next visit.
+  const finishedThisVisit = useRef(false);
 
   // Stable dispatch with small haptic cues.
   const send = useCallback((action) => {
@@ -83,6 +85,7 @@ export default function App() {
   // Anonymous count of finished games (no names, no personal data).
   useEffect(() => {
     if (state.screen !== 'over') return;
+    finishedThisVisit.current = true;
     trackEvent('game_finished', { category: state.categoryId });
     // Remember a one-line summary for the setup screen's "Last game" recap.
     const w = nameOf(state, state.winner);
@@ -91,9 +94,9 @@ export default function App() {
       const owner = state.secrets.indexOf(state.lastAccused);
       const item = getItem(state.categoryId, state.lastAccused)?.name ?? '';
       const turns = Math.max(1, Math.ceil(state.turn / state.count));
-      text = owner >= 0 ? `got ${nameOf(state, owner)}’s ${item} in ${turns} turn${turns === 1 ? '' : 's'}` : 'cracked the case';
+      text = `guessed it in ${turns} turn${turns === 1 ? '' : 's'}${owner >= 0 && item ? ` · ${item}` : ''}`;
     } else {
-      text = 'won when the others ran out of suspects';
+      text = 'won when the others ran out of cards';
     }
     saveLastGame({ categoryId: state.categoryId, winner: w, text, count: state.count });
   }, [state.screen]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -143,7 +146,7 @@ export default function App() {
 
   let view;
   switch (state.screen) {
-    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} onRematch={(categoryId) => deal('DEAL', undefined, categoryId)} />; break;
+    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} onRematch={(categoryId) => deal('REMATCH', undefined, categoryId)} showRecap={!finishedThisVisit.current} />; break;
     case 'dealing': view = <Dealing caseNo={state.caseNo} categoryName={getCategory(state.categoryId).name} />; break;
     case 'reveal': view = <Reveal s={state} send={send} />; break;
     case 'handoff': view = <Handoff s={state} send={send} />; break;

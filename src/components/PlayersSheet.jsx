@@ -10,7 +10,7 @@ const COUNTS = [
 
 const RULE_OPTIONS = [
   { id: 'last', name: 'Last one standing', blurb: 'Solve your target to knock them out. Take over their target.' },
-  { id: 'first', name: 'First to solve', blurb: 'The first correct accusation wins the case.' },
+  { id: 'first', name: 'First to solve', blurb: 'The first correct guess wins.' },
 ];
 
 /** A case number like the one on the dealing screen, picked when the briefing opens. */
@@ -42,7 +42,7 @@ function Badge({ s, send, p, hidden = false }) {
         if (el) el.inert = hidden;
       }}
     >
-      <span className="k">Detective {String(p + 1).padStart(2, '0')}</span>
+      <span className="k">Player {String(p + 1).padStart(2, '0')}</span>
       <input
         id={`name-${p}`}
         maxLength={14}
@@ -110,13 +110,13 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
       >
         <div className="brief-head">
           <span className="eyebrow">
-            Case Nº {caseNo} · {categoryName}
+            Game Nº {caseNo} · {categoryName}
           </span>
-          <h3 id="brief-title">Assemble your detectives</h3>
+          <h3 id="brief-title">Who’s playing?</h3>
         </div>
 
         <div className="brief-block">
-          <span className="eyebrow" id="count-label">Detectives</span>
+          <span className="eyebrow" id="count-label">Players</span>
           <div className="count-tags" role="radiogroup" aria-labelledby="count-label">
             {COUNTS.map((c) => (
               <button
@@ -125,7 +125,7 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
                 className="paper-pick count-tag"
                 role="radio"
                 aria-checked={s.count === c.n}
-                aria-label={`${c.n} detectives, ${c.label}`}
+                aria-label={`${c.n} players, ${c.label}`}
                 onClick={() => send({ type: 'SET_PLAYERS', count: c.n })}
               >
                 <b>{c.n}</b>
@@ -192,7 +192,7 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
             Back
           </button>
           <button type="button" className="btn btn-primary" onClick={() => onDeal(caseNo)}>
-            <Search className="ico" aria-hidden="true" /> Deal {s.count} suspects
+            <Search className="ico" aria-hidden="true" /> Deal {s.count} cards
           </button>
         </div>
       </div>

@@ -73,7 +73,7 @@ function Recap({ onRematch }) {
   );
 }
 
-export default function Setup({ s, send, onDeal, onRematch }) {
+export default function Setup({ s, send, onDeal, onRematch, showRecap = true }) {
   const lockupRef = useRef(null);
   useFitLockup(lockupRef);
   const chosen = getCategory(s.categoryId);
@@ -124,7 +124,7 @@ export default function Setup({ s, send, onDeal, onRematch }) {
             </div>
           </div>
         </div>
-        <Recap onRematch={onRematch} />
+        {showRecap && <Recap onRematch={onRematch} />}
       </header>
 
       <section className="section">
@@ -218,12 +218,12 @@ export default function Setup({ s, send, onDeal, onRematch }) {
           <ol>
             <li><strong>Ask</strong> your opponent one yes/no question out loud about their secret.</li>
             {s.count > 2 && (
-              <li>With 3 or 4 detectives, your opponent is the next one in the list. The app always says who you’re questioning.</li>
+              <li>With 3 or 4 players, your opponent is the next one in the list. The app always says who you’re questioning.</li>
             )}
-            <li><strong>Rule out</strong> suspects on your board, or <strong>accuse</strong> one. Never both in one turn.</li>
+            <li><strong>Rule out</strong> cards on your board, or <strong>guess</strong> one. Never both in one turn.</li>
             <li>Rule-outs can be undone until you end your turn. After that they're locked.</li>
-            <li>Rule out all but one, end your turn, and accuse that last suspect on your next turn.</li>
-            <li>A wrong accusation rules that suspect out and ends your turn. Run out of suspects and you {s.count > 2 ? 'are out' : 'lose'}.</li>
+            <li>Rule out all but one, end your turn, and guess that last card on your next turn.</li>
+            <li>A wrong guess rules that card out and ends your turn. Run out of cards and you {s.count > 2 ? 'are out' : 'lose'}.</li>
           </ol>
         </details>
         <div className="share-row"><ShareButton where="setup" className="btn btn-ghost btn-block" /></div>

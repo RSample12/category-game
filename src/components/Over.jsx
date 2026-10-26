@@ -17,7 +17,7 @@ function Story({ s }) {
             </span>
           ) : (
             <span>
-              <b className={`p${k.out}`}>{nameOf(s, k.out)}</b> ran out of suspects
+              <b className={`p${k.out}`}>{nameOf(s, k.out)}</b> ran out of cards
             </span>
           )}
         </li>
@@ -33,26 +33,26 @@ export default function Over({ s, send, onRematch }) {
   const loser = s.knockouts.length ? s.knockouts[s.knockouts.length - 1].out : 1 - w;
   let line;
   if (solved) {
-    line = `${nameOf(s, w)} named ${accused} and solved the case.`;
-    if (s.count > 2 && s.rules === 'last') line = `${nameOf(s, w)} named ${accused} and is the last detective standing.`;
+    line = `${nameOf(s, w)} guessed ${accused}.`;
+    if (s.count > 2 && s.rules === 'last') line = `${nameOf(s, w)} guessed ${accused} and is the last one standing.`;
   } else if (s.count > 2) {
-    line = `${nameOf(s, loser)} accused ${accused}, their last suspect, and it was wrong. ${nameOf(s, w)} is the last detective left.`;
+    line = `${nameOf(s, loser)} guessed ${accused}, their last card, and it was wrong. ${nameOf(s, w)} is the last one left.`;
   } else {
-    line = `${nameOf(s, loser)} accused ${accused}, their last suspect, and it was wrong. ${nameOf(s, w)} wins by default.`;
+    line = `${nameOf(s, loser)} guessed ${accused}, their last card, and it was wrong. ${nameOf(s, w)} wins by default.`;
   }
 
   return (
     <div className={`stage p${w} shake`}>
-      <span className={`slam${solved ? '' : ' loss'}`}>{solved ? 'Case closed' : 'Out of suspects'}</span>
+      <span className={`slam${solved ? '' : ' loss'}`}>{solved ? 'Got it!' : 'Out of cards'}</span>
       <h1>
-        <span className="who-big">{nameOf(s, w)}</span> wins
+        <span className="who-big" style={{ '--fit': Math.min(1, 9 / Math.max(nameOf(s, w).length, 1)) }}>{nameOf(s, w)}</span> wins
       </h1>
       <p className="lede">{line}</p>
       <Story s={s} />
       <div className="secrets">
         {playersOf(s).map((p) => (
           <div className={`mini p${p}`} key={p}>
-            <span className="k">{nameOf(s, p)} held</span>
+            <span className="k">{nameOf(s, p)} picked</span>
             <span className="n">{getItem(s.categoryId, s.secrets[p])?.name}</span>
           </div>
         ))}
