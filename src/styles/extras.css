@@ -273,3 +273,31 @@
 .masthead h1{white-space:nowrap}
 .masthead h1 span{display:inline}
 .masthead h1{font-size:clamp(40px,12.6vw,96px)}
+
+/* setup: a fan of suspect cards beside the intro (matches the share image) */
+.hero-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--s3)}
+.hero-row .lede{margin:0}
+.hero-fan{position:relative;width:132px;height:112px;flex:none}
+.hf-card{position:absolute;top:8px;width:62px;height:84px;border-radius:4px;background:var(--paper);color:var(--paper-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 18px rgba(var(--tint),.55);padding:16px 6px 7px;box-sizing:border-box;
+  display:grid;align-content:end;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:13px;line-height:.95;overflow:hidden}
+.hf-card::before{content:"";position:absolute;top:7px;left:7px;width:6px;height:6px;border-radius:50%;background:var(--ink)}
+.hf-1{left:0;top:16px;transform:rotate(-12deg)}
+.hf-2{left:34px;top:4px;transform:rotate(-2deg)}
+.hf-3{left:70px;top:14px;transform:rotate(9deg);background:var(--ink-2);border:2px solid var(--p1);color:var(--p1);font-size:40px;font-weight:900;place-items:center;align-content:center;text-align:center;padding:0}
+.hf-3::before{background:var(--p1)}
+.hf-stamp{position:absolute;left:2px;top:30px;transform:rotate(-14deg);font-style:normal;font-family:var(--display);font-weight:900;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--stamp-ink);border:2px solid var(--stamp-ink);border-radius:2px;padding:0 3px;background:rgba(235,228,211,.75);white-space:nowrap}
+/* deal-in: the cards fan out when the screen loads */
+.hf-card{animation:fan-in .5s cubic-bezier(.2,.9,.3,1) backwards}
+.hf-2{animation-delay:.08s} .hf-3{animation-delay:.16s}
+@keyframes fan-in{from{opacity:0;transform:translate(20px,10px) rotate(0)}}
+@media (prefers-reduced-motion:reduce){.hf-card{animation:none}}
+/* fan sits inside the column (clear of the sound button); scaled to fit narrow phones */
+.hero-row{grid-template-columns:minmax(0,1fr) 118px;gap:var(--s2)}
+.hero-row .lede{max-width:none}
+.hero-fan{width:118px;height:100px}
+.hf-card{overflow:visible;width:54px;height:76px;font-size:11.5px;padding:15px 5px 6px}
+.hf-1{left:2px;top:18px}
+.hf-2{left:30px;top:6px}
+.hf-3{left:58px;top:16px;font-size:34px}
+.hf-stamp{left:-3px;top:27px;font-size:9.5px}
