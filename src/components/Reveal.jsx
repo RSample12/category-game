@@ -25,8 +25,8 @@ export default function Reveal({ s, send }) {
     const cat = getCategory(s.categoryId);
     const idx = cat.items.findIndex((i) => i.id === item.id);
     card = (
-      <div className="bigtag" key="face" role="img" aria-label={`Your suspect is ${item.name}`}>
-        <span className="k">Your suspect</span>
+      <div className="bigtag" key="face" role="img" aria-label={`Your pick is ${item.name}`}>
+        <span className="k">Your pick</span>
         <span className="n">{item.name}</span>
         <span className="f">
           <span>{cat.name}</span>
@@ -37,7 +37,7 @@ export default function Reveal({ s, send }) {
   } else {
     card = (
       <div className="cover" key="back" aria-hidden="true">
-        <span>Classified</span>
+        <span>Top secret</span>
       </div>
     );
   }
@@ -57,8 +57,8 @@ export default function Reveal({ s, send }) {
             ? `Memorize it. ${nameOf(s, hunterOf(s, p))} will ask you yes/no questions about it, and you’ll question ${nameOf(s, s.targets[p])}. You can peek again before your turn or while you’re answering.`
             : 'Memorize it. Your opponent will ask you yes/no questions about it. You can peek again before your turn or while you’re answering.'
           : s.count > 2
-            ? `Everyone except ${name}, look away. ${name} is about to see their suspect.`
-            : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their suspect.`}
+            ? `Everyone except ${name}, look away. ${name} is about to see their pick.`
+            : `${nameOf(s, 1 - p)}, look away. ${name} is about to see their pick.`}
       </p>
       <div className="stack">
         <button className="btn btn-primary" onClick={next}>

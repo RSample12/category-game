@@ -401,3 +401,22 @@
 
 /* the intro stamp briefly scales the title past the screen edge; never let that make the page scroll sideways */
 html,body{overflow-x:clip}
+
+/* ---------- audit pass ---------- */
+/* in-game headings share the setup title's face */
+.stage h1,.sheet h3,.slam,.turnrow h2,.shuffle~h1{font-family:'Young Serif',Georgia,serif;font-weight:400;letter-spacing:-.01em;text-transform:uppercase}
+.stage h1{font-size:clamp(34px,10vw,60px);line-height:.95}
+.sheet h3{font-size:30px;line-height:1}
+.turnrow h2{font-size:24px}
+.slam{font-size:clamp(24px,7vw,36px)}
+.reveal-stage h1 .name{font-size:calc(var(--fit,1) * clamp(32px,9.5vw,44px))}
+/* readable small text */
+.count-tag span{font-size:12px;letter-spacing:.03em}
+.id-badge .k{font-size:11.5px}
+.id-badge input{min-height:40px}
+.how3 .d{font-size:12.5px}
+.recap .rt{font-size:10.5px}
+/* full 44px taps on the turn switch */
+.turnbar .seg button{min-height:44px}
+.stage h1 .who-big{font-size:calc(1em * var(--fit,1));white-space:nowrap}
+.turnrow h2{font-size:22px}

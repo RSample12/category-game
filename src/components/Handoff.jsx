@@ -13,7 +13,7 @@ function Report({ s }) {
   if (r.kind === 'cracked') {
     body = (
       <>
-        {nm(r.p)} solved {nm(r.out)}’s suspect, {item(r.itemId)}. {nm(r.out)} is out.{' '}
+        {nm(r.p)} guessed {nm(r.out)}’s pick, {item(r.itemId)}. {nm(r.out)} is out.{' '}
         {nm(r.p)} now questions {nm(r.next)}, starting fresh.
       </>
     );
@@ -21,7 +21,7 @@ function Report({ s }) {
     const h = hunterOf(s, r.p);
     body = (
       <>
-        {nm(r.p)} accused {item(r.itemId)}. Wrong, and that was their last suspect, so {nm(r.p)} is out.{' '}
+        {nm(r.p)} guessed {item(r.itemId)}. Wrong, and that was their last card, so {nm(r.p)} is out.{' '}
         {r.takeover >= 0 ? (
           <>{nm(r.takeover)} now questions {nm(r.next)}, starting fresh.</>
         ) : (
@@ -32,13 +32,13 @@ function Report({ s }) {
   } else if (r.kind === 'accused') {
     body = (
       <>
-        {nm(r.p)} accused {item(r.itemId)}. Wrong.
+        {nm(r.p)} guessed {item(r.itemId)}. Wrong.
       </>
     );
   } else if (r.count > 0) {
     body = (
       <>
-        {nm(r.p)} ruled out <b>{r.count}</b> suspect{r.count > 1 ? 's' : ''}.
+        {nm(r.p)} ruled out <b>{r.count}</b> card{r.count > 1 ? 's' : ''}.
       </>
     );
   } else {
@@ -56,11 +56,11 @@ export default function Handoff({ s, send }) {
     <div className={`stage p${p}`}>
       <span className="badge">Turn {s.turn}</span>
       <h1>
-        Pass to <span className="who-big">{nameOf(s, p)}</span>
+        Pass to <span className="who-big" style={{ '--fit': Math.min(1, 9 / Math.max(nameOf(s, p).length, 1)) }}>{nameOf(s, p)}</span>
       </h1>
       <Report s={s} />
       <p className="lede">
-        {left} suspect{left === 1 ? '' : 's'} still on your board.
+        {left} card{left === 1 ? '' : 's'} still on your board.
         {s.count > 2 && (
           <>
             {' '}You’re questioning <b className={`who-inline p${s.targets[p]}`}>{nameOf(s, s.targets[p])}</b>.
