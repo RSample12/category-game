@@ -236,6 +236,8 @@ export default function Setup({ s, send, onDeal, onRematch, showRecap = true }) 
           <a href="/about">About</a>
           <span aria-hidden="true"> · </span>
           <a href="/privacy">Privacy</a>
+          <span aria-hidden="true"> · </span>
+          <a href="/about#feedback">Feedback</a>
         </p>
       </section>
 
