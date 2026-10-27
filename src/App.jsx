@@ -73,13 +73,14 @@ export default function App() {
         category: categoryId,
         players: state.count,
         rules: state.count > 2 ? state.rules : 'duel',
+        timer: state.timer,
       });
       if (categoryId !== state.categoryId) send({ type: 'SET_CATEGORY', id: categoryId });
       const dealt = dealSecrets(categoryId, state.count);
       // The setup panel shows a case number before dealing; keep that same number.
       send({ type, ...dealt, caseNo: caseNo || dealt.caseNo });
     },
-    [send, state.categoryId, state.count, state.rules],
+    [send, state.categoryId, state.count, state.rules, state.timer],
   );
 
   // Anonymous count of finished games (no names, no personal data).

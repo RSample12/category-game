@@ -1,9 +1,58 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Stamp, Crosshair, Lock } from 'lucide-react';
 import { getCategory, getItem } from '../data/categories.js';
 import { remainingIds } from '../game/engine.js';
 import { cx, nameOf, pad } from './shared.jsx';
 import PeekButton from './PeekButton.jsx';
+import { play } from '../lib/sound.js';
+import { buzz } from '../lib/haptics.js';
+
+const clock = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+
+/**
+ * The turn timer: a bar in the player's colour that drains from the moment they start
+ * their turn. Red for the last ten seconds, a soft tick and buzz for the last five; at
+ * zero it calls onUp (the turn ends, anything ruled out is kept). No pause.
+ */
+function TurnTimer({ seconds, started, onUp }) {
+  const total = seconds * 1000;
+  const [now, setNow] = useState(() => Date.now());
+  const ticked = useRef(null);
+  const done = useRef(false);
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 100);
+    return () => clearInterval(id);
+  }, []);
+  const leftMs = Math.max(0, total - (now - started));
+  const secs = Math.ceil(leftMs / 1000);
+  useEffect(() => {
+    if (secs > 0 && secs <= 5 && ticked.current !== secs) {
+      ticked.current = secs;
+      play('tick');
+      buzz(10);
+    }
+    if (leftMs === 0 && !done.current) {
+      done.current = true;
+      buzz([20, 40, 20]);
+      onUp();
+    }
+  }, [secs, leftMs, onUp]);
+  const low = secs <= 10;
+  return (
+    <div className={cx('timer', low && 'low', secs <= 5 && 'last')}>
+      <div className="timer-track" aria-hidden="true">
+        <div className="timer-fill" style={{ transform: `scaleX(${leftMs / total})` }} />
+      </div>
+      <span className="timer-s" key={low ? secs : 'calm'} aria-hidden="true">
+        {clock(secs)}
+      </span>
+      {/* Screen readers hear the time only at the moments that matter, not every second. */}
+      <span className="sr-only" role="status">
+        {secs === 10 ? '10 seconds left' : secs === 0 ? "Time's up" : ''}
+      </span>
+    </div>
+  );
+}
 
 function Sheet({ s, send }) {
   const ref = useRef(null);
@@ -73,6 +122,10 @@ function Sheet({ s, send }) {
 
 export default function Turn({ s, send }) {
   const barRef = useRef(null);
+  // Each turn mounts this screen fresh, so this is when "Start my turn" was tapped.
+  const [started] = useState(() => Date.now());
+  const endTurn = () => send({ type: 'END_TURN', ms: Date.now() - started });
+  const timeUp = useRef(() => send({ type: 'TIME_UP' })).current;
   // Keep keyboard focus out from under the sticky turn bar: publish its height so
   // cards scroll into view below it (WCAG 2.4.11). Changes scrolling only, not appearance.
   useEffect(() => {
@@ -118,6 +171,7 @@ export default function Turn({ s, send }) {
   return (
     <div className={`p${p} ${guessing ? 'mode-guess' : ''}`}>
       <div className="turnbar" ref={barRef}>
+        {s.timer > 0 && <TurnTimer seconds={s.timer} started={started} onUp={timeUp} />}
         <div className="turnrow">
           <h1 className="sr-only">Guesswork, turn {s.turn}</h1>
           <h2>{nameOf(s, p)}</h2>
@@ -187,7 +241,7 @@ export default function Turn({ s, send }) {
               Back to ruling out
             </button>
           ) : (
-            <button className="btn btn-primary btn-block" onClick={() => send({ type: 'END_TURN' })}>
+            <button className="btn btn-primary btn-block" onClick={endTurn}>
               <Lock className="ico" aria-hidden="true" /> {pend ? `Lock ${pend} and end turn` : 'End turn'}
             </button>
           )}

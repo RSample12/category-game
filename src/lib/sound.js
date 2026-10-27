@@ -47,6 +47,10 @@ export const SOUNDS = {
   wrong: [tone(170, 0, 0.34, 0.16, { wave: 'sawtooth', to: 105, lowpass: 900 })],
   // case closed: two gavel knocks, then a short rising jingle
   win: [...knock(0), ...knock(0.2), ...jingle],
+  // turn timer, last five seconds: a soft woodblock tick
+  tick: [tone(1250, 0, 0.05, 0.08, { wave: 'triangle' }), noise('bandpass', 2400, 0, 0.025, 0.04, { q: 2 })],
+  // turn timer ran out: two quick low notes
+  timeup: [tone(330, 0, 0.14, 0.15, { wave: 'triangle' }), tone(220, 0.13, 0.3, 0.16, { wave: 'triangle' })],
   // out of suspects: three falling notes
   lose: [392, 329.63, 261.63].map((f, i) => tone(f, i * 0.16, 0.3, 0.16, { wave: 'triangle' })),
 };

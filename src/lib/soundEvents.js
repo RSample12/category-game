@@ -15,6 +15,7 @@ export function soundFor(prev, next) {
           if (next.report?.kind === 'accused') return 'wrong';
           if (next.report?.kind === 'cracked') return 'win'; // a knockout, game goes on
           if (next.report?.kind === 'out') return 'lose';
+          if (next.report?.timeUp) return 'timeup';
         }
         return 'handoff';
       case 'over':
