@@ -92,3 +92,13 @@ test('turn timer running out → time-up sound, not the handoff chime', () => {
   assert.equal(soundFor(prev, { screen: 'handoff', report: { kind: 'ruled', count: 1, timeUp: true } }), 'timeup');
   assert.equal(soundFor(prev, { screen: 'handoff', report: { kind: 'ruled', count: 1 } }), 'handoff');
 });
+
+test('new spots: start my turn, going home, mode switches, calling off a guess', () => {
+  const b = [{ pending: [] }, { pending: [] }];
+  assert.equal(soundFor({ screen: 'handoff' }, { screen: 'turn', boards: b, current: 0 }), 'start');
+  assert.equal(soundFor({ screen: 'turn', boards: b, current: 0 }, { screen: 'setup' }), 'close');
+  const t = { screen: 'turn', boards: b, current: 0, mode: 'elim', sheet: null };
+  assert.equal(soundFor(t, { ...t, mode: 'guess' }), 'guessmode');
+  assert.equal(soundFor({ ...t, mode: 'guess' }, t), 'elimmode');
+  assert.equal(soundFor({ ...t, mode: 'guess', sheet: { type: 'guess' } }, { ...t, mode: 'guess' }), 'close');
+});

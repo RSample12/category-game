@@ -82,9 +82,10 @@ export default function Over({ s, send, onRematch }) {
   const order = [...players.filter((p) => p !== key), ...(key >= 0 ? [key] : [])];
   const delay = (p) => FLIP_START + order.indexOf(p) * FLIP_GAP;
   useEffect(() => {
-    if (key < 0) return undefined;
-    const t = setTimeout(() => play('stamp'), (delay(key) + FLIP_LEN) * 1000);
-    return () => clearTimeout(t);
+    // A soft flap as each card turns (at the edge-on midpoint), then the stamp on the last.
+    const ts = order.map((p) => setTimeout(() => play('cardflip'), (delay(p) + 0.2) * 1000));
+    if (key >= 0) ts.push(setTimeout(() => play('stamp'), (delay(key) + FLIP_LEN) * 1000));
+    return () => ts.forEach(clearTimeout);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

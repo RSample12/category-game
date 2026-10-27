@@ -3,6 +3,7 @@ import { Search, ChevronDown } from 'lucide-react';
 import { GROUPS, getCategory } from '../data/categories.js';
 import PlayersSheet from './PlayersSheet.jsx';
 import { pad } from './shared.jsx';
+import { play } from '../lib/sound.js';
 import ShareButton from './ShareButton.jsx';
 import { CATEGORY_ICONS } from '../data/categoryIcons.js';
 import { loadLastGame } from '../lib/lastGame.js';
@@ -82,6 +83,7 @@ export default function Setup({ s, send, onDeal, onRematch, showRecap = true }) 
   const toggleGroup = (id) => {
     const next = openGroup === id ? null : id;
     setOpenGroup(next);
+    play(next ? 'open' : 'close');
     // Closing a group above can slide the tapped header upward; once the motion settles, keep it in view.
     setTimeout(() => {
       document.getElementById(`group-${id}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -89,7 +91,10 @@ export default function Setup({ s, send, onDeal, onRematch, showRecap = true }) 
   };
   // Player count, names and rules live in the "Who's playing?" panel opened by Play.
   const [picking, setPicking] = useState(false);
-  const closePicking = useCallback(() => setPicking(false), []);
+  const closePicking = useCallback(() => {
+    play('close');
+    setPicking(false);
+  }, []);
   return (
     <>
       <QuestionField />
@@ -213,7 +218,7 @@ export default function Setup({ s, send, onDeal, onRematch, showRecap = true }) 
             <span className="d">Name their pick first</span>
           </li>
         </ol>
-        <details className="rules">
+        <details className="rules" onToggle={(e) => play(e.currentTarget.open ? 'open' : 'close')}>
           <summary>Full rules</summary>
           <ol>
             <li><strong>Ask</strong> your opponent one yes/no question out loud about their secret.</li>
@@ -235,7 +240,10 @@ export default function Setup({ s, send, onDeal, onRematch, showRecap = true }) 
       </section>
 
       <div className="cta">
-        <button className="btn btn-primary btn-block" onClick={() => setPicking(true)}>
+        <button className="btn btn-primary btn-block" onClick={() => {
+            play('open');
+            setPicking(true);
+          }}>
           <Search className="ico" aria-hidden="true" /> Play · {chosen?.name}
         </button>
       </div>

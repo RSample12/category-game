@@ -20,6 +20,10 @@ export function soundFor(prev, next) {
         return 'handoff';
       case 'over':
         return next.reason === 'solved' ? 'win' : 'lose';
+      case 'turn':
+        return prev.screen === 'handoff' ? 'start' : null;
+      case 'setup':
+        return 'close'; // home, or New category
       default:
         return null;
     }
@@ -33,6 +37,8 @@ export function soundFor(prev, next) {
     if (after > before) return 'stamp';
     if (after < before) return 'undo';
     if (!prev.sheet && next.sheet) return 'sheet';
+    if (prev.sheet && !next.sheet) return 'close'; // a guess called off
+    if (prev.mode !== next.mode) return next.mode === 'guess' ? 'guessmode' : 'elimmode';
   }
   return null;
 }
