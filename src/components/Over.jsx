@@ -26,8 +26,10 @@ function Stats({ s }) {
         <dd>{wrong}</dd>
       </div>
       {fast && (
-        <div>
-          <dt>Fastest · {nameOf(s, s.fastest.p)}</dt>
+        <div className={`p${s.fastest.p}`}>
+          <dt>
+            Fastest <span className="by">{nameOf(s, s.fastest.p)}</span>
+          </dt>
           <dd>
             {Math.max(1, Math.round(s.fastest.ms / 1000))}
             <small>s</small>
