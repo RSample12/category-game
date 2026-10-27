@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Share2 } from 'lucide-react';
 import { shareGame, shareUrl } from '../lib/share.js';
+import { play } from '../lib/sound.js';
 
 /** "Share the game" button. Shows a short confirmation when the link was copied instead of shared. */
 export default function ShareButton({ where, className = 'btn btn-ghost' }) {
@@ -9,6 +10,7 @@ export default function ShareButton({ where, className = 'btn btn-ghost' }) {
   useEffect(() => () => clearTimeout(timer.current), []);
 
   const onClick = async () => {
+    play('tap');
     const result = await shareGame(where);
     const msg = result === 'copied' ? 'Link copied. Paste it anywhere.' : result === 'failed' ? shareUrl() : '';
     setNote(msg);

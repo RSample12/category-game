@@ -64,7 +64,7 @@ export default function App() {
     dispatch(action);
     if (action.type === 'TAP_ITEM') buzz(8);
     else if (action.type === 'END_TURN' || action.type === 'SHEET_CONFIRM') buzz(18);
-    if (action.type === 'SET_CATEGORY') play('select');
+    if (['SET_CATEGORY', 'SET_PLAYERS', 'SET_RULES', 'SET_TIMER'].includes(action.type)) play('select');
   }, []);
 
   const deal = useCallback(

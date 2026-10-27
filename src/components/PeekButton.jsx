@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Fingerprint } from 'lucide-react';
+import { play } from '../lib/sound.js';
 
 /** Hold to reveal your own secret. Releasing (or leaving the button) hides it. */
 export default function PeekButton({
@@ -10,7 +11,12 @@ export default function PeekButton({
   className = '',
 }) {
   const [show, setShow] = useState(false);
-  const hide = () => setShow(false);
+  const shown = useRef(false); // up, leave and blur can all fire for one release: one sound
+  const hide = () => {
+    if (shown.current) play('unpeek');
+    shown.current = false;
+    setShow(false);
+  };
   return (
     <button
       type="button"
@@ -18,6 +24,8 @@ export default function PeekButton({
       aria-label={ariaLabel}
       onPointerDown={(e) => {
         e.currentTarget.setPointerCapture?.(e.pointerId);
+        play('peek');
+        shown.current = true;
         setShow(true);
       }}
       onPointerUp={hide}
@@ -26,7 +34,12 @@ export default function PeekButton({
       onBlur={hide}
       onContextMenu={(e) => e.preventDefault()}
       onClick={(e) => {
-        if (e.detail === 0) setShow((v) => !v); // keyboard: toggle
+        if (e.detail === 0) {
+          // keyboard: toggle
+          play(show ? 'unpeek' : 'peek');
+          shown.current = !show;
+          setShow(!show);
+        }
       }}
     >
       <span className="hint">

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Home } from 'lucide-react';
+import { play } from '../lib/sound.js';
 
 /** Asks before leaving, so a stray tap can never throw away a game in progress. */
 function ConfirmHome({ onStay, onLeave }) {
@@ -64,13 +65,19 @@ export default function HomeButton({ send }) {
         className="home-btn"
         aria-label="Home. Leave this game"
         aria-haspopup="dialog"
-        onClick={() => setAsking(true)}
+        onClick={() => {
+          play('open');
+          setAsking(true);
+        }}
       >
         <Home className="ico" aria-hidden="true" />
       </button>
       {asking && (
         <ConfirmHome
-          onStay={() => setAsking(false)}
+          onStay={() => {
+            play('close');
+            setAsking(false);
+          }}
           onLeave={() => {
             setAsking(false);
             send({ type: 'GO_HOME' });
