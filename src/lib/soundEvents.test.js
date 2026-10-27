@@ -86,3 +86,9 @@ test('correct accusation → win; running out of suspects → lose', () => {
   assert.equal(last.sheet.type, 'last');
   assert.equal(soundFor(last, reducer(last, { type: 'SHEET_CONFIRM' })), 'lose');
 });
+
+test('turn timer running out → time-up sound, not the handoff chime', () => {
+  const prev = { screen: 'turn', boards: [], current: 0 };
+  assert.equal(soundFor(prev, { screen: 'handoff', report: { kind: 'ruled', count: 1, timeUp: true } }), 'timeup');
+  assert.equal(soundFor(prev, { screen: 'handoff', report: { kind: 'ruled', count: 1 } }), 'handoff');
+});

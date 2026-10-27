@@ -31,6 +31,8 @@ export const STATE_VERSION = 3;
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 4;
 export const RULES = ['last', 'first'];
+/** Turn timer choices, in seconds (0 = off). */
+export const TIMERS = [0, 30, 60, 90];
 
 export const emptyBoard = () => ({ locked: [], pending: [], wrong: [] });
 
@@ -44,6 +46,7 @@ export function createInitialState(saved = {}) {
     screen: 'setup', // setup | dealing | reveal | handoff | turn | over
     count, // players in this game (2-4)
     rules: RULES.includes(saved.rules) ? saved.rules : 'last',
+    timer: TIMERS.includes(saved.timer) ? saved.timer : 0,
     names: padTo(saved.names, MAX_PLAYERS, ''),
     scores: padTo(saved.scores, MAX_PLAYERS, 0),
     categoryId: saved.categoryId ?? DEFAULT_CATEGORY_ID,
@@ -52,6 +55,8 @@ export function createInitialState(saved = {}) {
     targets: [], // targets[p] = the player p is hunting
     alive: [],
     knockouts: [], // [{ by, out, how: 'cracked' | 'exhausted', turn, itemId }]
+    fastest: null, // quickest finished turn this game: { p, ms }
+    misses: 0, // wrong guesses this game (boards get wiped on takeovers, so counted here)
     current: 0,
     starter: Number.isInteger(saved.starter) ? saved.starter % count : 0,
     turn: 1,
@@ -124,6 +129,8 @@ function startDeal(state, { secrets, caseNo }) {
     targets: ring(n),
     alive: Array(n).fill(true),
     knockouts: [],
+    fastest: null,
+    misses: 0,
     current: state.starter % n,
     turn: 1,
     revealStep: 0,
@@ -135,6 +142,12 @@ function startDeal(state, { secrets, caseNo }) {
     reason: null,
     lastAccused: null,
   };
+}
+
+/** The game's quickest turn, updated with this one if it was quicker. */
+function quicker(state, p, ms) {
+  if (!Number.isFinite(ms) || ms <= 0) return state.fastest ?? null;
+  return !state.fastest || ms < state.fastest.ms ? { p, ms: Math.round(ms) } : state.fastest;
 }
 
 /** Next player still in the game, going round the list. */
@@ -220,7 +233,7 @@ function accuse(state, itemId) {
     state,
     p,
     { locked: [...locked, itemId], pending: [], wrong: [...b.wrong, itemId] },
-    { sheet: null },
+    { sheet: null, misses: (state.misses ?? 0) + 1 },
   );
   if (remainingIds(missed, p).length > 0) {
     return passTurn({ ...missed, report: { p, kind: 'accused', itemId } });
@@ -264,6 +277,10 @@ export function reducer(state, action) {
       const scores = state.scores.map((v, i) => (i < count ? v : 0));
       return { ...state, count, names, scores, starter: state.starter % count };
     }
+    case 'SET_TIMER':
+      return TIMERS.includes(action.seconds) && state.screen === 'setup'
+        ? { ...state, timer: action.seconds }
+        : state;
     case 'SET_RULES':
       return RULES.includes(action.rules) && state.screen === 'setup'
         ? { ...state, rules: action.rules }
@@ -281,8 +298,8 @@ export function reducer(state, action) {
     case 'GO_HOME': {
       // Abandon the current game. Names, scores, category and who starts next are kept.
       if (state.screen === 'setup') return state;
-      const { names, scores, categoryId, starter, count, rules } = state;
-      return createInitialState({ names, scores, categoryId, starter, count, rules });
+      const { names, scores, categoryId, starter, count, rules, timer } = state;
+      return createInitialState({ names, scores, categoryId, starter, count, rules, timer });
     }
 
     case 'REVEAL_NEXT': {
@@ -361,15 +378,19 @@ export function reducer(state, action) {
     case 'SHEET_CONFIRM':
       return state.sheet ? accuse(state, state.sheet.itemId) : state;
 
-    case 'END_TURN': {
-      if (state.screen !== 'turn' || state.sheet) return state;
+    case 'END_TURN':
+    case 'TIME_UP': {
+      // TIME_UP ends the turn even with a guess prompt open (the prompt closes without guessing).
+      const timeUp = action.type === 'TIME_UP';
+      if (state.screen !== 'turn' || (state.sheet && !timeUp)) return state;
       const p = state.current;
       const b = state.boards[p];
+      // A "last card" prompt may have staged an undo; time-up keeps what is on the board.
       const next = withBoard(
         state,
         p,
         { ...b, locked: [...b.locked, ...b.pending], pending: [] },
-        { report: { p, kind: 'ruled', count: b.pending.length } },
+        { report: { p, kind: 'ruled', count: b.pending.length, ...(timeUp && { timeUp }) }, fastest: quicker(state, p, action.ms) },
       );
       return passTurn(next);
     }
@@ -436,6 +457,7 @@ export function restoreState(raw) {
       categoryId: cat?.id,
       count: count ?? 2,
       rules: s.rules,
+      timer: s.timer,
       starter: Number.isInteger(s.starter) ? s.starter : 0,
     };
 
@@ -470,6 +492,10 @@ export function restoreState(raw) {
     if (!okBoards || !okSecrets || !okRing) return fresh(keep);
 
     let next = { ...createInitialState(keep), ...s, sheet: null, justId: null };
+    next.timer = TIMERS.includes(s.timer) ? s.timer : 0;
+    const f = s.fastest;
+    next.misses = Number.isInteger(s.misses) && s.misses >= 0 ? s.misses : 0;
+    next.fastest = f && Number.isInteger(f.p) && f.p < count && Number.isFinite(f.ms) && f.ms > 0 ? f : null;
     if (next.screen === 'dealing') next.screen = 'reveal';
     if (next.screen === 'reveal' && next.revealStep % 2 === 1) next.revealStep -= 1;
     if (next.screen === 'turn') {

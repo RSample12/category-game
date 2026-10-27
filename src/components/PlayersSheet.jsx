@@ -8,6 +8,13 @@ const COUNTS = [
   { n: 4, label: 'Full table' },
 ];
 
+const TIMER_OPTIONS = [
+  { sec: 0, label: 'Off', unit: 'None', aria: 'No turn timer' },
+  { sec: 30, label: '30', unit: 'Sec', aria: '30 seconds a turn' },
+  { sec: 60, label: '60', unit: 'Sec', aria: '60 seconds a turn' },
+  { sec: 90, label: '90', unit: 'Sec', aria: '90 seconds a turn' },
+];
+
 const RULE_OPTIONS = [
   { id: 'last', name: 'Last one standing', blurb: 'Solve your target to knock them out. Take over their target.' },
   { id: 'first', name: 'First to solve', blurb: 'The first correct guess wins.' },
@@ -186,6 +193,26 @@ export default function PlayersSheet({ s, send, categoryName, onClose, onDeal })
             </div>
           </div>
         </Collapse>
+
+        <div className="brief-block">
+          <span className="eyebrow" id="timer-label">Turn timer</span>
+          <div className="timer-tags" role="radiogroup" aria-labelledby="timer-label">
+            {TIMER_OPTIONS.map((t) => (
+              <button
+                key={t.sec}
+                type="button"
+                className="paper-pick count-tag timer-tag"
+                role="radio"
+                aria-checked={s.timer === t.sec}
+                aria-label={t.aria}
+                onClick={() => send({ type: 'SET_TIMER', seconds: t.sec })}
+              >
+                <b>{t.label}</b>
+                <span>{t.unit}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="row">
           <button type="button" className="btn btn-ghost" onClick={onClose}>

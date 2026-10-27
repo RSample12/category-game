@@ -348,3 +348,53 @@ test('restore: a v2 two-player save migrates; a 3-player game survives a refresh
   assert.equal(r.rules, 'first');
   assert.equal(r.screen, 'handoff');
 });
+
+test('turn timer: set on setup only, kept through rematch and restore, bad values ignored', () => {
+  let s = createInitialState();
+  assert.equal(s.timer, 0);
+  s = run(s, { type: 'SET_TIMER', seconds: 60 });
+  assert.equal(s.timer, 60);
+  assert.equal(run(s, { type: 'SET_TIMER', seconds: 45 }).timer, 60);
+  assert.equal(createInitialState({ timer: 'x' }).timer, 0);
+  s = run(s, { type: 'DEAL', secrets: [ITEMS[0], ITEMS[1]], caseNo: '1' });
+  assert.equal(run(s, { type: 'SET_TIMER', seconds: 30 }).timer, 60);
+  s = run(s, { type: 'GO_HOME' });
+  assert.equal(s.timer, 60);
+  assert.equal(restoreState(serialize(s)).timer, 60);
+});
+
+test('time up: pending rule-outs lock, an open guess closes unguessed, turn passes', () => {
+  let s = run(startedGame(), ...tap(ITEMS[3], ITEMS[4]), { type: 'TIME_UP' });
+  assert.deepEqual(s.boards[0].locked, [ITEMS[3], ITEMS[4]]);
+  assert.deepEqual(s.report, { p: 0, kind: 'ruled', count: 2, timeUp: true });
+  assert.equal(s.current, 1);
+  s = run(s, { type: 'START_TURN' }, { type: 'SET_MODE', mode: 'guess' }, ...tap(ITEMS[0]));
+  assert.equal(s.sheet?.type, 'guess');
+  s = run(s, { type: 'TIME_UP' });
+  assert.equal(s.sheet, null);
+  assert.equal(s.screen, 'handoff');
+  assert.equal(s.winner, null);
+  assert.deepEqual(s.boards[1].wrong, []);
+  assert.equal(run(s, { type: 'TIME_UP' }), s); // only during a turn
+});
+
+test('fastest turn is tracked from END_TURN timings and reset on a new deal', () => {
+  let s = run(startedGame(), { type: 'END_TURN', ms: 9000 }, { type: 'START_TURN' }, { type: 'END_TURN', ms: 4200 });
+  assert.deepEqual(s.fastest, { p: 1, ms: 4200 });
+  s = run(s, { type: 'START_TURN' }, { type: 'END_TURN', ms: 7000 });
+  assert.deepEqual(s.fastest, { p: 1, ms: 4200 });
+  s = run(s, { type: 'START_TURN' }, { type: 'END_TURN' });
+  assert.deepEqual(s.fastest, { p: 1, ms: 4200 });
+  s = run(s, { type: 'REMATCH', secrets: [ITEMS[2], ITEMS[3]], caseNo: '2' });
+  assert.equal(s.fastest, null);
+});
+
+test('wrong guesses are counted for the game, even after the winner’s board is reset', () => {
+  let s = run(startedGame(), { type: 'SET_MODE', mode: 'guess' }, ...tap(ITEMS[5]), { type: 'SHEET_CONFIRM' });
+  assert.equal(s.misses, 1);
+  s = run(s, { type: 'START_TURN' }, { type: 'END_TURN' }, { type: 'START_TURN' },
+    { type: 'SET_MODE', mode: 'guess' }, ...tap(ITEMS[1]), { type: 'SHEET_CONFIRM' });
+  assert.equal(s.screen, 'over');
+  assert.equal(s.misses, 1);
+  assert.equal(run(s, { type: 'REMATCH', secrets: [ITEMS[2], ITEMS[3]], caseNo: '2' }).misses, 0);
+});
