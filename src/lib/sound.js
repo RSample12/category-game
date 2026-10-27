@@ -22,6 +22,8 @@ const knock = (at, gain = 0.5) => [
 ];
 // Paper moving: low-passed noise that swells in rather than snapping.
 const rustle = (at, dur = 0.14, gain = 0.06, freq = 800) => noise('lowpass', freq, at, dur, gain, { attack: 0.04 });
+// Card edges: a little papery texture in the mids, soft attack, so cards don't sound muffled.
+const paper = (at, dur, gain, freq = 1800) => noise('bandpass', freq, at, dur, gain, { q: 0.6, attack: 0.012 });
 // Arpeggio notes for the win jingle (C major: C5 E5 G5 C6), soft sine.
 const jingle = [523.25, 659.25, 783.99, 1046.5].map((f, i) =>
   tone(f, 0.42 + i * 0.12, i === 3 ? 0.55 : 0.24, i === 3 ? 0.12 : 0.13, { wave: i === 3 ? 'sine' : 'triangle', attack: 0.015, lowpass: 1800 }),
@@ -35,7 +37,12 @@ export const SOUNDS = {
   // the guess prompt rising
   sheet: [tone(300, 0, 0.14, 0.12, { to: 370, attack: 0.02 }), rustle(0, 0.14, 0.04, 600)],
   // turning a card over for a private reveal
-  flip: [rustle(0, 0.16, 0.09, 900), tone(240, 0.02, 0.12, 0.05, { to: 170, attack: 0.02 })],
+  flip: [
+    rustle(0, 0.16, 0.07, 1500),
+    paper(0, 0.06, 0.05, 1900),
+    paper(0.06, 0.07, 0.04, 1600),
+    tone(240, 0.02, 0.12, 0.045, { to: 170, attack: 0.02 }),
+  ],
   // picking an option (category, players, rules, timer)
   select: [tone(660, 0, 0.07, 0.07, { attack: 0.006 })],
   // any plain button
@@ -45,7 +52,8 @@ export const SOUNDS = {
   close: [rustle(0, 0.14, 0.05, 600), tone(392, 0.01, 0.14, 0.045, { to: 330, attack: 0.03 })],
   // shuffling the deck: a soft riffle, then the deck squared on the table
   shuffle: [
-    ...Array.from({ length: 7 }, (_, i) => rustle(i * 0.1, 0.09, 0.06 + (i % 2) * 0.012, 900 + (i % 3) * 150)),
+    ...Array.from({ length: 7 }, (_, i) => rustle(i * 0.1, 0.09, 0.05 + (i % 2) * 0.01, 1400 + (i % 3) * 250)),
+    ...Array.from({ length: 7 }, (_, i) => paper(i * 0.1 + 0.01, 0.05, 0.03, 1700 + (i % 2) * 300)),
     ...knock(0.74, 0.07),
   ],
   // phone changes hands: two rising notes
@@ -59,7 +67,7 @@ export const SOUNDS = {
   peek: [rustle(0, 0.1, 0.05, 600), tone(440, 0, 0.12, 0.05, { to: 494, attack: 0.03 })],
   unpeek: [tone(494, 0, 0.1, 0.035, { to: 440, attack: 0.02 })],
   // each card turning over on the game-over screen
-  cardflip: [rustle(0, 0.09, 0.07, 900), tone(200, 0.04, 0.08, 0.04, { to: 150 })],
+  cardflip: [rustle(0, 0.09, 0.055, 1500), paper(0, 0.05, 0.04, 1900), tone(200, 0.04, 0.08, 0.035, { to: 150 })],
   // wrong guess: a low, dull "nope"
   wrong: [tone(196, 0, 0.3, 0.15, { wave: 'triangle', to: 147, lowpass: 500 }), tone(98, 0, 0.22, 0.09, { to: 70 })],
   // case closed: two muffled knocks, then a short rising jingle
