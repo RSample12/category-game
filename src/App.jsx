@@ -56,8 +56,6 @@ function announcement(s) {
 export default function App() {
   const [state, dispatch] = useReducer(reducer, undefined, init);
   const root = useRef(null);
-  // The setup recap repeats the game-over screen, so skip it until the next visit.
-  const finishedThisVisit = useRef(false);
 
   // Stable dispatch with small haptic cues.
   const send = useCallback((action) => {
@@ -86,7 +84,6 @@ export default function App() {
   // Anonymous count of finished games (no names, no personal data).
   useEffect(() => {
     if (state.screen !== 'over') return;
-    finishedThisVisit.current = true;
     trackEvent('game_finished', { category: state.categoryId });
     // Remember a one-line summary for the setup screen's "Last game" recap.
     const w = nameOf(state, state.winner);
@@ -147,7 +144,7 @@ export default function App() {
 
   let view;
   switch (state.screen) {
-    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} onRematch={(categoryId) => deal('REMATCH', undefined, categoryId)} showRecap={!finishedThisVisit.current} />; break;
+    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} onRematch={(categoryId) => deal('REMATCH', undefined, categoryId)} />; break;
     case 'dealing': view = <Dealing caseNo={state.caseNo} categoryName={getCategory(state.categoryId).name} />; break;
     case 'reveal': view = <Reveal s={state} send={send} />; break;
     case 'handoff': view = <Handoff s={state} send={send} />; break;
