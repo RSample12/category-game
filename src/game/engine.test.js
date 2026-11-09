@@ -149,13 +149,13 @@ test('a player who starts a turn with one item left gets the prompt immediately'
   assert.equal(s.sheet.itemId, ITEMS[5]);
 });
 
-test('rematch: new deal, same category, scores kept, first player alternates', () => {
+test('rematch: new deal, same category, scores kept, player 1 starts', () => {
   let s = run(startedGame(), { type: 'SET_MODE', mode: 'guess' }, ...tap(ITEMS[1]), { type: 'SHEET_CONFIRM' });
   s = run(s, { type: 'REMATCH', secrets: [ITEMS[2], ITEMS[3]], caseNo: 'x' });
   assert.equal(s.screen, 'dealing');
   assert.equal(s.categoryId, 'dogs');
   assert.deepEqual(s.scores.slice(0, 2), [1, 0]);
-  assert.equal(s.current, 1);
+  assert.equal(s.current, 0);
   assert.deepEqual(s.secrets, [ITEMS[2], ITEMS[3]]);
   // A new game from the home screen starts with player 1 again.
   s = run(s, { type: 'NEW_CATEGORY' }, { type: 'DEAL', secrets: [ITEMS[4], ITEMS[5]], caseNo: 'y' });
@@ -330,13 +330,13 @@ test('first to solve: running out skips your turns but nobody takes over; last o
   assert.equal(s.current, 1);
 });
 
-test('rematch passes the first turn round the table', () => {
+test('rematch in a 3-player game starts with player 1', () => {
   let s = bigGame(3, 'last');
   s = run(s, ...guess(ITEMS[1]), { type: 'TAKEOVER', keep: false }, START, ...guess(ITEMS[0])); // P0 knocked out by P2
   assert.equal(s.screen, 'over');
   s = run(s, { type: 'REMATCH', secrets: ITEMS.slice(3, 6), caseNo: 'y' });
-  assert.equal(s.starter, 1);
-  assert.equal(s.current, 1);
+  assert.equal(s.starter, 0);
+  assert.equal(s.current, 0);
   assert.deepEqual(s.alive, [true, true, true]);
 });
 

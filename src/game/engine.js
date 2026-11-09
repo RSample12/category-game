@@ -296,8 +296,8 @@ export function reducer(state, action) {
       // A new game from the home screen always starts with player 1.
       return startDeal({ ...state, starter: 0 }, action);
     case 'REMATCH':
-      // The next player goes first; keep scores and category.
-      return startDeal({ ...state, starter: (state.starter + 1) % state.count }, action);
+      // Same category and scores; player 1 goes first, like every new game.
+      return startDeal({ ...state, starter: 0 }, action);
     case 'DEAL_DONE':
       return state.screen === 'dealing' ? { ...state, screen: 'reveal' } : state;
     case 'NEW_CATEGORY':
