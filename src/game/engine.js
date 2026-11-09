@@ -17,7 +17,8 @@
  *    remaining item, that player is out.
  *  - Two rule sets for 3-4 players (identical with two players):
  *      'last'  (last one standing): solving your target's suspect knocks them out. You then hunt
- *              whoever they were hunting, starting a fresh board. A player who runs out
+ *              whoever they were hunting, choosing to take over the knocked-out
+ *              player's board or start a fresh one. A player who runs out
  *              of suspects is out too, and their hunter takes over their target (fresh
  *              board). The last player left wins.
  *      'first' (first to solve): the first player to solve their target's suspect wins. A player
@@ -222,6 +223,11 @@ function accuse(state, itemId) {
     if (state.rules === 'first' && state.count > 2) return finish(solved, p, 'solved', itemId);
     const { next } = knockOut(solved, target, p, 'cracked', itemId);
     if (aliveCount(next) === 1) return finish(next, p, 'solved', itemId);
+    // Last one standing: the solver chooses to inherit the knocked-out player's board
+    // (their rule-outs against the same target) or start fresh. The turn waits on that choice.
+    if (state.rules === 'last' && state.count > 2) {
+      return { ...next, lastAccused: itemId, mode: 'elim', justId: null, sheet: { type: 'takeover', out: target, itemId } };
+    }
     return passTurn({
       ...next,
       lastAccused: itemId,
@@ -287,7 +293,8 @@ export function reducer(state, action) {
         : state;
 
     case 'DEAL':
-      return startDeal(state, action);
+      // A new game from the home screen always starts with player 1.
+      return startDeal({ ...state, starter: 0 }, action);
     case 'REMATCH':
       // The next player goes first; keep scores and category.
       return startDeal({ ...state, starter: (state.starter + 1) % state.count }, action);
@@ -361,7 +368,7 @@ export function reducer(state, action) {
 
     case 'SHEET_CANCEL': {
       const { sheet } = state;
-      if (!sheet) return state;
+      if (!sheet || sheet.type === 'takeover') return state;
       if (sheet.type === 'last' && sheet.undo) {
         const p = state.current;
         const b = state.boards[p];
@@ -376,13 +383,29 @@ export function reducer(state, action) {
     }
 
     case 'SHEET_CONFIRM':
-      return state.sheet ? accuse(state, state.sheet.itemId) : state;
+      return state.sheet && state.sheet.type !== 'takeover' ? accuse(state, state.sheet.itemId) : state;
+
+    case 'TAKEOVER': {
+      // After a knockout: keep the knocked-out player's board, or start fresh.
+      const { sheet } = state;
+      if (state.screen !== 'turn' || sheet?.type !== 'takeover') return state;
+      const p = state.current;
+      const theirs = state.boards[sheet.out];
+      const board = action.keep
+        ? { locked: [...theirs.locked, ...theirs.pending], pending: [], wrong: [...theirs.wrong] }
+        : emptyBoard();
+      return passTurn(
+        withBoard(state, p, board, {
+          report: { p, kind: 'cracked', out: sheet.out, itemId: sheet.itemId, next: state.targets[p], took: !!action.keep },
+        }),
+      );
+    }
 
     case 'END_TURN':
     case 'TIME_UP': {
       // TIME_UP ends the turn even with a guess prompt open (the prompt closes without guessing).
       const timeUp = action.type === 'TIME_UP';
-      if (state.screen !== 'turn' || (state.sheet && !timeUp)) return state;
+      if (state.screen !== 'turn' || (state.sheet && !timeUp) || state.sheet?.type === 'takeover') return state;
       const p = state.current;
       const b = state.boards[p];
       // A "last card" prompt may have staged an undo; time-up keeps what is on the board.
@@ -491,7 +514,8 @@ export function restoreState(raw) {
       s.current < count;
     if (!okBoards || !okSecrets || !okRing) return fresh(keep);
 
-    let next = { ...createInitialState(keep), ...s, sheet: null, justId: null };
+    const base = s.screen === 'turn' && s.sheet?.type === 'takeover' ? reducer(s, { type: 'TAKEOVER', keep: false }) : s;
+    let next = { ...createInitialState(keep), ...base, sheet: null, justId: null };
     next.timer = TIMERS.includes(s.timer) ? s.timer : 0;
     const f = s.fastest;
     next.misses = Number.isInteger(s.misses) && s.misses >= 0 ? s.misses : 0;

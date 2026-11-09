@@ -13,7 +13,7 @@ export function soundFor(prev, next) {
         // coming straight from a turn that ended in an accusation
         if (prev.screen === 'turn') {
           if (next.report?.kind === 'accused') return 'wrong';
-          if (next.report?.kind === 'cracked') return 'win'; // a knockout, game goes on
+          if (next.report?.kind === 'cracked') return next.report.took === undefined ? 'win' : 'handoff'; // a knockout; with the choice, the win sound already played
           if (next.report?.kind === 'out') return 'lose';
           if (next.report?.timeUp) return 'timeup';
         }
@@ -36,7 +36,7 @@ export function soundFor(prev, next) {
     const after = next.boards[next.current].pending.length;
     if (after > before) return 'stamp';
     if (after < before) return 'undo';
-    if (!prev.sheet && next.sheet) return 'sheet';
+    if (!prev.sheet && next.sheet) return next.sheet.type === 'takeover' ? 'win' : 'sheet';
     if (prev.sheet && !next.sheet) return 'close'; // a guess called off
     if (prev.mode !== next.mode) return next.mode === 'guess' ? 'guessmode' : 'elimmode';
   }

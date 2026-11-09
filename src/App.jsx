@@ -144,7 +144,7 @@ export default function App() {
 
   let view;
   switch (state.screen) {
-    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} onRematch={(categoryId) => deal('REMATCH', undefined, categoryId)} />; break;
+    case 'setup': view = <Setup s={state} send={send} onDeal={(caseNo) => deal('DEAL', caseNo)} onRematch={(categoryId) => deal('DEAL', undefined, categoryId)} />; break;
     case 'dealing': view = <Dealing caseNo={state.caseNo} categoryName={getCategory(state.categoryId).name} />; break;
     case 'reveal': view = <Reveal s={state} send={send} />; break;
     case 'handoff': view = <Handoff s={state} send={send} />; break;

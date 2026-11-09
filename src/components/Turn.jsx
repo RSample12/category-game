@@ -54,6 +54,70 @@ function TurnTimer({ seconds, started, onUp }) {
   );
 }
 
+/**
+ * Last one standing, after a knockout: keep the knocked-out player's board (their rule-outs
+ * against the same target) or start fresh. Nothing else can happen until they choose.
+ */
+function TakeoverSheet({ s, send }) {
+  const ref = useRef(null);
+  const keepRef = useRef(null);
+  const { out, itemId } = s.sheet;
+  const total = getCategory(s.categoryId).items.length;
+  const theirLeft = remainingIds(s, out).length;
+  const ruled = total - theirLeft;
+  const outName = nameOf(s, out);
+  const next = nameOf(s, s.targets[s.current]);
+
+  // Focus the main choice and keep Tab inside. Escape does nothing: one of the two must be picked.
+  useEffect(() => {
+    const previous = document.activeElement;
+    keepRef.current?.focus({ preventScroll: true });
+    const onKey = (e) => {
+      if (e.key !== 'Tab') return;
+      const buttons = ref.current?.querySelectorAll('button');
+      if (!buttons?.length) return;
+      const first = buttons[0];
+      const last = buttons[buttons.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      previous?.focus?.({ preventScroll: true });
+    };
+  }, []);
+
+  return (
+    <div className={`scrim p${s.current}`}>
+      <div className="sheet takeover" role="dialog" aria-modal="true" aria-labelledby="takeover-title" ref={ref}>
+        <span className="eyebrow">Got it! {getItem(s.categoryId, itemId)?.name}</span>
+        <h3 id="takeover-title">
+          <em className={`p${out}`}>{outName}</em> is out
+        </h3>
+        <p>
+          You now question <b>{next}</b>. {outName} was already questioning them and had ruled out{' '}
+          <b>{ruled === 0 ? 'nothing' : `${ruled} card${ruled === 1 ? '' : 's'}`}</b>
+          {ruled > 0 && <>, leaving {theirLeft}</>}. Take over that board, or start fresh with all {total}?
+        </p>
+        <div className="row">
+          <button className="btn btn-ghost" onClick={() => send({ type: 'TAKEOVER', keep: false })}>
+            Start fresh
+          </button>
+          <button className="btn btn-primary" ref={keepRef} onClick={() => send({ type: 'TAKEOVER', keep: true })}>
+            Take over
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Sheet({ s, send }) {
   const ref = useRef(null);
   const confirmRef = useRef(null);
@@ -64,7 +128,7 @@ function Sheet({ s, send }) {
   // What a correct accusation does depends on the rules and how many are still in.
   const right =
     multi && s.rules === 'last' && s.alive.filter(Boolean).length > 2
-      ? `Right and ${opp} is out, and you take over their target.`
+      ? `Right and ${opp} is out, and you can take over their board.`
       : 'Right and you win.';
 
   // Focus the primary action, trap Tab inside, close on Escape, restore focus after.
@@ -171,7 +235,7 @@ export default function Turn({ s, send }) {
   return (
     <div className={`p${p} ${guessing ? 'mode-guess' : ''}`}>
       <div className="turnbar" ref={barRef}>
-        {s.timer > 0 && <TurnTimer seconds={s.timer} started={started} onUp={timeUp} />}
+        {s.timer > 0 && s.sheet?.type !== 'takeover' && <TurnTimer seconds={s.timer} started={started} onUp={timeUp} />}
         <div className="turnrow">
           <h1 className="sr-only">Guesswork, turn {s.turn}</h1>
           <h2>{nameOf(s, p)}</h2>
@@ -248,7 +312,7 @@ export default function Turn({ s, send }) {
         </div>
       </div>
 
-      {s.sheet && <Sheet s={s} send={send} />}
+      {s.sheet?.type === 'takeover' ? <TakeoverSheet s={s} send={send} /> : s.sheet && <Sheet s={s} send={send} />}
     </div>
   );
 }

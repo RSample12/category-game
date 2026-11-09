@@ -157,6 +157,10 @@ test('rematch: new deal, same category, scores kept, first player alternates', (
   assert.deepEqual(s.scores.slice(0, 2), [1, 0]);
   assert.equal(s.current, 1);
   assert.deepEqual(s.secrets, [ITEMS[2], ITEMS[3]]);
+  // A new game from the home screen starts with player 1 again.
+  s = run(s, { type: 'NEW_CATEGORY' }, { type: 'DEAL', secrets: [ITEMS[4], ITEMS[5]], caseNo: 'y' });
+  assert.equal(s.starter, 0);
+  assert.equal(s.current, 0);
   assert.deepEqual(s.boards.map((b) => b.locked.length + b.pending.length), [0, 0]);
 });
 
@@ -200,7 +204,7 @@ test('GO_HOME mid-game: back to setup, game wiped, names/scores/category kept', 
   assert.deepEqual(s.names.slice(0, 2), ['Ann', 'Bo']);
   assert.deepEqual(s.scores.slice(0, 2), [2, 1]);
   assert.equal(s.categoryId, 'pokemon');
-  assert.equal(s.starter, 1);
+  assert.equal(s.starter, 0); // DEAL from home always starts with player 1
   assert.equal(s.sheet, null);
 });
 
@@ -271,7 +275,11 @@ test('last one standing: solving your target knocks them out and you take their 
   s = run(s, ...tap(ITEMS[5], ITEMS[6]), END, START); // P0 rules out two, P1's turn
   s = run(s, END, START, END, START); // back to P0
   s = run(s, ...guess(ITEMS[1])); // P0 solves P1
+  assert.equal(s.screen, 'turn');
+  assert.deepEqual(s.sheet, { type: 'takeover', out: 1, itemId: ITEMS[1] }); // the choice waits
+  s = run(s, { type: 'TAKEOVER', keep: false });
   assert.equal(s.screen, 'handoff');
+  assert.equal(s.report.took, false);
   assert.deepEqual(s.alive, [true, false, true]);
   assert.equal(s.targets[0], 2); // now hunting whoever P1 was hunting
   assert.deepEqual(s.boards[0], { locked: [], pending: [], wrong: [] }); // fresh
@@ -324,7 +332,7 @@ test('first to solve: running out skips your turns but nobody takes over; last o
 
 test('rematch passes the first turn round the table', () => {
   let s = bigGame(3, 'last');
-  s = run(s, ...guess(ITEMS[1]), START, ...guess(ITEMS[0])); // P0 knocked out by P2
+  s = run(s, ...guess(ITEMS[1]), { type: 'TAKEOVER', keep: false }, START, ...guess(ITEMS[0])); // P0 knocked out by P2
   assert.equal(s.screen, 'over');
   s = run(s, { type: 'REMATCH', secrets: ITEMS.slice(3, 6), caseNo: 'y' });
   assert.equal(s.starter, 1);
@@ -397,4 +405,33 @@ test('wrong guesses are counted for the game, even after the winner’s board is
   assert.equal(s.screen, 'over');
   assert.equal(s.misses, 1);
   assert.equal(run(s, { type: 'REMATCH', secrets: [ITEMS[2], ITEMS[3]], caseNo: '2' }).misses, 0);
+});
+
+test('last one standing: taking over the knocked-out player\'s board keeps their rule-outs', () => {
+  let s = bigGame(3, 'last');
+  s = run(s, END, START); // P1's turn: P1 (hunting P2) rules out three
+  s = run(s, ...tap(ITEMS[5], ITEMS[6], ITEMS[7]), END, START, END, START); // back to P0
+  const theirs = s.boards[1];
+  s = run(s, ...guess(ITEMS[1])); // P0 solves P1
+  // nothing else moves while the choice is open
+  for (const a of [END, { type: 'TIME_UP' }, { type: 'SHEET_CANCEL' }, { type: 'SHEET_CONFIRM' }, ...tap(ITEMS[9])]) {
+    assert.equal(run(s, a), s);
+  }
+  s = run(s, { type: 'TAKEOVER', keep: true });
+  assert.deepEqual(s.boards[0].locked, theirs.locked);
+  assert.equal(s.targets[0], 2);
+  assert.equal(remainingIds(s, 0).length, ITEMS.length - 3);
+  assert.equal(s.report.took, true);
+  assert.equal(s.current, 2);
+});
+
+test('restore mid-choice: the knockout stands, a fresh board, the turn passes', () => {
+  let s = bigGame(3, 'last');
+  s = run(s, ...guess(ITEMS[1]));
+  assert.equal(s.sheet?.type, 'takeover');
+  const r = restoreState(serialize(s));
+  assert.equal(r.screen, 'handoff');
+  assert.equal(r.current, 2);
+  assert.deepEqual(r.alive, [true, false, true]);
+  assert.deepEqual(r.boards[0], { locked: [], pending: [], wrong: [] });
 });

@@ -14,7 +14,7 @@ function Report({ s }) {
     body = (
       <>
         {nm(r.p)} guessed {nm(r.out)}’s pick, {item(r.itemId)}. {nm(r.out)} is out.{' '}
-        {nm(r.p)} now questions {nm(r.next)}, starting fresh.
+        {nm(r.p)} now questions {nm(r.next)}, {r.took ? <>using {nm(r.out)}’s board.</> : 'starting fresh.'}
       </>
     );
   } else if (r.kind === 'out') {

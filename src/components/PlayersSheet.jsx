@@ -16,7 +16,7 @@ const TIMER_OPTIONS = [
 ];
 
 const RULE_OPTIONS = [
-  { id: 'last', name: 'Last one standing', blurb: 'Solve your target to knock them out. Take over their target.' },
+  { id: 'last', name: 'Last one standing', blurb: 'Guess your target to knock them out, then take over their board or start fresh.' },
   { id: 'first', name: 'First to solve', blurb: 'The first correct guess wins.' },
 ];
 
