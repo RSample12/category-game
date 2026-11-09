@@ -61,12 +61,9 @@ function TurnTimer({ seconds, started, onUp }) {
 function TakeoverSheet({ s, send }) {
   const ref = useRef(null);
   const keepRef = useRef(null);
-  const { out, itemId } = s.sheet;
-  const total = getCategory(s.categoryId).items.length;
+  const { out } = s.sheet;
   const theirLeft = remainingIds(s, out).length;
-  const ruled = total - theirLeft;
   const outName = nameOf(s, out);
-  const next = nameOf(s, s.targets[s.current]);
 
   // Focus the main choice and keep Tab inside. Escape does nothing: one of the two must be picked.
   useEffect(() => {
@@ -96,14 +93,12 @@ function TakeoverSheet({ s, send }) {
   return (
     <div className={`scrim p${s.current}`}>
       <div className="sheet takeover" role="dialog" aria-modal="true" aria-labelledby="takeover-title" ref={ref}>
-        <span className="eyebrow">Got it! {getItem(s.categoryId, itemId)?.name}</span>
+        <span className="eyebrow">Got it!</span>
         <h3 id="takeover-title">
           <em className={`p${out}`}>{outName}</em> is out
         </h3>
         <p>
-          You now question <b>{next}</b>. {outName} was already questioning them and had ruled out{' '}
-          <b>{ruled === 0 ? 'nothing' : `${ruled} card${ruled === 1 ? '' : 's'}`}</b>
-          {ruled > 0 && <>, leaving {theirLeft}</>}. Take over that board, or start fresh with all {total}?
+          Take {outName}’s board ({theirLeft} left) or start fresh?
         </p>
         <div className="row">
           <button className="btn btn-ghost" onClick={() => send({ type: 'TAKEOVER', keep: false })}>
